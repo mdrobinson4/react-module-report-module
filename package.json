@@ -1,0 +1,53 @@
+{
+  "name": "@folio/report-module",
+  "version": "0.1.0",
+  "description": "A react plotly application that renders data using react plotly for The University of Alabama libraries",
+  "main": "src/index.js",
+  "repository": "",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "scripts": {
+    "start": "stripes serve",
+    "build": "stripes build --output ./output",
+    "test": "stripes test nightmare --run demo --show",
+    "lint": "eslint src"
+  },
+  "devDependencies": {
+    "@folio/eslint-config-stripes": "^1.1.0",
+    "@folio/stripes-cli": "^1.2.0",
+    "babel-eslint": "^8.0.3",
+    "eslint": "^4.8.0"
+  },
+  "dependencies": {
+    "@folio/stripes-components": "^2.0.0",
+    "prop-types": "^15.6.0",
+    "react-router-dom": "^4.1.1"
+  },
+  "peerDependencies": {
+    "react": "*"
+  },
+  "stripes": {
+    "type": "app",
+    "displayName": "Report Module",
+    "route": "/reportmodule",
+    "hasSettings": true,
+    "okapiInterfaces": {},
+    "permissionSets": [
+      {
+        "permissionName": "module.report-module.enabled",
+        "displayName": "UI: Report Module module is enabled",
+        "visible": true
+      },
+      {
+        "permissionName": "settings.report-module.enabled",
+        "displayName": "Settings (report-module): display list of settings pages",
+        "subPermissions": [
+          "settings.enabled"
+        ],
+        "visible": true
+      }
+    ]
+  }
+}
