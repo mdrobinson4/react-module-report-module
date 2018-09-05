@@ -1,7 +1,7 @@
 {
   "name": "@folio/report-module",
   "version": "0.1.0",
-  "description": "A react plotly application that renders data using react plotly for The University of Alabama libraries",
+  "description": "test",
   "main": "src/index.js",
   "repository": "",
   "license": "Apache-2.0",
@@ -22,7 +22,12 @@
   },
   "dependencies": {
     "@folio/stripes-components": "^2.0.0",
+    "flexbox-react": "^4.4.0",
+    "plotly": "^1.0.6",
+    "plotly.js": "^1.40.0",
     "prop-types": "^15.6.0",
+    "react-d3-basic": "^1.6.11",
+    "react-plotly.js": "^2.2.0",
     "react-router-dom": "^4.1.1"
   },
   "peerDependencies": {
@@ -37,7 +42,7 @@
     "permissionSets": [
       {
         "permissionName": "module.report-module.enabled",
-        "displayName": "UI: Report Module module is enabled",
+        "displayName": "UI: Report module module is enabled",
         "visible": true
       },
       {

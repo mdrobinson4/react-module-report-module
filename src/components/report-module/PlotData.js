@@ -46,40 +46,6 @@ export default class ShowGraph extends React.Component {
           size: size
         }
     };
-    if (xType === 'categorical') {
-        trace1 = {
-          x: xAxis,
-          y: yAxis,
-          mode: plotmode,
-          marker: {
-            size: size,
-            opacity: opacity
-          },
-          line: {
-            dash: 'solid',
-            opacity: opacity,
-            width: size / 3,
-            size: size
-          }
-      };
-  };
-
-  if (yType === 'categorical') {
-    trace1 = {
-        x: xAxis,
-        y: yAxis,
-        mode: plotmode,
-        marker: {
-          size: size,
-          opacity: opacity
-        },
-        line: {
-          dash: 'solid',
-          opacity: opacity,
-          width: size / 3
-        }
-    };
-  };
 
   if (xType !== 'categorical' && yType !== 'categorical') {
     if (Switch === true) {
@@ -103,7 +69,7 @@ export default class ShowGraph extends React.Component {
   };
 
   let layout = {
-    xaxis: {
+    xAxis: {
       autotick: !ShowAllXTick
         }
     };

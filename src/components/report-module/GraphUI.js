@@ -1,12 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import PlotData from './PlotData';
+import Checkbox from '@folio/stripes-components/lib/Checkbox';
+import { Dropdown } from '@folio/stripes-components/lib/Dropdown';
+import Button from '@folio/stripes-components/lib/Button';
+import DropdownMenu from '@folio/stripes-components/lib/DropdownMenu';
+
+import { Grid, Row, Col } from '@folio/stripes-components/lib/LayoutGrid';
 
 
 export default class ResponsiveGraph extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      dropdownOpen: false,
       // Will eventually be an array of objects with the values, names, and types
       xRecords: {name: '', values: []}, // X
       yRecords: {name: '', values: []}, // Y
@@ -21,9 +28,18 @@ export default class ResponsiveGraph extends React.Component {
       frequency: true,
       showAllTicks: '',
       opacity: 1,
+
     };
     this.handleUIChange = this.handleUIChange.bind(this);
     this.handleAxisChange = this.handleAxisChange.bind(this);
+    this.onToggle = this.onToggle.bind(this);
+  }
+
+
+onToggle() {
+    this.setState(prevState => ({
+      dropdownOpen: !prevState.dropdownOpen
+    }));
   }
 
   handleAxisChange(event) {
@@ -51,8 +67,10 @@ export default class ResponsiveGraph extends React.Component {
 
     const keys = Object.keys(this.props.records);
     let columns = keys.map((col) =>
-      <option key={col} value={col}>{col.toUpperCase()}</option>
+      <option type="button" key={col} value={col} >{col.toUpperCase()}</option>
     );
+
+    //<Button type="button" key={col} value={col} >{col.toUpperCase()}</Button>
 
     const dataType = ['continuous', 'categorical'];
     let dataTypeOp = dataType.map((type) =>
@@ -63,18 +81,19 @@ export default class ResponsiveGraph extends React.Component {
 
     const App = {
       display: "grid",
-      gridTemplateColumns: "repeat(3, 1fr)",
+      gridTemplateColumns: "repeat(2, auto)",
       gridAutoRows: "auto",
-      justifyItems: "center",
-      justifyContent: "space-around",
-      textAlign: "center",
+      justifyItems: "start",
+      justifyContent: "start",
+      textAlign: "left",
       textTransform: "uppercase"
     };
 
     const ui = {
       gridColumn: 1 / 1,
-      justifySelf: "center",
-      alignSelf: "center"
+      justifySelf: "start",
+      alignSelf: "center",
+      marginLeft: 5
     };
 
     const graph = {
@@ -87,7 +106,8 @@ export default class ResponsiveGraph extends React.Component {
     };
 
     const checkbox = {
-      margin: "1em"
+      margin: "1em",
+      textAlign: "left"
     };
 
     const input = {
@@ -102,7 +122,14 @@ export default class ResponsiveGraph extends React.Component {
       textAlign: "center"
     };
 
+    const plotlyStyle = {
+      'padding': '1em'
+    };
+
     return (
+
+<div>
+
             <div style={App}>
 
             <div style={ui} >
@@ -110,13 +137,13 @@ export default class ResponsiveGraph extends React.Component {
 
                 <div className="axis">
 
-                  <h4>X-Axis:</h4>
+                <h4>X-Axis:</h4>
 
-                  <div style={axisControl}>
-                    <label>Data: </label><br />
-                    <select name="xRecords" onChange={this.handleAxisChange}>
-                      {columns}
-                    </select>
+                <div style={axisControl}>
+                  <label>Data: </label><br />
+                  <select name="xRecords" onChange={this.handleAxisChange}>
+                    {columns}
+                  </select>
                   </div>
 
                   <div style={axisControl}>
@@ -155,21 +182,16 @@ export default class ResponsiveGraph extends React.Component {
                 <form>
 
                   <div>
-                    <div style={checkbox} >
-                      <label >Frequency</label>
-                      <input type="checkbox" name="frequency" value={this.state.frequency}  onChange={this.handleUIChange} style={input} /><br />
-                    </div>
-                    <div style={checkbox} >
-                      <label>Show All X-Ticks</label>
-                      <input type="checkbox" name="showAllTicks" value={this.state.showAllTicks} onChange={this.handleUIChange} style={input}/><br />
-                    </div>
-                    <div style={checkbox} >
-                      <label>Opacity</label>
-                      <input type="checkbox" name="opacity" value={this.state.opacity} onChange={this.handleUIChange} style={input}/><br />
-                    </div>
-                    <div style={checkbox} >
-                      <label>Switch</label>
-                      <input type="checkbox" name="switch" value={this.state.switch} onChange={this.handleUIChange} style={input}/><br />
+                    <div style={checkbox}>
+
+                      <Checkbox name="frequency" label="Frequency" value={this.state.frequency} onChange={this.handleUIChange} />
+
+                      <Checkbox name="showAllTicks" label="Show All X-Ticks" value={this.state.showAllTicks} onChange={this.handleUIChange} />
+
+                      <Checkbox name="opacity" label="Opacity" value={this.state.opacity} onChange={this.handleUIChange} />
+
+                      <Checkbox name="switch" label="Switch" value={this.state.switch} onChange={this.handleUIChange} />
+
                     </div>
                   </div>
 
@@ -181,7 +203,8 @@ export default class ResponsiveGraph extends React.Component {
             </div>
 
         <div style={graph} >
-          <PlotData data={this.state}/>
+          <PlotData data={this.state} style={plotlyStyle}/>
+        </div>
         </div>
         </div>
     )
