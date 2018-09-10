@@ -2,11 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import PlotData from './PlotData';
 import Checkbox from '@folio/stripes-components/lib/Checkbox';
-import { Dropdown } from '@folio/stripes-components/lib/Dropdown';
-import Button from '@folio/stripes-components/lib/Button';
-import DropdownMenu from '@folio/stripes-components/lib/DropdownMenu';
-import { Grid, Row, Col } from '@folio/stripes-components/lib/LayoutGrid';
-
 import css from './style.css';
 
 // Returns the graphical interce and sends the fields' values to PLOTLY
