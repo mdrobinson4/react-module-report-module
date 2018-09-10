@@ -4,80 +4,56 @@ import Plot from 'react-plotly.js';
 
 
 
-export default class ShowGraph extends React.Component {
+export default class PlotData extends React.Component {
   constructor(props) {
     super(props);
   }
   render() {
-    let xAxis=this.props.data['xRecords']['values'];
-    let yAxis=this.props.data['yRecords']['values'];
-    let xAxisName = this.props.data['xRecords']['name'];
-    let yAxisName = this.props.data['yRecords']['name'];
-    let size = this.props.data['size'];
-    let opacity = this.props.data['opacity'];
-    let xType = this.props.data['xType'];
-    let yType = this.props.data['yType'];
-    let Switch = this.props.data['switch'];
-    let graphType = this.props.data['graphType'];
-    let ShowAllXTick = this.props.data['showAllTicks'];
     let plotmode = 'markers'
 
-    if (opacity) {
-      opacity = true;
-    }
-    else {
-      opacity = false;
-    }
+    // Change plot mode to lines + markers if line graph
     if (this.props.data.type === 'line')
       plotmode = 'lines+markers'
 
     let trace1 = {
-       x: xAxis,
-       y: yAxis,
+       x: this.props.data['xRecords']['values'],
+       y: this.props.data['yRecords']['values'],
        mode: plotmode,
        marker: {
-         size: size,
-          opacity: opacity
+         size: this.props.data['size'],
+          opacity: this.props.data['opacity']
         },
         line: {
           dash: 'solid',
-          opacity: opacity,
-          width: size / 3,
-          size: size
-        }
+          opacity: this.props.data['opacity'],
+          width: this.props.data['size'] / 3,
+          size: this.props.data['size']
+        },
+        type: this.props.data['graphType']
     };
 
-  if (xType !== 'categorical' && yType !== 'categorical') {
-    if (Switch === true) {
-      xAxis = xAxisName;
-      yAxis = yAxisName;
-      trace1 = {
-        x: xAxis,
-        y: yAxis,
-        mode: plotmode,
-        marker: {
-          size: size,
-          opacity: opacity
-        },
-        line: {
-          dash: 'solid',
-          opacity: opacity,
-          width: size / 3
-        }
-      };
-    };
+// if the datatypes are not categorical and switch is enabled make the traces be the name of the records
+  if (this.props.data['xType'] !== 'categorical' && this.props.data['yType'] !== 'categorical' && this.props.data['switch']) {
+    trace1.x = this.props.data['xRecords']['name'];
+    trace1.y = this.props.data['xRecords']['name'];
+    trace1.mode = 'markers';
   };
 
   let layout = {
-    xAxis: {
-      autotick: !ShowAllXTick
-        }
-    };
-  if (graphType === 'bar') {
-    trace1.type = 'bar'
-  }
+    margin: {
+      b: 500,
+      l: 500,
+      r: 500
+    },
+    size: 100,
+    width: this.props.data.height * 1.555555556,
+    height: this.props.data.height,
+    xaxis: {
+      autotick: !this.props.data['showAllTicks']
+    }
+}
+//console.log(this.props.data);
   let data = [trace1];
-
 
     return (
       <Plot

@@ -6,29 +6,34 @@ export default class GetRecords extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      csv: this.props.info.csv,
+      csvName: this.props.info.csvName,
       error: null,
       isLoaded: false,
       totalRecords: 0,
       records: []
     };
   }
-  componentDidMount() {
+
+  // Gets the records and stores them in this.state.records
+  updateData() {
     let currentCount = 0;
     let records = [];
+    let csv = this.props.info.csv;
 
-    fetch('http://localhost:9130/instance-storage/instances?limit=30&offset=' + currentCount + '&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title', {
+    fetch(csv.slice(0, csv.indexOf('offset=') + 7) + currentCount + csv.slice(csv.indexOf('offset=') + 7), {
       method: 'GET',
       headers: new Headers({
         'Content-type': 'application/json',
         'X-Okapi-Tenant': 'diku',
-        'X-Okapi-Token': this.props.okapiToken
+        'X-Okapi-Token': this.props.info.okapiToken
       })
     })
     .then(res => res.json())
     .then(
       (result) => {
         this.setState({
-        records: result.instances,
+        records: result[Object.keys(result)[0]],
         totalRecords: result.totalRecords,
         isLoaded: true
         });
@@ -38,20 +43,20 @@ export default class GetRecords extends React.Component {
       () => {
         currentCount += 30;
         while (currentCount < this.state.totalRecords) {
-          fetch('http://localhost:9130/instance-storage/instances?limit=30&offset=' + currentCount + '&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title', {
+          fetch(csv.slice(0, csv.indexOf('offset=') + 7) + currentCount + csv.slice(csv.indexOf('offset=') + 7), {
               method: 'GET',
               headers: new Headers({
                 'Content-type': 'application/json',
                 'X-Okapi-Tenant': 'diku',
-                'X-Okapi-Token': this.props.okapiToken
+                'X-Okapi-Token': this.props.info.okapiToken
               })
             })
             .then(res => res.json())
             .then(
               (response) => {
-                for (var i = 0; i < response.instances.length; i++) {
+                for (var i = 0; i < response[Object.keys(response)[0]].length; i++) {
                   this.setState(previousState => ({
-                    records: [...previousState.records, response.instances[i]]
+                    records: [...previousState.records, response[Object.keys(response)[0]][i]]
                   }));
                 }
               }
@@ -61,6 +66,17 @@ export default class GetRecords extends React.Component {
       }
     )
   }
+  componentDidMount() {
+    this.updateData();
+  }
+  // Called whenever a new csv is loaded
+  componentDidUpdate(prevProps) {
+  // Typical usage (don't forget to compare props):
+  if (this.props.info.csv !== prevProps.info.csv) {
+    this.updateData();
+  }
+}
+
   render() {
     const {error, isLoaded, records, totalRecords} = this.state;
     if (error) {
@@ -68,7 +84,7 @@ export default class GetRecords extends React.Component {
     }
     if (isLoaded && records.length >= totalRecords) {
       return (
-        <div><OrgRecords records={records} /></div>
+        <div><OrgRecords info={this.state} /></div>
       )
     }
     else {

@@ -2,13 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import GraphUI from './GraphUI';
 
+// stores the data as an object of arrays
 export default class OrgRecords extends React.Component {
   constructor(props) {
     super(props);
-    this.records = this.props.records;
+    this.records = this.props.info.records;
   }
 
   render() {
+    console.log(this.props.info.csvName);
     let key = Object.keys(this.records[0]);
     let dataArr = {};
     for (let i = 0; i < this.records.length; i++) {
@@ -23,9 +25,10 @@ export default class OrgRecords extends React.Component {
         dataArr[obj].push(this.records[i][obj]);
       }
     }
+    let records = {name: this.props.info.csvName, data: dataArr}
     console.log(dataArr);
       return (
-        <div><GraphUI records={dataArr} /></div>
+        <div><GraphUI records={records} /></div>
       )
     }
   }

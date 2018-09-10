@@ -13,6 +13,9 @@ import GetToken from './components/report-module/GetToken';
 */
 
 class ReportModule extends React.Component {
+  constructor(props) {
+    super(props);
+  }
   static propTypes = {
     match: PropTypes.object.isRequired,
     showSettings: PropTypes.bool,
@@ -24,7 +27,7 @@ class ReportModule extends React.Component {
     }
     return (
       <Switch>
-		<GetToken />
+		    <GetToken />
         <Route path={`${this.props.match.path}`} exact component={Application} />
         <Route path={`${this.props.match.path}/examples`} exact component={ExamplePage} />
       </Switch>
