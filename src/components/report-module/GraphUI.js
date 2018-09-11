@@ -1,6 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import PlotData from './PlotData';
 import Checkbox from '@folio/stripes-components/lib/Checkbox';
 import css from './style.css';
 
@@ -16,9 +14,6 @@ export default class GraphUI extends React.Component {
       xType: 'categorical',
       yType: 'categorical',
       size: 20,
-      height: 1165,
-      //width: 700,
-      graphType: 'bar',
       switch: true,
       frequency: true,
       showAllTicks: '',
@@ -132,10 +127,6 @@ onToggle() {
                   </div>
                 </form>
             </div>
-
-        <div className={css.graph} >
-          <PlotData data={this.state} className={css.plotlyStyle} />
-        </div>
         </div>
         </div>
     )
