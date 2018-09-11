@@ -80,17 +80,15 @@ export default class GetRecords extends React.Component {
   render() {
     const {error, isLoaded, records, totalRecords} = this.state;
     if (error) {
-      return <div> Error: {error.message} </div>;
+      return <p> Error: {error.message} </p>;
     }
     if (isLoaded && records.length >= totalRecords) {
       return (
-        <div><OrgRecords info={this.state} /></div>
+        <OrgRecords info={this.state} />
       )
     }
     else {
-      return (
-        <div>Loading...</div>
-      )
+      return (<p>Loading...</p>)
     }
   }
 }

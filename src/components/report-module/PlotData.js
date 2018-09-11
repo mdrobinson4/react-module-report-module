@@ -29,7 +29,7 @@ export default class PlotData extends React.Component {
           width: this.props.data['size'] / 3,
           size: this.props.data['size']
         },
-        type: this.props.data['graphType']
+        type: this.props.data['graphType'],
     };
 
 // if the datatypes are not categorical and switch is enabled make the traces be the name of the records
@@ -40,26 +40,17 @@ export default class PlotData extends React.Component {
   };
 
   let layout = {
-    margin: {
-      b: 500,
-      l: 500,
-      r: 500
-    },
+    title: 'Graph',
     size: 100,
     width: this.props.data.height * 1.555555556,
     height: this.props.data.height,
     xaxis: {
-      autotick: !this.props.data['showAllTicks']
+      autotick: !this.props.data['showAllTicks'],
     }
 }
 //console.log(this.props.data);
   let data = [trace1];
 
-    return (
-      <Plot
-        data={data}
-        layout={layout}
-       />
-    );
+    return (<Plot data={data} layout={layout}/>);
   }
 }

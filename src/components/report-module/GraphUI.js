@@ -77,72 +77,58 @@ onToggle() {
     );
 
     return (
+      <div className={css.container}>
+      <div className={css.userInterface} >
 
-      <div>
+          <h4>X-Axis:</h4>
+          <select name="xRecords" onChange={this.handleAxisChange}>
+            {columns}
+          </select>
 
-        <div>
+          <h4>Y-Axis:</h4>
+          <select name="yRecords" onChange={this.handleAxisChange}>
+            {columns}
+          </select>
 
-            <div className={css.ui} >
+          <div>
+            <h4>DataType: </h4>
+            <select name="dataType" onChange={this.handleUIChange}>
+              {dataTypeOp}
+            </select>
+          </div>
 
-                <div className={css.axisControl}>
-                  <h4>X-Axis:</h4>
-                  <select name="xRecords" onChange={this.handleAxisChange}>
-                    {columns}
-                  </select>
-
-                  <h4>Y-Axis:</h4>
-                  <select name="yRecords" onChange={this.handleAxisChange}>
-                    {columns}
-                  </select>
-
-                  <div>
-                    <h4>DataType: </h4>
-                    <select name="dataType" onChange={this.handleUIChange}>
-                      {dataTypeOp}
-                    </select>
-                  </div>
-
-                </div>
-
-                <div className={css.gType}>
-                  <h4>Graph Type:</h4>
-                  <select name="graphType" onChange={this.handleUIChange}>
-                    {graphTypeOp}
-                  </select>
-                </div>
-
-                <form>
-
-                  <div>
-                    <div className={css.checkbox}>
-
-                      <Checkbox name="frequency" label="Frequency" value={this.state.frequency.toString()} onChange={this.handleUIChange} />
-
-                      <Checkbox name="showAllTicks" label="Show All X-Ticks" value={this.state.showAllTicks} onChange={this.handleUIChange} />
-
-                      <Checkbox name="opacity" label="Opacity" value={this.state.opacity} onChange={this.handleUIChange} />
-
-                      <Checkbox name="switch" label="Switch" value={this.state.switch} onChange={this.handleUIChange} />
-
-                    </div>
-                  </div>
-
-                  <div className={css.range}>
-                    <label>Size: {this.state.size} </label><br />
-                    <input type="range" name="size" min="1" max="2000" value={this.state.size} className="form-control-range" onChange={this.handleUIChange} className={css.input}/><br />
-                  </div>
-                  <div className={css.range}>
-                    <label>Graph Size: {this.state.height} </label><br />
-                    <input type="range" name="height" min="1" max="2000" value={this.state.height} className="form-control-range" onChange={this.handleUIChange} className={css.input}/><br />
-                  </div>
-                </form>
-            </div>
-
-        <div className={css.graph} >
-          <PlotData data={this.state} className={css.plotlyStyle} />
+        <div className={css.gType}>
+          <h4>Graph Type:</h4>
+          <select name="graphType" onChange={this.handleUIChange}>
+            {graphTypeOp}
+          </select>
         </div>
+
+        <form>
+          <div className={css.checkbox}>
+            <Checkbox name="frequency" label="Frequency" value={this.state.frequency.toString()} onChange={this.handleUIChange} />
+            <Checkbox name="showAllTicks" label="Show All X-Ticks" value={this.state.showAllTicks} onChange={this.handleUIChange} />
+            <Checkbox name="opacity" label="Opacity" value={this.state.opacity} onChange={this.handleUIChange} />
+            <Checkbox name="switch" label="Switch" value={this.state.switch} onChange={this.handleUIChange} />
+          </div>
+          <div className={css.range}>
+            <label>Size: {this.state.size} </label><br />
+            <input type="range" name="size" min="1" max="2000" value={this.state.size} className="form-control-range" onChange={this.handleUIChange} className={css.input}/><br />
+          </div>
+          <div className={css.range}>
+            <label>Graph Size: {this.state.height} </label><br />
+            <input type="range" name="height" min="1" max="2000" value={this.state.height} className="form-control-range" onChange={this.handleUIChange} className={css.input}/><br />
+          </div>
+        </form>
+
         </div>
-        </div>
+
+
+      <div className={css.graph} >
+        <PlotData data={this.state} className={css.plotlyStyle} />
+      </div>
+
+    </div>
     )
   }
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import GetRecords from './GetRecords';
 import css from './style.css';
-
+import { Row, Col } from '@folio/stripes-components/lib/LayoutGrid';
 
 export default class GetToken extends React.Component {
   constructor(props) {
@@ -57,20 +57,19 @@ export default class GetToken extends React.Component {
     // Sends data once all of it is loaded
     if (this.state.isLoaded) {
       return (
-        <div className={css.App}>
-          <div className={css.item}>
+        <div className={css.container1}>
+          <div className={css.userInterface1}>
             <h4>Select Data:</h4>
             <select onChange={this.handleCSVchange}>
               {csv}
             </select>
-            <GetRecords info={this.state} />
           </div>
-
+            <GetRecords info={this.state} />
         </div>
       )
     }
     else {
-      return <div><p>Getting Okapi Token</p></div>
+      return <p>Getting Okapi Token</p>
     }
   }
 }
