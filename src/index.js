@@ -26,8 +26,14 @@ class ReportModule extends React.Component {
       okapiToken: '',
       records: [],
       dataset: {
-        name: '',
-        url: ''
+        name: dataset[0].name,
+        url: dataset[0].url
+      },
+      getRecords: (result) => {
+        console.log(`Updating Parent With: ${result}`);
+        this.setState({
+          records: result
+        });
       }
     }
   }
@@ -37,7 +43,7 @@ class ReportModule extends React.Component {
     showSettings: PropTypes.bool,
   }
 
-  componentWillMount() {
+  componentDidMount() {
     fetch('http://localhost:9130/authn/login', {
       method: 'POST',
       body: JSON.stringify({
@@ -58,7 +64,6 @@ class ReportModule extends React.Component {
   }
 
   changeData = (e) => {
-    console.log(e);
     this.setState({
       dataset: {
         value: e.target.value,
@@ -67,20 +72,12 @@ class ReportModule extends React.Component {
     });
   }
 
-  let getRecords = (result) => {
-    this.setState({
-      records: result
-    });
-  }
-
   render() {
     console.log(this.state);
-    /*
     const dataset = [
       {name: 'Circulation', url: 'http://localhost:9130/instance-storage/instances?limit=30&offset=&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title'},
       {name: 'Users', url: 'http://localhost:9130/users?limit=30&offset=&query=%28cql.allRecords%3D1%29%20sortby%20personal.lastName%20personal.firstName'}
     ];
-    */
 
     let options = dataset.map(data => ({
       value: data.url,
@@ -90,21 +87,22 @@ class ReportModule extends React.Component {
     if (this.props.showSettings) {
       return <Settings {...this.props} />;
     }
-
-    return (
-      <Switch>
-        <Select
-          id={this.props.pluginType}
-          placeholder='Select Dataset'
-          value={this.state.dataset.name}
-          dataOptions={options}
-          onChange={this.changeData}
-          />
-        <GetRecords onUpdate={this.getRecords} okapiToken={this.state.okapiToken} />
-        <Route path={`${this.props.match.path}`} exact component={Application} />
-        <Route path={`${this.props.match.path}/examples`} exact component={ExamplePage} />
-      </Switch>
-    );
+    if (this.state.okapiToken && this.state.dataset.url) {
+      console.log(`Token: ${this.state.okapiToken} || URL: ${this.state.dataset.url}`);
+      console.log(this.state.records);
+      return (
+        <Switch>
+          <GetRecords info={this.state} />
+          <Route path={`${this.props.match.path}`} exact component={Application} />
+          <Route path={`${this.props.match.path}/examples`} exact component={ExamplePage} />
+        </Switch>
+      );
+    }
+    else {
+      return(
+        <div>Loading</div>
+      )
+    }
   }
 }
 

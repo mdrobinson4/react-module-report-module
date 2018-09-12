@@ -54,7 +54,7 @@ export default class GetToken extends React.Component {
   };
 
   render() {
-    console.log(this.state.okapiToken);
+    console.log(this.state.records);
 
     const csvFiles = [
       {name: 'Circulation', url: 'http://localhost:9130/instance-storage/instances?limit=30&offset=&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title'},
