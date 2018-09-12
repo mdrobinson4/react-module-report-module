@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import GraphUI from './GraphUI';
 
 // stores the data as an object of arrays
