@@ -4,6 +4,22 @@ import GetRecords from './GetRecords';
 import css from './style.css';
 import { Row, Col } from '@folio/stripes-components/lib/LayoutGrid';
 
+function GetToken(props) {
+  let dataSet = this.props.data;
+
+  return (
+    <div>
+
+    </div>
+  )
+}
+
+
+
+
+
+
+
 export default class GetToken extends React.Component {
   constructor(props) {
     super(props);
@@ -16,6 +32,7 @@ export default class GetToken extends React.Component {
     };
     this.handleCSVchange = this.handleCSVchange.bind(this);
   }
+
   componentWillMount() {
     fetch('http://localhost:9130/authn/login', {
         method: 'POST',
@@ -35,13 +52,6 @@ export default class GetToken extends React.Component {
         });
       })
   };
-  handleCSVchange(e) {
-    console.log(e);
-    this.setState({
-      csv: e.target.value,
-      csvName: e.target.name
-    });
-  }
 
   render() {
     console.log(this.state.okapiToken);
@@ -57,13 +67,10 @@ export default class GetToken extends React.Component {
     // Sends data once all of it is loaded
     if (this.state.isLoaded) {
       return (
-        <div className={css.container1}>
-          <div className={css.userInterface1}>
+        <div>
             <h4>Select Data:</h4>
-            <select onChange={this.handleCSVchange}>
               {csv}
             </select>
-          </div>
             <GetRecords info={this.state} />
         </div>
       )

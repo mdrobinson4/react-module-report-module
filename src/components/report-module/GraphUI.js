@@ -105,6 +105,7 @@ onToggle() {
         </div>
 
         <form>
+          <legend><h4>Options</h4></legend>
           <div className={css.checkbox}>
             <Checkbox name="frequency" label="Frequency" value={this.state.frequency.toString()} onChange={this.handleUIChange} />
             <Checkbox name="showAllTicks" label="Show All X-Ticks" value={this.state.showAllTicks} onChange={this.handleUIChange} />
@@ -112,7 +113,7 @@ onToggle() {
             <Checkbox name="switch" label="Switch" value={this.state.switch} onChange={this.handleUIChange} />
           </div>
           <div className={css.range}>
-            <label>Size: {this.state.size} </label><br />
+            <label>Line Size: {this.state.size} </label><br />
             <input type="range" name="size" min="1" max="2000" value={this.state.size} className="form-control-range" onChange={this.handleUIChange} className={css.input}/><br />
           </div>
           <div className={css.range}>

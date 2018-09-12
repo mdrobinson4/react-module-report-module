@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import OrgRecords from './OrgRecords';
+import Select from '@folio/stripes-components/lib/Select';
+import GraphUI from './GraphUI';
 
 export default class GetRecords extends React.Component {
   constructor(props) {
@@ -13,6 +14,7 @@ export default class GetRecords extends React.Component {
       totalRecords: 0,
       records: []
     };
+    this.dataArr = {};
   }
 
   // Gets the records and stores them in this.state.records
@@ -53,10 +55,10 @@ export default class GetRecords extends React.Component {
             })
             .then(res => res.json())
             .then(
-              (response) => {
-                for (var i = 0; i < response[Object.keys(response)[0]].length; i++) {
+              (result) => {
+                for (let i = 0; i < result[Object.keys(result)[0]].length; i++) {
                   this.setState(previousState => ({
-                    records: [...previousState.records, response[Object.keys(response)[0]][i]]
+                    records: [...previousState.records, result[Object.keys(result)[0]][i]]
                   }));
                 }
               }
@@ -65,26 +67,44 @@ export default class GetRecords extends React.Component {
         }
       }
     )
+    .then(
+      () => {
+        let key = Object.keys(this.state.records[0]);
+        for (let i = 0; i < this.state.records.length; i++) {
+          for (let obj in this.state.records[i]) {
+            this.dataArr[obj] = [];
+            key.push(obj);
+          }
+        }
+        // Store values in arrays
+        for (let i = 0; i < this.records.length; i++) {
+          for (let obj in this.records[i]) {
+            this.dataArr[obj].push(this.records[i][obj]);
+          }
+        }
+      }
+    );
   }
+
   componentDidMount() {
     this.updateData();
   }
+
   // Called whenever a new csv is loaded
   componentDidUpdate(prevProps) {
-  // Typical usage (don't forget to compare props):
   if (this.props.info.csv !== prevProps.info.csv) {
     this.updateData();
   }
 }
 
   render() {
-    const {error, isLoaded, records, totalRecords} = this.state;
+    const {error, isLoaded, totalRecords} = this.state;
     if (error) {
       return <p> Error: {error.message} </p>;
     }
-    if (isLoaded && records.length >= totalRecords) {
+    if (isLoaded && this.dataArr.length >= totalRecords) {
       return (
-        <OrgRecords info={this.state} />
+        <GraphUI records={this.state} />
       )
     }
     else {
