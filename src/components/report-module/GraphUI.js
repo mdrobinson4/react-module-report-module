@@ -26,6 +26,7 @@ export default class GraphUI extends React.Component {
   }
 
 
+
 onToggle() {
     this.setState(prevState => ({
       dropdownOpen: !prevState.dropdownOpen

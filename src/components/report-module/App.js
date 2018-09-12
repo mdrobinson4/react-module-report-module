@@ -17,14 +17,14 @@ export default class App extends React.Component {
                     width: 1000,
                     title: 'Sample Graph'
                 }
-            }
+            },
+            okapiToken: String
         }
     }
     render() {
         return (
             <div>
-                
-                <PlotData data={this.state}></PlotData>
+                <PlotData graph={this.state.graphData}/>
             </div>
         );
     }

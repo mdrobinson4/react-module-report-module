@@ -17,7 +17,7 @@ export default class GetRecords extends React.Component {
 
   // Gets the records and stores them in this.state.records
   updateData() {
-    let currentCount = 0;
+    let currentCount = 30;
     let records = [];
     let csv = this.props.info.csv;
 
@@ -41,7 +41,6 @@ export default class GetRecords extends React.Component {
     )
     .then(
       () => {
-        currentCount += 30;
         while (currentCount < this.state.totalRecords) {
           fetch(csv.slice(0, csv.indexOf('offset=') + 7) + currentCount + csv.slice(csv.indexOf('offset=') + 7), {
               method: 'GET',

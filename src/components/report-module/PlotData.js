@@ -8,16 +8,14 @@ export default class PlotData extends React.Component {
     super(props);
 
     this.state = {
-      graphData: this.props.data.graphData,
-      axesType: this.props.data.axesType,
-      switchAxes: this.props.data.switchAxes
+
     }
   }
   render() {
     return (
       <Plot
-        data={this.state.graphData.data}
-        layout={this.state.graphData.layout}
+        data={this.props.graph.data}
+        layout={this.props.graph.layout}
        />
     );
   }
