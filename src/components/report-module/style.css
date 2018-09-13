@@ -50,3 +50,12 @@
 .plotlyStyle {
   padding: 1em
 }
+
+.select {
+  width: 5%;
+}
+
+.componentFlex {
+  display: flex;
+  flex-direction: row;
+}

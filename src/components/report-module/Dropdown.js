@@ -6,7 +6,9 @@ export default class Dropdown extends React.Component {
 
         this.state = {
             dropdownData: {
-                graphType: []
+                graphType: ['bar', 'line', 'pie'],
+                dataType: [], //column names from data goes here
+                
             }
         }
     }
