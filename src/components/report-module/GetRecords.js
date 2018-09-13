@@ -4,7 +4,7 @@ import Select from '@folio/stripes-components/lib/Select';
 import GraphUI from './GraphUI';
 
 
-let dataArr = {};
+let dataArr = [];
 
 export default class GetRecords extends React.Component {
   constructor(props) {
@@ -39,43 +39,47 @@ export default class GetRecords extends React.Component {
       (result) => {
         this.setState({
         records: result[Object.keys(result)[0]],
-        totalRecords: result.totalRecords,
-        isLoaded: true
+        totalRecords: result.totalRecords
         });
       }
     )
     .then(
       () => {
-        currentCount += 30;
-        while (currentCount < this.state.totalRecords) {
-          fetch(csv.slice(0, csv.indexOf('offset=') + 7) + currentCount + csv.slice(csv.indexOf('offset=') + 7), {
-              method: 'GET',
-              headers: new Headers({
-                'Content-type': 'application/json',
-                'X-Okapi-Tenant': 'diku',
-                'X-Okapi-Token': this.props.info.okapiToken
-              })
-            })
-            .then(res => res.json())
-            .then(
-              (result) => {
-                for (let i = 0; i < result[Object.keys(result)[0]].length; i++) {
-                  this.setState(previousState => ({
-                    records: [...previousState.records, result[Object.keys(result)[0]][i]]
-                  }));
-                }
-              }
-            )
-          currentCount += 30;
-        }
-        console.log(this.state.records);
-      }
-    )
-    .then(() => {
+        this.getRecords(currentCount, csv);
+    })
+    .then(
+      () => {
       this.mergeRecords();
     });
   }
-  mergeRecords() {
+
+
+  getRecords = (currentCount, csv) => {
+    currentCount += 30;
+    while (currentCount < this.state.totalRecords) {
+      fetch(csv.slice(0, csv.indexOf('offset=') + 7) + currentCount + csv.slice(csv.indexOf('offset=') + 7), {
+          method: 'GET',
+          headers: new Headers({
+            'Content-type': 'application/json',
+            'X-Okapi-Tenant': 'diku',
+            'X-Okapi-Token': this.props.info.okapiToken
+          })
+        })
+        .then(res => res.json())
+        .then(
+          (result) => {
+            for (let i = 0; i < result[Object.keys(result)[0]].length; i++) {
+              this.setState(previousState => ({
+                records: [...previousState.records, result[Object.keys(result)[0]][i]]
+              }));
+            }
+          }
+        )
+      currentCount += 30;
+    }
+  }
+
+  mergeRecords = () => {
     let key = Object.keys(this.state.records[0]);
     for (let i = 0; i < this.state.records.length; i++) {
       for (let obj in this.state.records[i]) {
@@ -89,8 +93,10 @@ export default class GetRecords extends React.Component {
         dataArr[obj].push(this.state.records[i][obj]);
       }
     }
-    console.log(this.state.records);
     this.props.info.getRecords(dataArr);
+    this.setState({
+      isLoaded: true
+    });
   }
 
   componentDidMount() {
@@ -102,19 +108,16 @@ export default class GetRecords extends React.Component {
   componentDidUpdate(prevProps) {
   if (this.props.info.csv !== prevProps.info.csv) {
     this.updateData();
-    this.props.info.getRecords(dataArr);
   }
 }
 
   render() {
-    console.log(this.state.records);
     const {error, isLoaded, totalRecords} = this.state;
     if (error) {
       return <p> Error: {error.message} </p>;
     }
-    console.log(`LOADED: ${isLoaded}`);
-    console.log(dataArr.length);
-    if (isLoaded && dataArr.length >= totalRecords) {
+    if (isLoaded) {
+      console.log(this.state.records);
       return (<div>DONE</div>
       )
     }
