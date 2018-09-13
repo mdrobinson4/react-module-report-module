@@ -38,14 +38,9 @@ export default class GetRecords extends React.Component {
     .then(res => res.json())
     .then(
       (result) => {
-        /*
-        console.log(result);
-        this.setState({
-        records: result[Object.keys(result)[0]],
-        totalRecords: result.totalRecords
-      });
-      */
-      records = result;
+      // Access the items stored in the first key, which is allways the data we want
+      records = result[Object.keys(result)[0]];
+      console.log(records);
       }
     )
     .then(
@@ -56,6 +51,7 @@ export default class GetRecords extends React.Component {
     .then(
       () => {
       this.mergeRecords();
+      console.log(records);
     });
   }
 
@@ -74,14 +70,8 @@ export default class GetRecords extends React.Component {
         .then(res => res.json())
         .then(
           (result) => {
-            /*
-            for (let i = 0; i < result[Object.keys(result)[0]].length; i++) {
-              this.setState(previousState => ({
-                records: [...previousState.records, result[Object.keys(result)[0]][i]]
-              }));
-              */
               records = records.concat(result);
-              console.log(records);
+              console.log(allRecords);
             }
           );
       currentCount += 30;
@@ -89,17 +79,20 @@ export default class GetRecords extends React.Component {
   }
 
   mergeRecords = () => {
-    let key = Object.keys(this.state.records[0]);
-    for (let i = 0; i < this.state.records.length; i++) {
-      for (let obj in this.state.records[i]) {
+    console.log(records);
+    console.log()
+    let key = Object.keys(records[0]);
+    console.log(key);
+    for (let i = 0; i < records.length; i++) {
+      for (let obj in records[i]) {
         dataArr[obj] = [];
         key.push(obj);
       }
     }
     // Store values in arrays
-    for (let i = 0; i < this.state.records.length; i++) {
-      for (let obj in this.state.records[i]) {
-        dataArr[obj].push(this.state.records[i][obj]);
+    for (let i = 0; i < records.length; i++) {
+      for (let obj in records[i]) {
+        dataArr[obj].push(records[i][obj]);
       }
     }
     this.props.info.getRecords(dataArr);
