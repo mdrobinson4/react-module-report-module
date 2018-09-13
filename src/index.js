@@ -30,7 +30,6 @@ class ReportModule extends React.Component {
         url: dataset[0].url
       },
       getRecords: (result) => {
-        console.log(`Updating Parent With: ${result}`);
         this.setState({
           records: result
         });
@@ -73,7 +72,6 @@ class ReportModule extends React.Component {
   }
 
   render() {
-    console.log(this.state);
     const dataset = [
       {name: 'Circulation', url: 'http://localhost:9130/instance-storage/instances?limit=30&offset=&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title'},
       {name: 'Users', url: 'http://localhost:9130/users?limit=30&offset=&query=%28cql.allRecords%3D1%29%20sortby%20personal.lastName%20personal.firstName'}
@@ -88,8 +86,6 @@ class ReportModule extends React.Component {
       return <Settings {...this.props} />;
     }
     if (this.state.okapiToken && this.state.dataset.url) {
-      console.log(`Token: ${this.state.okapiToken} || URL: ${this.state.dataset.url}`);
-      console.log(this.state.records);
       return (
         <Switch>
           <GetRecords info={this.state} />

@@ -5,6 +5,7 @@ import GraphUI from './GraphUI';
 
 
 let dataArr = [];
+let records = [];
 
 export default class GetRecords extends React.Component {
   constructor(props) {
@@ -37,15 +38,20 @@ export default class GetRecords extends React.Component {
     .then(res => res.json())
     .then(
       (result) => {
+        /*
+        console.log(result);
         this.setState({
         records: result[Object.keys(result)[0]],
         totalRecords: result.totalRecords
-        });
+      });
+      */
+      records = result;
       }
     )
     .then(
       () => {
         this.getRecords(currentCount, csv);
+        console.log(records);
     })
     .then(
       () => {
@@ -68,13 +74,16 @@ export default class GetRecords extends React.Component {
         .then(res => res.json())
         .then(
           (result) => {
+            /*
             for (let i = 0; i < result[Object.keys(result)[0]].length; i++) {
               this.setState(previousState => ({
                 records: [...previousState.records, result[Object.keys(result)[0]][i]]
               }));
+              */
+              records = records.concat(result);
+              console.log(records);
             }
-          }
-        )
+          );
       currentCount += 30;
     }
   }
@@ -94,9 +103,15 @@ export default class GetRecords extends React.Component {
       }
     }
     this.props.info.getRecords(dataArr);
+    this.handleMerge();
+  }
+
+  handleMerge = () => {
     this.setState({
       isLoaded: true
     });
+    console.log(`isLoaded is now {${this.state.isLoaded}}`);
+    console.log(this.state.records);
   }
 
   componentDidMount() {
@@ -116,8 +131,7 @@ export default class GetRecords extends React.Component {
     if (error) {
       return <p> Error: {error.message} </p>;
     }
-    if (isLoaded) {
-      console.log(this.state.records);
+    if (isLoaded === true) {
       return (<div>DONE</div>
       )
     }
