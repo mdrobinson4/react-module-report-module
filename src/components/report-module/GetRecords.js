@@ -4,8 +4,10 @@ import Select from '@folio/stripes-components/lib/Select';
 import GraphUI from './GraphUI';
 
 
-let dataArr = [];
+let dataArr = {};
 let records = [];
+let totalRecords = 0;
+let currentCount = 0;
 
 export default class GetRecords extends React.Component {
   constructor(props) {
@@ -23,10 +25,7 @@ export default class GetRecords extends React.Component {
 
   // Gets the records and stores them in this.state.records
   updateData() {
-    let currentCount = 0;
-    let records = [];
     let csv = this.props.info.dataset.url;
-
     fetch(csv.slice(0, csv.indexOf('offset=') + 7) + currentCount + csv.slice(csv.indexOf('offset=') + 7), {
       method: 'GET',
       headers: new Headers({
@@ -38,27 +37,18 @@ export default class GetRecords extends React.Component {
     .then(res => res.json())
     .then(
       (result) => {
-      // Access the items stored in the first key, which is allways the data we want
+      // Access the items stored in the first key, which contains the data we want
       records = result[Object.keys(result)[0]];
-      console.log(records);
-      }
-    )
-    .then(
-      () => {
-        this.getRecords(currentCount, csv);
-        console.log(records);
-    })
-    .then(
-      () => {
-      this.mergeRecords();
-      console.log(records);
+      totalRecords = result.totalRecords;
+      this.getRecords(csv);
+      this.mergeRecords(records);
     });
   }
 
-
-  getRecords = (currentCount, csv) => {
+  getRecords = (csv) => {
     currentCount += 30;
-    while (currentCount < this.state.totalRecords) {
+    while (currentCount < totalRecords) {
+      console.log(`currentCount: ${currentCount} < totalRecords: ${totalRecords}`);
       fetch(csv.slice(0, csv.indexOf('offset=') + 7) + currentCount + csv.slice(csv.indexOf('offset=') + 7), {
           method: 'GET',
           headers: new Headers({
@@ -70,41 +60,46 @@ export default class GetRecords extends React.Component {
         .then(res => res.json())
         .then(
           (result) => {
-              records = records.concat(result);
-              console.log(allRecords);
+            for (let i = 0; i < result[Object.keys(result)[0]].length; i++) {
+              records.push(result[Object.keys(result)[0]][i]);
+              console.log(records);
             }
-          );
-      currentCount += 30;
+            currentCount += 30;
+          }
+        )
+    }
+    console.log(dataArr);
+  }
+
+  mergeRecords = (records) => {
+    let key = Object.keys(records[0]);
+
+  for (let i in records) {
+    for (let obj in records[i]) {
+      dataArr[obj] = [];
+      key.push(obj);
     }
   }
 
-  mergeRecords = () => {
-    console.log(records);
-    console.log()
-    let key = Object.keys(records[0]);
-    console.log(key);
-    for (let i = 0; i < records.length; i++) {
-      for (let obj in records[i]) {
-        dataArr[obj] = [];
-        key.push(obj);
-      }
-    }
     // Store values in arrays
-    for (let i = 0; i < records.length; i++) {
-      for (let obj in records[i]) {
-        dataArr[obj].push(records[i][obj]);
-      }
+  for (let i in records) {
+    for (let obj in records[i]) {
+      dataArr[obj].push(records[i][obj]);
     }
-    this.props.info.getRecords(dataArr);
-    this.handleMerge();
+  }
+
+  this.props.info.getRecords(dataArr);
+  this.handleMerge();
+
   }
 
   handleMerge = () => {
     this.setState({
       isLoaded: true
     });
+    console.log('RECORDS MERGED');
     console.log(`isLoaded is now {${this.state.isLoaded}}`);
-    console.log(this.state.records);
+    console.log(dataArr);
   }
 
   componentDidMount() {
