@@ -1,12 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import PlotData from './PlotData';
 import Checkbox from '@folio/stripes-components/lib/Checkbox';
-import { Dropdown } from '@folio/stripes-components/lib/Dropdown';
-import Button from '@folio/stripes-components/lib/Button';
-import DropdownMenu from '@folio/stripes-components/lib/DropdownMenu';
-import { Grid, Row, Col } from '@folio/stripes-components/lib/LayoutGrid';
-
 import css from './style.css';
 
 // Returns the graphical interce and sends the fields' values to PLOTLY
@@ -21,9 +14,6 @@ export default class GraphUI extends React.Component {
       xType: 'categorical',
       yType: 'categorical',
       size: 20,
-      height: 1165,
-      //width: 700,
-      graphType: 'bar',
       switch: true,
       frequency: true,
       showAllTicks: '',
@@ -34,6 +24,7 @@ export default class GraphUI extends React.Component {
     this.handleAxisChange = this.handleAxisChange.bind(this);
     this.onToggle = this.onToggle.bind(this);
   }
+
 
 
 onToggle() {
@@ -124,12 +115,18 @@ onToggle() {
 
         </div>
 
-
-      <div className={css.graph} >
-        <PlotData data={this.state} className={css.plotlyStyle} />
-      </div>
-
-    </div>
+                  <div className={css.range}>
+                    <label>Size: {this.state.size} </label><br />
+                    <input type="range" name="size" min="1" max="2000" value={this.state.size} className="form-control-range" onChange={this.handleUIChange} className={css.input}/><br />
+                  </div>
+                  <div className={css.range}>
+                    <label>Graph Size: {this.state.height} </label><br />
+                    <input type="range" name="height" min="1" max="2000" value={this.state.height} className="form-control-range" onChange={this.handleUIChange} className={css.input}/><br />
+                  </div>
+                </form>
+            </div>
+        </div>
+        </div>
     )
   }
 }

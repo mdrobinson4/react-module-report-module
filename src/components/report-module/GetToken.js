@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import GetRecords from './GetRecords';
 import css from './style.css';
 import { Row, Col } from '@folio/stripes-components/lib/LayoutGrid';
