@@ -27,26 +27,26 @@ export default class GraphUI extends React.Component {
 
 
 
-onToggle() {
-    this.setState(prevState => ({
-      dropdownOpen: !prevState.dropdownOpen
-    }));
-  }
+  onToggle() {
+      this.setState(prevState => ({
+        dropdownOpen: !prevState.dropdownOpen
+      }));
+    }
 
-  handleAxisChange(event) {
+    handleAxisChange(event) {
+      this.setState({
+        [event.target.name]: {
+          values: this.props.records.data[event.target.value],
+          name: event.target.value
+        }
+      });
+    }
+
+    handleUIChange(event) {
     this.setState({
-      [event.target.name]: {
-        values: this.props.records.data[event.target.value],
-        name: event.target.value
-      }
+      [event.target.name]: event.target.type === 'checkbox' ? event.target.checked : event.target.value
     });
   }
-
-  handleUIChange(event) {
-  this.setState({
-    [event.target.name]: event.target.type === 'checkbox' ? event.target.checked : event.target.value
-  });
-}
 
   render() {
     // Creates the option elements for the graph types
@@ -69,24 +69,12 @@ onToggle() {
 
     return (
       <div className={css.container}>
-      <div className={css.userInterface} >
+        <div className={css.userInterface} >
 
           <h4>X-Axis:</h4>
           <select name="xRecords" onChange={this.handleAxisChange}>
             {columns}
           </select>
-
-          <h4>Y-Axis:</h4>
-          <select name="yRecords" onChange={this.handleAxisChange}>
-            {columns}
-          </select>
-
-          <div>
-            <h4>DataType: </h4>
-            <select name="dataType" onChange={this.handleUIChange}>
-              {dataTypeOp}
-            </select>
-          </div>
 
         <div className={css.gType}>
           <h4>Graph Type:</h4>
@@ -113,20 +101,17 @@ onToggle() {
           </div>
         </form>
 
-        </div>
-
-                  <div className={css.range}>
-                    <label>Size: {this.state.size} </label><br />
-                    <input type="range" name="size" min="1" max="2000" value={this.state.size} className="form-control-range" onChange={this.handleUIChange} className={css.input}/><br />
-                  </div>
-                  <div className={css.range}>
-                    <label>Graph Size: {this.state.height} </label><br />
-                    <input type="range" name="height" min="1" max="2000" value={this.state.height} className="form-control-range" onChange={this.handleUIChange} className={css.input}/><br />
-                  </div>
-                </form>
-            </div>
-        </div>
-        </div>
-    )
-  }
+        <form>
+          <div className={css.range}>
+            <label>Size: {this.state.size} </label><br />
+            <input type="range" name="size" min="1" max="2000" value={this.state.size} className="form-control-range" onChange={this.handleUIChange} className={css.input}/><br />
+          </div>
+          <div className={css.range}>
+            <label>Graph Size: {this.state.height} </label><br />
+            <input type="range" name="height" min="1" max="2000" value={this.state.height} className="form-control-range" onChange={this.handleUIChange} className={css.input}/><br />
+          </div>
+        </form>
+    </div>
+  </div>
+  )}
 }

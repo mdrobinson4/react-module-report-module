@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Select from '@folio/stripes-components/lib/Select';
-import GraphUI from './GraphUI';
 
 
 let dataArr = {};
@@ -18,8 +17,8 @@ export default class GetRecords extends React.Component {
 
   // Gets the records and stores them in this.state.records
   getRecords = () => {
-    let csv = this.props.info.dataset.url;
-    fetch(csv, {
+    let dataset = this.props.info.dataset.url;
+    fetch(dataset, {
       method: 'GET',
       headers: new Headers({
         'Content-type': 'application/json',
@@ -75,7 +74,7 @@ export default class GetRecords extends React.Component {
 
   // Called whenever a new dataset is loaded
   componentDidUpdate(prevProps) {
-  if (this.props.info.csv !== prevProps.info.csv)
+  if (this.props.info.dataset !== prevProps.info.dataset)
     this.getRecords();
 }
 
