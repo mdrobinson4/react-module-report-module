@@ -2,6 +2,7 @@ import React from 'react';
 import GraphUI from './GraphUI'
 import GetRecords from './GetRecords'
 import PlotData from './PlotData'
+import Pie from './Pie'
 
 const datasets = [
   {name: 'Circulation', url: 'http://localhost:9130/instance-storage/instances?limit=500&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title'},
@@ -82,7 +83,7 @@ export default class App extends React.Component {
       // Go to PLOTLY -> this.state.records
       if (isloaded) {
         console.log(records);
-        return <div>PLOTLY IS NEXT!!</div>
+        return <Pie records={records} />
       }
 
       else if (this.state.okapiToken)
