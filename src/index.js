@@ -14,9 +14,16 @@ import GetRecords from './components/report-module/GetRecords';
   This is the main entry point into your new app.
 */
 
+/*
 const dataset = [
   {name: 'Circulation', url: 'http://localhost:9130/instance-storage/instances?limit=30&offset=&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title'},
   {name: 'Users', url: 'http://localhost:9130/users?limit=30&offset=&query=%28cql.allRecords%3D1%29%20sortby%20personal.lastName%20personal.firstName'}
+];
+*/
+
+const dataset = [
+  {name: 'Circulation', url: 'http://localhost:9130/instance-storage/instances?limit=500&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title'},
+  {name: 'Users', url: 'http://localhost:9130/users?limit=500&query=%28cql.allRecords%3D1%29%20sortby%20personal.lastName%20personal.firstName'}
 ];
 
 class ReportModule extends React.Component {
@@ -25,13 +32,15 @@ class ReportModule extends React.Component {
     this.state = {
       okapiToken: '',
       records: [],
+      isloaded: false,
       dataset: {
         name: dataset[0].name,
         url: dataset[0].url
       },
       getRecords: (result) => {
         this.setState({
-          records: result
+          records: result,
+          isloaded: true
         });
       }
     }
@@ -72,11 +81,7 @@ class ReportModule extends React.Component {
   }
 
   render() {
-    const dataset = [
-      {name: 'Circulation', url: 'http://localhost:9130/instance-storage/instances?limit=30&offset=&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title'},
-      {name: 'Users', url: 'http://localhost:9130/users?limit=30&offset=&query=%28cql.allRecords%3D1%29%20sortby%20personal.lastName%20personal.firstName'}
-    ];
-
+    let {records, isloaded} = this.state
     let options = dataset.map(data => ({
       value: data.url,
       label: data.name
@@ -85,7 +90,12 @@ class ReportModule extends React.Component {
     if (this.props.showSettings) {
       return <Settings {...this.props} />;
     }
-    if (this.state.okapiToken && this.state.dataset.url) {
+    if (isloaded) {
+      // Go to plotly
+      console.log(this.state.records);
+      return <div>L</div>
+    }
+    else if (this.state.okapiToken && this.state.dataset.url) {
       return (
         <Switch>
           <GetRecords info={this.state} />
