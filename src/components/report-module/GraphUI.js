@@ -83,6 +83,7 @@ export default class GraphUI extends React.Component {
       <div>
         <div className={css.ui}>
           <div className={css.axisControl}>
+            
             <Checkbox name="xAxisCheckbox" label="X-Axis" onChange={this.toggleCheckbox} value={this.state.xAxisCheckbox}/>
             <Checkbox name="yAxisCheckbox" label="Y-Axis" onChange={this.toggleCheckbox} value={this.state.yAxisCheckbox}/>
           </div>

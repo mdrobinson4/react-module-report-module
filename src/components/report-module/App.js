@@ -29,7 +29,7 @@ export default class App extends React.Component {
                 {id: 6, username: 'Terry', enrollmentData: new Date(2018, 5)},
                 {id: 7, username: 'Kate', enrollmentData: new Date(2017, 5)}
             ],
-            dataToPropertyMap: new Map()
+            propertyArray: []
         },
 
         this.handlePropertyArray = this.handlePropertyArray.bind(this)
@@ -42,10 +42,6 @@ export default class App extends React.Component {
     componentDidMount() {
         let propertyArray = Object.getOwnPropertyNames(this.state.userData[0])
         this.handlePropertyArray(propertyArray);
-
-        for (var property in this.state.userData[0]) {
-            this.dataToPropertyMap.set()
-        }
 
     }
     render() {
