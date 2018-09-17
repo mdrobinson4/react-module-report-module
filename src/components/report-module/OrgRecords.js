@@ -26,8 +26,6 @@ export default class OrgRecords extends React.Component {
     }
     let records = {name: this.props.info.csvName, data: dataArr}
     console.log(dataArr);
-      return (
-        <div><GraphUI records={records} /></div>
-      )
+      return (<GraphUI records={records} />)
     }
   }

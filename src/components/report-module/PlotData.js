@@ -8,7 +8,6 @@ export default class PlotData extends React.Component {
     super(props);
 
     this.state = {
-
     }
   }
   render() {
