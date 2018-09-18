@@ -1,15 +1,15 @@
 import React from 'react';
 import Plot from 'react-plotly.js';
-import PiSlider from './PieSlider';
 
-export default class pie extends React.Component {
+export default class Pie extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
         data: [],
         layout: {},
         viewNum: 10,
-        records
+        update: false,
+        records: {}
       }
     }
 
@@ -18,42 +18,15 @@ export default class pie extends React.Component {
       this.PiePlot(this.props.records);
     }
 
-
-    componentDidUpdate() {
-      if (this.props.records != this.state.records) {
-        console.log(JSON.stringify(this.props.records));
-        this.PiePlot(this.props.records);
-      }
-    }
-
-    handleNumChange = (e) => {
-      this.setState({
-        viewNum: e.target.value
-      });
-    }
-
-    countDuplicates = (obj, num) => {
-      obj[num] = (++obj[num] || 1);
-      return obj;
-    }
-
     handleMount = () => {
       this.setState({
         records: this.props.records
       });
     }
 
-    handlePieUpdate = (data, layout) => {
-      this.setState({
-        data: data,
-        layout: layout,
-      });
-    }
-
     PiePlot = (records) => {
       // Returns dictionary with data statistics
       let SumStat = this.summaryCategorical(records);
-      console.log(SumStat);
       let data = [
         {
           values: SumStat['TopFrequency'],
@@ -64,25 +37,48 @@ export default class pie extends React.Component {
       let layout = {
         height: 1000,
         width: 1000,
-        showlegend: false
+        showlegend: true
       };
       this.handlePieUpdate(data, layout);
+    }
+
+    componentDidUpdate() {
+      if (this.state.update)
+        this.PiePlot(this.props.records);
+    }
+
+    handleNumChange = (e) => {
+      console.log('Handle Num change');
+      this.setState({
+        viewNum: e.target.value,
+        update: true
+      });
+    }
+
+    countDuplicates = (obj, num) => {
+      obj[num] = (++obj[num] || 1);
+      return obj;
+    }
+
+
+
+    handlePieUpdate = (data, layout) => {
+      this.setState({
+        data: data,
+        layout: layout,
+        update: false
+      });
     }
 
     //Summary function for categorical variable
     summaryCategorical = (records) => {
       let answer = '';
-      console.log(records);
 
       // Removes and keeps track of num of dups
       answer = records.title.reduce(this.countDuplicates, {});
 
-      console.log(answer);
-
       // Sorts by the number of duplicates [Low -> High]
       let sortKey = Object.keys(answer).sort((a, b) => answer[b] - answer[a]);
-
-      console.log(sortKey);
 
       let sortCount = [];
       let sortFrequency = [];
@@ -125,8 +121,11 @@ export default class pie extends React.Component {
 
     render() {
       return (
-        <PieSlider onChange={() => this.handleNumChange}
-        <Plot data={this.state.data} layout={this.state.layout}/>
+        <div>
+          <input type="range" min="1" max="100" value={this.state.viewNum} onChange={this.handleNumChange}/>
+          <Plot data={this.state.data} layout={this.state.layout}/>
+        </div>
+
       )
     }
   }
