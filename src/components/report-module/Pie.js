@@ -1,38 +1,58 @@
 import React from 'react';
 import Plot from 'react-plotly.js';
-
-
+import PiSlider from './PieSlider';
 
 export default class pie extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
         data: [],
-        layout: {}
+        layout: {},
+        viewNum: 10,
+        records
       }
     }
 
     componentDidMount() {
-      console.log(JSON.stringify(this.props.records));
+      this.handleMount();
       this.PiePlot(this.props.records);
     }
 
-/*
+
     componentDidUpdate() {
-      console.log(JSON.stringify(this.props.records));
-      this.PiePlot(this.props.records);
+      if (this.props.records != this.state.records) {
+        console.log(JSON.stringify(this.props.records));
+        this.PiePlot(this.props.records);
+      }
     }
-*/
+
+    handleNumChange = (e) => {
+      this.setState({
+        viewNum: e.target.value
+      });
+    }
 
     countDuplicates = (obj, num) => {
-        obj[num] = (++obj[num] || 1);
-        return obj;
+      obj[num] = (++obj[num] || 1);
+      return obj;
+    }
+
+    handleMount = () => {
+      this.setState({
+        records: this.props.records
+      });
+    }
+
+    handlePieUpdate = (data, layout) => {
+      this.setState({
+        data: data,
+        layout: layout,
+      });
     }
 
     PiePlot = (records) => {
-      let viewNum = 10;
       // Returns dictionary with data statistics
-      let SumStat = this.summaryCategorical(records, viewNum);
+      let SumStat = this.summaryCategorical(records);
       console.log(SumStat);
       let data = [
         {
@@ -50,7 +70,7 @@ export default class pie extends React.Component {
     }
 
     //Summary function for categorical variable
-    summaryCategorical = (records, viewNum) => {
+    summaryCategorical = (records) => {
       let answer = '';
       console.log(records);
 
@@ -82,12 +102,14 @@ export default class pie extends React.Component {
       let dictAbove7 = {
         'Level': this.countUnique(records.title),
         'UniqueLabel': sortKey,
-        'TopLabel':sortKey.slice(0,(viewNum-1)),
-        'TopCount':sortCount.slice(0,(viewNum-1)),
-        'TopFrequency':sortFrequency.slice(0,(viewNum-1)),
-        'BottomLabel':sortKey.slice( Object.keys(answer).length-viewNum-1,-1),
-        'BottomCount':sortCount.slice( Object.keys(answer).length-viewNum-1,-1),
-        'BottomFrequency':sortFrequency.slice( Object.keys(answer).length-viewNum-1,-1)
+        'TopLabel':sortKey.slice(0,(this.state.viewNum - 1)),
+        'TopCount':sortCount.slice(0,(this.state.viewNum - 1)),
+        'TopFrequency':sortFrequency.slice(0,(this.state.viewNum - 1)),
+
+
+        'BottomLabel':sortKey.slice( Object.keys(answer).length - this.state.viewNum - 1, - 1),
+        'BottomCount':sortCount.slice( Object.keys(answer).length-this.state.viewNum - 1, - 1),
+        'BottomFrequency':sortFrequency.slice( Object.keys(answer).length-this.state.viewNum - 1, - 1)
       };
 
       if (Object.keys(answer).length > 7)
@@ -97,20 +119,13 @@ export default class pie extends React.Component {
     }
 
 
-
     countUnique = (iterable) => {
       return new Set(iterable).size;
     }
 
-    handlePieUpdate = (data, layout) => {
-      this.setState({
-        data: data,
-        layout: layout
-      });
-    }
-
     render() {
       return (
+        <PieSlider onChange={() => this.handleNumChange}
         <Plot data={this.state.data} layout={this.state.layout}/>
       )
     }
