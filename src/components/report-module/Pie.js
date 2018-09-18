@@ -1,6 +1,8 @@
 import React from 'react';
 import Plot from 'react-plotly.js';
 
+
+
 export default class pie extends React.Component {
     constructor(props) {
       super(props);
@@ -11,53 +13,74 @@ export default class pie extends React.Component {
     }
 
     componentDidMount() {
-      console.log(this.props.records);
+      console.log(JSON.stringify(this.props.records));
       this.PiePlot(this.props.records);
     }
 
+/*
     componentDidUpdate() {
+      console.log(JSON.stringify(this.props.records));
       this.PiePlot(this.props.records);
     }
+*/
 
-    PiePlot = () => {
-      let viewNum = 100;
-      let sumStat = this.summaryCategorical(data, viewNum);
+    countDuplicates = (obj, num) => {
+        obj[num] = (++obj[num] || 1);
+        return obj;
+    }
+
+    PiePlot = (records) => {
+      let viewNum = 10;
+      // Returns dictionary with data statistics
+      let SumStat = this.summaryCategorical(records, viewNum);
+      console.log(SumStat);
       let data = [
         {
-          values: SumStat['LabelCount'],
+          values: SumStat['TopFrequency'],
           labels: SumStat['UniqueLabel'],
           type: 'pie'
         }
       ];
-      this.handlePieUpdate(data);
+      let layout = {
+        height: 1000,
+        width: 1000,
+        showlegend: false
+      };
+      this.handlePieUpdate(data, layout);
     }
 
     //Summary function for categorical variable
-    summaryCategorical = (data) => {
-      let data1 = data;
-      let answer = data1.reduce(this.countDuplicates, {});
+    summaryCategorical = (records, viewNum) => {
+      let answer = '';
+      console.log(records);
 
-      let sortKey = Object.keys(answer).sort((a, b) => {
-          return answer[b] - answer[a];
-      });
+      // Removes and keeps track of num of dups
+      answer = records.title.reduce(this.countDuplicates, {});
+
+      console.log(answer);
+
+      // Sorts by the number of duplicates [Low -> High]
+      let sortKey = Object.keys(answer).sort((a, b) => answer[b] - answer[a]);
+
+      console.log(sortKey);
 
       let sortCount = [];
       let sortFrequency = [];
 
       for (let i = 0; i < Object.keys(answer).length; i++) {
         sortCount.push(answer[sortKey[i]]);
-        sortFrequency.push(answer[sortKey[i]]/(Object.keys(answer).length));
+        sortFrequency.push(answer[sortKey[i]] / (Object.keys(answer).length));
       };
 
       let dictBelow7 = {
-        'Level': this.countUnique(variable),
+        'Level': this.countUnique(records.title),
         'UniqueLabel': sortKey,
         'LabelCount':sortCount,
         'LabelFrequency':sortFrequency
       };
 
       let dictAbove7 = {
-        'Level': this.countUnique(variable),
+        'Level': this.countUnique(records.title),
         'UniqueLabel': sortKey,
         'TopLabel':sortKey.slice(0,(viewNum-1)),
         'TopCount':sortCount.slice(0,(viewNum-1)),
@@ -68,23 +91,18 @@ export default class pie extends React.Component {
       };
 
       if (Object.keys(answer).length > 7)
-        dict = dictAbove7;
-      else
-        dict = dictBelow7;
+        return dictAbove7;
 
-      return dict;
+      return dictBelow7;
     }
 
-    countDuplicates = (obj, num) => {
-        obj[num] = (++obj[num] || 1);
-        return obj;
-    }
+
 
     countUnique = (iterable) => {
       return new Set(iterable).size;
     }
 
-    handlePieUpdate = (data) => {
+    handlePieUpdate = (data, layout) => {
       this.setState({
         data: data,
         layout: layout
@@ -93,7 +111,7 @@ export default class pie extends React.Component {
 
     render() {
       return (
-        <Plot data={this.state.data} layout={this.state.layout} />
+        <Plot data={this.state.data} layout={this.state.layout}/>
       )
     }
   }

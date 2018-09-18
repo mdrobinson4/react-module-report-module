@@ -9,22 +9,27 @@ const datasets = [
   {name: 'Users', url: 'http://localhost:9130/users?limit=500&query=%28cql.allRecords%3D1%29%20sortby%20personal.lastName%20personal.firstName'}
 ];
 
+
 export default class App extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
         okapiToken: '',
+        gotToken: false,
         dataset: {
           url: datasets[0].url,
           name: datasets[0].name
         },
-        isloaded: false,
         getRecords: (result) => {
+          console.log('Updating App.js');
+          console.log(JSON.stringify(result));
+
           this.setState({
             records: result,
             isloaded: true
           });
         },
+        isloaded: false,
         records: [],
         graphData: {
           data: [{
@@ -56,7 +61,7 @@ export default class App extends React.Component {
       .then((res) => {
         this.setState({
           okapiToken: res.headers.get('x-okapi-token'),
-          isLoaded: true
+          gotToken: true
         });
       });
     }
@@ -71,7 +76,7 @@ export default class App extends React.Component {
     }
 
     render() {
-      let {records, isloaded} = this.state;
+      let {records, isloaded, gotToken} = this.state;
       let options = datasets.map(data => ({
         value: data.url,
         label: data.name
@@ -82,11 +87,11 @@ export default class App extends React.Component {
 
       // Go to PLOTLY -> this.state.records
       if (isloaded) {
-        console.log(records);
+        console.log(JSON.stringify(records));
         return <Pie records={records} />
       }
 
-      else if (this.state.okapiToken)
+      else if (gotToken)
         return <GetRecords info={this.state} />
 
       else
