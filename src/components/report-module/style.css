@@ -1,11 +1,28 @@
-.App {
-  display: grid;
-  justify-content: start;
-  grid-template-columns: 20em auto;
-  grid-auto-rows: 50em auto;
-  grid-gap: 1em;
-  text-transform: uppercase;
-  margin-left: 2em;
+.container {
+  display: flex;
+  flex-direction: row;
+}
+
+.container1 {
+  display: flex;
+  flex-direction: column;
+}
+
+.userInterface {
+  background-color: white;
+  padding-right: .2em;
+  margin-right: 5em;
+}
+
+.userInterface1 {
+  background-color: white;
+  padding-right: .2em;
+  width: 25%;
+}
+
+.checkbox {
+  margin-top: 1em;
+  margin-bottom: 1em;
 }
 
 .item {
@@ -21,9 +38,7 @@
 }
 
 .graph {
-  grid-row: 1;
-  grid-column: 2 / 3;
-  justify-items: start;
+
 }
 
 .axisControl {
@@ -55,7 +70,14 @@
   width: 5%;
 }
 
-.componentFlex {
+.componentFlexRow {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+}
+
+.componentFlexColumn {
+  margin-top: 20px;
   display: flex;
   flex-direction: row;
 }

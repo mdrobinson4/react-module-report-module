@@ -1,6 +1,6 @@
 import React from 'react';
 import Checkbox from '@folio/stripes-components/lib/Checkbox';
-import Select from '@folio/stripes-components/lib/Select';
+import DataOptions from './DataOptions'
 import css from './style.css';
 //dataOptions={[
 //  {value: "Y", label: "Yes"},
@@ -32,11 +32,9 @@ export default class GraphUI extends React.Component {
     this.toggleCheckbox = this.toggleCheckbox.bind(this);
   }
 
-  toggleCheckbox(e) {
-    let boxState = {}
-
-    boxState[e.target.name] = e.target.value
-    this.setState(boxState)
+  toggleCheckbox() {
+    var value = this.check.value
+    this.props.changeAxis(value)
   }
 
   onToggle() {
@@ -83,7 +81,7 @@ export default class GraphUI extends React.Component {
       <div>
         <div className={css.ui}>
           <div className={css.axisControl}>
-            
+            <DataOptions properties={this.props.properties}></DataOptions>
             <Checkbox name="xAxisCheckbox" label="X-Axis" onChange={this.toggleCheckbox} value={this.state.xAxisCheckbox}/>
             <Checkbox name="yAxisCheckbox" label="Y-Axis" onChange={this.toggleCheckbox} value={this.state.yAxisCheckbox}/>
           </div>

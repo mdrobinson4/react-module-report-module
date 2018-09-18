@@ -3,7 +3,7 @@ import Plot from 'react-plotly.js';
 
 
 
-export default class PlotData extends React.Component {
+export default class RenderGraph extends React.Component {
   constructor(props) {
     super(props);
 
