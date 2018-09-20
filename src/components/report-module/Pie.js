@@ -9,6 +9,7 @@ export default class Pie extends React.Component {
         data: [],
         layout: {},
         viewNum: 10,
+        abbrRecords: [],
         records: [],
         size: 0
       }
@@ -28,14 +29,14 @@ export default class Pie extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-      if ((this.state.viewNum != prevState.viewNum) || (this.state.records != prevState.records))
+      if ((this.state.viewNum != prevState.viewNum) || (this.state.abbrRecords != prevState.records))
         this.PiePlot(this.props.records.title); // Graph {title} data set
     }
 
     abbr = () => {
       for (let i = 0; i < this.data.length; i++) {
         if (this.data[i].length > 15) {
-          this.data[i] = this.data[i].slice(0, this.data[i].indexOf(' ', 20));
+          this.data[i] = this.data[i].slice(0, this.data[i].indexOf(' ', 15));
           this.data[i] = this.data[i].concat('...');
         }
       }
@@ -44,7 +45,8 @@ export default class Pie extends React.Component {
 
     setData = () => {
       this.setState({
-        records: this.data
+        abbrRecords: this.data,
+        records: this.data = this.props.records.title
       });
     }
 
@@ -75,7 +77,7 @@ export default class Pie extends React.Component {
 
     //Summary function for categorical variable
     summaryCategorical = () => {
-      let uniqueRec = this.state.records.reduce(this.countDuplicates, {});  // Removes and keeps track of num of dups
+      let uniqueRec = this.state.abbrRecords.reduce(this.countDuplicates, {});  // Removes and keeps track of num of dups
       let sortedRec = Object.keys(uniqueRec).sort((a, b) => uniqueRec[b] - uniqueRec[a]);  // Sorts the records by the number of duplicates [High -> Low]
       let sortedCount = [];
       let sortedFreq = [];
