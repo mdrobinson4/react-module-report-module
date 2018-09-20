@@ -1,5 +1,6 @@
 import React from 'react';
 import Plot from 'react-plotly.js';
+import PieSlider from './PieSlider';
 
 export default class Pie extends React.Component {
     constructor(props) {
@@ -8,121 +9,115 @@ export default class Pie extends React.Component {
         data: [],
         layout: {},
         viewNum: 10,
-        update: false,
-        records: {}
+        records: [],
+        size: 0
       }
+      this.data = this.props.records.title;
     }
+
+    /*
+     Graph {title} data set.
+     In the future, only the specified
+    dataset will be sent as a prop
+     to the Pie component
+     */
 
     componentDidMount() {
-      this.handleMount();
-      this.PiePlot(this.props.records);
+      this.abbr();
+      this.PiePlot();
     }
 
-    handleMount = () => {
+    componentDidUpdate(prevProps, prevState) {
+      if ((this.state.viewNum != prevState.viewNum) || (this.state.records != prevState.records))
+        this.PiePlot(this.props.records.title); // Graph {title} data set
+    }
+
+    abbr = () => {
+      for (let i = 0; i < this.data.length; i++) {
+        if (this.data[i].length > 15) {
+          this.data[i] = this.data[i].slice(0, this.data[i].indexOf(' ', 20));
+          this.data[i] = this.data[i].concat('...');
+        }
+      }
+      this.setData();
+    }
+
+    setData = () => {
       this.setState({
-        records: this.props.records
+        records: this.data
       });
     }
 
-    PiePlot = (records) => {
+    PiePlot = () => {
       // Returns dictionary with data statistics
-      let SumStat = this.summaryCategorical(records);
+      let SumStat = this.summaryCategorical();
       let data = [
         {
-          values: SumStat['TopFrequency'],
-          labels: SumStat['UniqueLabel'],
+          values: SumStat['Count'],
+          labels: SumStat['Label'],
           type: 'pie'
         }
       ];
       let layout = {
+        title: this.props.name,
         height: 1000,
         width: 1000,
         showlegend: true
       };
-      this.handlePieUpdate(data, layout);
+      let size = SumStat['Level'];
+      this.handlePieUpdate(data, layout, size);
     }
 
-    componentDidUpdate() {
-      if (this.state.update)
-        this.PiePlot(this.props.records);
-    }
-
-    handleNumChange = (e) => {
-      console.log('Handle Num change');
-      this.setState({
-        viewNum: e.target.value,
-        update: true
-      });
-    }
-
-    countDuplicates = (obj, num) => {
-      obj[num] = (++obj[num] || 1);
+    countDuplicates = (obj, key) => {
+      obj[key] = (++obj[key] || 1);
       return obj;
     }
 
+    //Summary function for categorical variable
+    summaryCategorical = () => {
+      let uniqueRec = this.state.records.reduce(this.countDuplicates, {});  // Removes and keeps track of num of dups
+      let sortedRec = Object.keys(uniqueRec).sort((a, b) => uniqueRec[b] - uniqueRec[a]);  // Sorts the records by the number of duplicates [High -> Low]
+      let sortedCount = [];
+      let sortedFreq = [];
 
 
-    handlePieUpdate = (data, layout) => {
+      for (let i = 0; i < Object.keys(uniqueRec).length; i++) {
+        sortedCount.push(uniqueRec[sortedRec[i]]); // stores the number of dups present for each record
+        sortedFreq.push(uniqueRec[sortedRec[i]] / (Object.keys(uniqueRec).length));  // stores the frequency of each record
+      };
+
+      let dictionary = {
+        'Level': Object.keys(uniqueRec).length,
+        'UniqueLabel': sortedRec,
+        'Label': Object.keys(uniqueRec).slice(0,(this.state.viewNum - 1)),
+        'Count': sortedCount.slice(0,(this.state.viewNum - 1)),
+        'Frequency': sortedFreq.slice(0,(this.state.viewNum - 1))
+      };
+      return dictionary;
+    }
+
+    handleNumChange = (e) => {
       this.setState({
-        data: data,
-        layout: layout,
-        update: false
+        viewNum: e.target.value
       });
     }
 
-    //Summary function for categorical variable
-    summaryCategorical = (records) => {
-      let answer = '';
-
-      // Removes and keeps track of num of dups
-      answer = records.title.reduce(this.countDuplicates, {});
-
-      // Sorts by the number of duplicates [Low -> High]
-      let sortKey = Object.keys(answer).sort((a, b) => answer[b] - answer[a]);
-
-      let sortCount = [];
-      let sortFrequency = [];
-
-      for (let i = 0; i < Object.keys(answer).length; i++) {
-        sortCount.push(answer[sortKey[i]]);
-        sortFrequency.push(answer[sortKey[i]] / (Object.keys(answer).length));
-      };
-
-      let dictBelow7 = {
-        'Level': this.countUnique(records.title),
-        'UniqueLabel': sortKey,
-        'LabelCount':sortCount,
-        'LabelFrequency':sortFrequency
-      };
-
-      let dictAbove7 = {
-        'Level': this.countUnique(records.title),
-        'UniqueLabel': sortKey,
-        'TopLabel':sortKey.slice(0,(this.state.viewNum - 1)),
-        'TopCount':sortCount.slice(0,(this.state.viewNum - 1)),
-        'TopFrequency':sortFrequency.slice(0,(this.state.viewNum - 1)),
-
-
-        'BottomLabel':sortKey.slice( Object.keys(answer).length - this.state.viewNum - 1, - 1),
-        'BottomCount':sortCount.slice( Object.keys(answer).length-this.state.viewNum - 1, - 1),
-        'BottomFrequency':sortFrequency.slice( Object.keys(answer).length-this.state.viewNum - 1, - 1)
-      };
-
-      if (Object.keys(answer).length > 7)
-        return dictAbove7;
-
-      return dictBelow7;
-    }
-
-
-    countUnique = (iterable) => {
-      return new Set(iterable).size;
+    handlePieUpdate = (data, layout, size) => {
+      this.setState({
+        data: data,
+        layout: layout,
+        size: size
+      });
     }
 
     render() {
       return (
         <div>
-          <input type="range" min="1" max="100" value={this.state.viewNum} onChange={this.handleNumChange}/>
+          <PieSlider
+            value={this.state.viewNum}
+            onValueChange={this.handleNumChange}
+            size={this.state.size}
+          />
           <Plot data={this.state.data} layout={this.state.layout}/>
         </div>
 

@@ -5,7 +5,7 @@ import PlotData from './PlotData'
 import Pie from './Pie'
 
 const datasets = [
-  {name: 'Circulation', url: 'http://localhost:9130/instance-storage/instances?limit=500&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title'},
+  {name: 'Inventory', url: 'http://localhost:9130/instance-storage/instances?limit=500&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title'},
   {name: 'Users', url: 'http://localhost:9130/users?limit=500&query=%28cql.allRecords%3D1%29%20sortby%20personal.lastName%20personal.firstName'}
 ];
 
@@ -88,7 +88,7 @@ export default class App extends React.Component {
       // Go to PLOTLY -> this.state.records
       if (isloaded) {
         console.log(JSON.stringify(records));
-        return <Pie records={records} />
+        return <Pie records={records} name={this.state.dataset.name} />
       }
 
       else if (gotToken)
