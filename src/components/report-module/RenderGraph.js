@@ -16,7 +16,6 @@ export default class RenderGraph extends React.Component {
       <Plot
         data={this.props.graph.data}
         layout={this.props.graph.layout}
-        revision={this.props.revision}
        />
     );
   }

@@ -2,24 +2,22 @@ import React from 'react';
 import GraphUI from './GraphUI';
 import styles from './style.css';
 import RenderGraph from './RenderGraph';
+import Plot from 'react-plotly.js';
 
 export default class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            graphData: {
-                data: [{
-                    x: ['Dog', 'Cat'],
-                    y: [1, 2],
-                    type: 'bar'
-                }],
-                layout: {
-                    height: 500,
-                    width: 1000,
-                    title: 'Sample Graph'
-                }
+            data: [{
+                x: ['Dog', 'Cat', 'Mouse'],
+                y: [1, 2, 3],
+                type: 'bar'
+            }],
+            layout: {
+                height: 500,
+                width: 1000,
+                title: 'Sample Graph'
             },
-            revision: 0,
             okapiToken: String,
             xAxisToggle: false,
             yAxisToggle: false,
@@ -50,7 +48,11 @@ export default class App extends React.Component {
                   isloaded: true
                 });
               }
-        },
+        }
+
+        const plotJSON = {
+
+        }
 
         this.componentDidMount = this.componentDidMount.bind(this);
         this.onAxisChange = this.onAxisChange.bind(this);
@@ -58,12 +60,15 @@ export default class App extends React.Component {
 
     onAxisChange(e) {
         var values = e;
+        console.log(values)
 
-        var temp = this.state.graphData.data[0];
-        temp.x = values;
+        var temp = [{
+            x: values,
+            y: this.state.data[0].y,
+            type: this.state.data[0].type
+        }]
 
-        this.setState({ revision: this.state.revision + 1 })
-        this.setState({...this.graphData, data: temp});
+        this.setState({ data: temp })
     }
 
 
@@ -111,10 +116,7 @@ export default class App extends React.Component {
                     changeAxis={this.onAxisChange}
                     axisData={this.state.propertyObjectArray}
                 />
-                <RenderGraph
-                    graph={this.state.graphData}
-                    revision={this.state.revision}
-                />
+                <Plot data={this.state.data} layout={this.state.layout}></Plot>
             </div>
         );
     }
