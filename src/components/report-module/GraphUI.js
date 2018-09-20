@@ -27,7 +27,6 @@ export default class GraphUI extends React.Component {
       ]
     };
     this.handleUIChange = this.handleUIChange.bind(this);
-    this.handleAxisChange = this.handleAxisChange.bind(this);
     this.onToggle = this.onToggle.bind(this);
     this.toggleCheckbox = this.toggleCheckbox.bind(this);
   }
@@ -43,19 +42,11 @@ export default class GraphUI extends React.Component {
       }));
     }
 
-    handleAxisChange(event) {
-      this.setState({
-        [event.target.name]: {
-          values: this.props.records.data[event.target.value],
-          name: event.target.value
-        }
-      });
-    }
-
     handleUIChange(event) {
     this.setState({
       [event.target.name]: event.target.type === 'checkbox' ? event.target.checked : event.target.value
     });
+
 }
 
   render() {
@@ -81,9 +72,10 @@ export default class GraphUI extends React.Component {
       <div>
         <div className={css.ui}>
           <div className={css.axisControl}>
-            <DataOptions properties={this.props.properties}></DataOptions>
-            <Checkbox name="xAxisCheckbox" label="X-Axis" onChange={this.toggleCheckbox} value={this.state.xAxisCheckbox}/>
-            <Checkbox name="yAxisCheckbox" label="Y-Axis" onChange={this.toggleCheckbox} value={this.state.yAxisCheckbox}/>
+            <DataOptions
+              axisData={this.props.axisData}
+              changeAxis={this.props.changeAxis}
+            />
           </div>
         </div>
       </div>

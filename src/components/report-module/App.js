@@ -19,6 +19,7 @@ export default class App extends React.Component {
                     title: 'Sample Graph'
                 }
             },
+            revision: 0,
             okapiToken: String,
             xAxisToggle: false,
             yAxisToggle: false,
@@ -29,9 +30,8 @@ export default class App extends React.Component {
                 {id: 6, username: 'Terry', enrollmentData: new Date(2018, 5)},
                 {id: 7, username: 'Kate', enrollmentData: new Date(2017, 5)}
             ],
-            records: [],
+            propertyObjectArray: [],
             isLoaded: Boolean,
-            propertyArray: [],
             dataSets: [
                 {name: 'Circulation', url: 'http://localhost:9130/instance-storage/instances?limit=500&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title'},
                 {name: 'Users', url: 'http://localhost:9130/users?limit=500&query=%28cql.allRecords%3D1%29%20sortby%20personal.lastName%20personal.firstName'}
@@ -52,21 +52,37 @@ export default class App extends React.Component {
               }
         },
 
-        this.handlePropertyArray = this.handlePropertyArray.bind(this)
         this.componentDidMount = this.componentDidMount.bind(this);
         this.onAxisChange = this.onAxisChange.bind(this);
     }
 
-    onAxisChange(value) {
-        this.setState({ xAxisToggle: value})
+    onAxisChange(e) {
+        var values = e;
+
+        var temp = this.state.graphData.data[0];
+        temp.x = values;
+
+        this.setState({ revision: this.state.revision + 1 })
+        this.setState({...this.graphData, data: temp});
     }
 
-    handlePropertyArray(properties) {
-        this.setState({ propertyArray: properties })
-    }
+
     componentDidMount() {
-        let propertyArray = Object.getOwnPropertyNames(this.state.userData[0])
-        this.handlePropertyArray(propertyArray);
+        let propertyArray = Object.getOwnPropertyNames(this.state.userData[0]);
+
+        propertyArray.forEach(element => {
+            var propertyObject = {
+                type: element,
+                data: [ ]
+            };
+            this.state.userData.forEach(element => {
+                var temp = Object.getOwnPropertyDescriptor(element, propertyObject.type)
+
+                propertyObject.data.push(temp.value)
+            });
+            this.state.propertyObjectArray.push(propertyObject);
+        });
+
         fetch('http://localhost:9130/authn/login', {
           method: 'POST',
           body: this.state.body,
@@ -91,8 +107,14 @@ export default class App extends React.Component {
     render() {
         return (
             <div className={styles.componentFlexRow}>
-                <GraphUI changeAxis={this.onAxisChange} properties={this.state.propertyArray}></GraphUI>
-                <RenderGraph graph={this.state.graphData}/>
+                <GraphUI 
+                    changeAxis={this.onAxisChange}
+                    axisData={this.state.propertyObjectArray}
+                />
+                <RenderGraph
+                    graph={this.state.graphData}
+                    revision={this.state.revision}
+                />
             </div>
         );
     }

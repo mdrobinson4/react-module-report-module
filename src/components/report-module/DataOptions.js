@@ -1,5 +1,5 @@
 import React from "react";
-import styles from './style.css';
+
 
 export default class DataOptions extends React.Component {
     constructor(props) {
@@ -7,16 +7,14 @@ export default class DataOptions extends React.Component {
 
         this.state = {
             isChecked: {
-                value: { },
+                axisValues: [],
                 status: false
             },
-            prop: [
-                'Dog',
-                'Cat'
-            ]
+            currentAxis: {
+                type: String,
+                values: []
+             }
         }
-
-
 
         this.handleChange = this.handleChange.bind(this);
 
@@ -28,18 +26,29 @@ export default class DataOptions extends React.Component {
 
     handleChange(event) {
         const target = event.target;
-        const value = target.type;
+
+        const axis = {
+            type: target.name,
+            values: target.value
+        }
+
+        this.setState({currentAxis: axis}, this.updateAxis)
+
+    }
+
+    updateAxis() {
+        var convertedValues = this.state.currentAxis.values.split(",")
+        this.props.changeAxis(convertedValues)
     }
 
 
     render() {
 
-        const properties = this.props.properties;
-        const checkboxList = properties.map((property) =>
+        const checkboxList = this.props.axisData.map((field) =>
         <li>
             <label>
-                {property} 
-                <input name={property} type="checkbox" onChange={this.handleChange}/>
+                {field.type.toUpperCase() + ":  "}  
+                <input name={field.type} type="checkbox" value={field.data} onChange={this.handleChange}/>
             </label>
         </li>
         );
