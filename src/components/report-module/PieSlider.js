@@ -8,12 +8,12 @@ export default class PieSlider extends React.Component {
     }
 
     render() {
-      console.log(this.props.size);
+      console.log(this.props.value);
       if (this.props.size > 10) {
         return (
           <fieldset>
             <legend>Records Shown: {this.props.value}</legend>
-            <input type="range" name="slices" min="1" max="100" value={this.props.value} onChange={this.props.onValueChange} />
+            <input type="range" name="slices" min="1" max="100" value={this.props.value} onChange={this.props.handleNumChange} />
         </fieldset>
         )
       }

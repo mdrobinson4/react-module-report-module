@@ -19,7 +19,7 @@ export default class Pie extends React.Component {
     /*
      Graph {title} data set.
      In the future, only the specified
-    dataset will be sent as a prop
+     dataset will be sent as a prop
      to the Pie component
      */
 
@@ -36,14 +36,15 @@ export default class Pie extends React.Component {
     abbr = () => {
       for (let i = 0; i < this.data.length; i++) {
         if (this.data[i].length > 15) {
-          this.data[i] = this.data[i].slice(0, this.data[i].indexOf(' ', 15));
+          if (this.data[i].indexOf(' ', 15) !== -1)
+            this.data[i] = this.data[i].slice(0, this.data[i].indexOf(' ', 15));
           this.data[i] = this.data[i].concat('...');
         }
       }
-      this.setData();
+      this.setRecords();
     }
 
-    setData = () => {
+    setRecords = () => {
       this.setState({
         abbrRecords: this.data,
         records: this.data = this.props.records.title
@@ -53,6 +54,7 @@ export default class Pie extends React.Component {
     PiePlot = () => {
       // Returns dictionary with data statistics
       let SumStat = this.summaryCategorical();
+      console.log(SumStat);
       let data = [
         {
           values: SumStat['Count'],
@@ -77,24 +79,26 @@ export default class Pie extends React.Component {
 
     //Summary function for categorical variable
     summaryCategorical = () => {
-      let uniqueRec = this.state.abbrRecords.reduce(this.countDuplicates, {});  // Removes and keeps track of num of dups
-      let sortedRec = Object.keys(uniqueRec).sort((a, b) => uniqueRec[b] - uniqueRec[a]);  // Sorts the records by the number of duplicates [High -> Low]
-      let sortedCount = [];
-      let sortedFreq = [];
+      let records = this.state.abbrRecords.reduce(this.countDuplicates, {});  // Stores the unique records
+      let count = [];
+      let freq = [];
 
+      for (let key in records) {
+        count.push(records[key]); // store count of each item in array
+        freq.push(records[key] / Object.keys(records).length);  store frequency -> [count / Total Count] in array
+      }
 
-      for (let i = 0; i < Object.keys(uniqueRec).length; i++) {
-        sortedCount.push(uniqueRec[sortedRec[i]]); // stores the number of dups present for each record
-        sortedFreq.push(uniqueRec[sortedRec[i]] / (Object.keys(uniqueRec).length));  // stores the frequency of each record
-      };
+      count = count.sort((a, b) => b - a);  // Sorts the count of each item from [High -> Low]
+      freq = count.sort((a, b) => b - a);  // Sorts the frequency of each item from [High -> Low]
+      records = Object.keys(records).sort((a, b) => records[b] - records[a]);  // Sorts the records by the number of duplicates [High -> Low]
 
       let dictionary = {
-        'Level': Object.keys(uniqueRec).length,
-        'UniqueLabel': sortedRec,
-        'Label': Object.keys(uniqueRec).slice(0,(this.state.viewNum - 1)),
-        'Count': sortedCount.slice(0,(this.state.viewNum - 1)),
-        'Frequency': sortedFreq.slice(0,(this.state.viewNum - 1))
+        'Level': records.length, // stores the number of records
+        'Label': records.slice(0,(this.state.viewNum)),
+        'Count': count.slice(0,(this.state.viewNum)),
+        'Frequency': freq.slice(0,(this.state.viewNum))
       };
+
       return dictionary;
     }
 
@@ -117,7 +121,7 @@ export default class Pie extends React.Component {
         <div>
           <PieSlider
             value={this.state.viewNum}
-            onValueChange={this.handleNumChange}
+            handleNumChange={this.handleNumChange}
             size={this.state.size}
           />
           <Plot data={this.state.data} layout={this.state.layout}/>
