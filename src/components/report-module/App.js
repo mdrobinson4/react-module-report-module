@@ -2,28 +2,31 @@ import React from 'react';
 import GraphUI from './GraphUI'
 import GetRecords from './GetRecords'
 import PlotData from './PlotData'
+import CDF from './CDF'
 
 const datasets = [
-  {name: 'Circulation', url: 'http://localhost:9130/instance-storage/instances?limit=500&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title'},
+  {name: 'Inventory', url: 'http://localhost:9130/instance-storage/instances?limit=500&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title'},
   {name: 'Users', url: 'http://localhost:9130/users?limit=500&query=%28cql.allRecords%3D1%29%20sortby%20personal.lastName%20personal.firstName'}
 ];
+
 
 export default class App extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
         okapiToken: '',
+        gotToken: false,
         dataset: {
           url: datasets[0].url,
           name: datasets[0].name
         },
-        isloaded: false,
         getRecords: (result) => {
           this.setState({
             records: result,
             isloaded: true
           });
         },
+        isloaded: false,
         records: [],
         graphData: {
           data: [{
@@ -55,7 +58,7 @@ export default class App extends React.Component {
       .then((res) => {
         this.setState({
           okapiToken: res.headers.get('x-okapi-token'),
-          isLoaded: true
+          gotToken: true
         });
       });
     }
@@ -70,7 +73,7 @@ export default class App extends React.Component {
     }
 
     render() {
-      let {records, isloaded} = this.state;
+      let {records, isloaded, gotToken} = this.state;
       let options = datasets.map(data => ({
         value: data.url,
         label: data.name
@@ -81,11 +84,10 @@ export default class App extends React.Component {
 
       // Go to PLOTLY -> this.state.records
       if (isloaded) {
-        console.log(records);
-        return <div>PLOTLY IS NEXT!!</div>
+        return <CDF records={records} name={this.state.dataset.name} />
       }
 
-      else if (this.state.okapiToken)
+      else if (gotToken)
         return <GetRecords info={this.state} />
 
       else
