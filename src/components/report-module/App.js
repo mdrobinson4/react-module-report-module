@@ -25,7 +25,9 @@ export default class App extends React.Component {
             yAxisValues: [],
             userData: [
                 {id: 5, username: 'John', enrollmentData: new Date(2018, 11)},
+                {id: 8, username: 'John', enrollmentData: new Date(2017, 11)},
                 {id: 6, username: 'Terry', enrollmentData: new Date(2018, 5)},
+                {id: 9, username: 'Larry', enrollmentData: new Date(2018, 5)},
                 {id: 7, username: 'Kate', enrollmentData: new Date(2017, 5)}
             ],
             propertyObjectArray: [],
@@ -50,21 +52,16 @@ export default class App extends React.Component {
               }
         }
 
-        const plotJSON = {
-
-        }
-
         this.componentDidMount = this.componentDidMount.bind(this);
         this.onAxisChange = this.onAxisChange.bind(this);
     }
 
     onAxisChange(e) {
-        var values = e;
-        console.log(values)
+        var axes = e;
 
         var temp = [{
-            x: values,
-            y: this.state.data[0].y,
+            x: axes.x.values,
+            y: axes.y.values,
             type: this.state.data[0].type
         }]
 
