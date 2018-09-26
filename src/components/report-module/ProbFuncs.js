@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Checkbox from '@folio/stripes-components/lib/Checkbox';
-import Select from '@folio/stripes-components/lib/Select';
 import Plot from 'react-plotly.js';
 
 export default class ProbFuncs extends React.Component {
@@ -10,7 +9,7 @@ export default class ProbFuncs extends React.Component {
     this.state = {
       data:
         {
-          x: this.props.records[Object.keys(this.props.records)[0]],      // In the FUTURE project, the specified values will be stored in this.props.values
+          x: this.props.records[Object.keys(this.props.records)[0]],      // In the FUTURE, the specified values will be stored in this.props.values
           type: 'histogram',
           cumulative: {enabled: true},
           histonorm: '',
@@ -26,18 +25,18 @@ export default class ProbFuncs extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if ((this.props.values !== prevProps.values)  && prevState.data.x)  // render if the values are updated
+    if ((this.props.values !== prevProps.values)  && prevState.data.x)  // render if the VALUES are changed
       this.updateValues();
 
-    if (this.props.type !== prevProps.type  && prevState.data.x)  // render if the type is upaded
+    if (this.props.type !== prevProps.type  && prevState.data.x)  // render if the TYPE is changed
       this.updateType();
   }
 
-    // Update the values and reset the options -> [cumulative, histonorm, type]
+    // Update the values and RESET the other options -> [cumulative, histonorm, type]
     updateValues = () => {
       this.setState((prevState) => ({
         data: {
-          x: this.props.records[Object.keys(this.props.records)[0]],
+          x: this.props.records[Object.keys(this.props.records)[0]],  // In the FUTURE, the specified values will be stored in this.props.values
           type: 'cdf',
           cumulative: {enabled: true},
           histonorm: '',
@@ -46,9 +45,8 @@ export default class ProbFuncs extends React.Component {
       }));
     }
 
-    // Update the type and set the other options -> [cumulative, histonorm, marker]
+    // Update the type and SET the other options -> [cumulative, histonorm, marker]
     updateType = () => {
-      console.log('update type');
       this.setState((prevState) => ({
         data: {
           x: prevState.data.x,
@@ -61,12 +59,12 @@ export default class ProbFuncs extends React.Component {
       }));
     }
 
-    // Update the function if normalized is enabled
+    // Update the function if the NORMALIZE value is changed
     handleNormChange = (e) => {
-      let result = (e.target.value === 'false') ? 'true' : 'false';
+      let newNormVal = (e.target.value === 'false') ? 'true' : 'false'; // Since the checkbox component only takes strings
       let data = this.state.data;
 
-      if (result === 'true') {
+      if (newNormVal === 'true') {
         data.histonorm = 'probability';
         data.marker.color = 'rgb(255, 255, 100)';
       }
@@ -76,7 +74,7 @@ export default class ProbFuncs extends React.Component {
         data.marker.color = '';
       }
 
-      this.updateState(data, result);
+      this.updateState(data, newNormVal);
     }
 
     updateState = (data, normalized) => {
@@ -88,10 +86,10 @@ export default class ProbFuncs extends React.Component {
 
   render() {
     console.log(this.state.data);
-    let normalized = (this.state.type === 'pdf') ? <Checkbox name="normalized" label="Normalized" onChange={this.handleNormChange} value={this.state.normalized}/> : null;
+    let normCheckBox = (this.state.type === 'pdf') ? <Checkbox name="normalized" label="Normalized" onChange={this.handleNormChange} value={this.state.normalized}/> : null;
     return (
       <div>
-        {normalized}
+        {normCheckBox}
         <Plot
           data={[this.state.data]}
           layout={this.state.layout}
