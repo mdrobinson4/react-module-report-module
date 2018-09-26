@@ -54,7 +54,6 @@ export default class Pie extends React.Component {
     PiePlot = () => {
       // Returns dictionary with data statistics
       let SumStat = this.summaryCategorical();
-      console.log(SumStat);
       let data = [
         {
           values: SumStat['Count'],
@@ -85,7 +84,7 @@ export default class Pie extends React.Component {
 
       for (let key in records) {
         count.push(records[key]); // store count of each item in array
-        freq.push(records[key] / Object.keys(records).length);  store frequency -> [count / Total Count] in array
+        freq.push(records[key] / Object.keys(records).length);  // store frequency -> [count / Total Count] in array
       }
 
       count = count.sort((a, b) => b - a);  // Sorts the count of each item from [High -> Low]
