@@ -1,5 +1,5 @@
 import React from 'react';
-import Checkbox from '@folio/stripes-components/lib/Checkbox';
+import Button from './Button';
 import DataOptions from './DataOptions'
 import css from './style.css';
 //dataOptions={[
@@ -50,24 +50,6 @@ export default class GraphUI extends React.Component {
 }
 
   render() {
-    //// Creates the option elements for the graph types
-    //const graphType = ['bar', 'line', 'pie'];
-    //let graphTypeOp = graphType.map((type) =>
-    //  <option key={type} value={type}>{type.toUpperCase()}</option>
-    //);
-//
-    //// Creates the option elements for each row of data
-    //const keys = Object.keys(this.props.records.data);
-    //let columns = keys.map((col) =>
-    //  <option type="button" key={col} value={col} >{col.toUpperCase()}</option>
-    //);
-//
-    //// Creates the option elements for data types
-    //const dataType = ['continuous', 'categorical'];
-    //let dataTypeOp = dataType.map((type) =>
-    //  <option key={type} value={type}>{type.toUpperCase()}</option>
-    //);
-
     return (
       <div>
         <div className={css.ui}>
@@ -75,6 +57,10 @@ export default class GraphUI extends React.Component {
             <DataOptions
               axisData={this.props.axisData}
               changeAxis={this.props.changeAxis}
+            />
+            <Button
+              label={"Switch Axes"}
+              onClick={this.props.swapAxes}
             />
           </div>
         </div>

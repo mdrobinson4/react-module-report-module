@@ -54,6 +54,7 @@ export default class App extends React.Component {
 
         this.componentDidMount = this.componentDidMount.bind(this);
         this.onAxisChange = this.onAxisChange.bind(this);
+        this.swapAxes = this.swapAxes.bind(this);
     }
 
     onAxisChange(e) {
@@ -68,6 +69,19 @@ export default class App extends React.Component {
         this.setState({ data: temp })
     }
 
+    swapAxes() {
+        var stateHolder = this.state.data;
+
+        var swap = {
+            x: this.state.data[0].y,
+            y: this.state.data[0].x,
+            type: this.state.data[0].type
+        }
+
+        stateHolder[0] = swap;
+
+        this.setState({ data: stateHolder })
+    }
 
     componentDidMount() {
         let propertyArray = Object.getOwnPropertyNames(this.state.userData[0]);
@@ -112,6 +126,7 @@ export default class App extends React.Component {
                 <GraphUI 
                     changeAxis={this.onAxisChange}
                     axisData={this.state.propertyObjectArray}
+                    swapAxes={this.swapAxes}
                 />
                 <Plot data={this.state.data} layout={this.state.layout}></Plot>
             </div>

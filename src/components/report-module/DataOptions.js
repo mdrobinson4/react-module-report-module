@@ -25,14 +25,8 @@ export default class DataOptions extends React.Component {
         this.getCount = this.getCount.bind(this);
     }
 
-    componentDidMount() {
-
-    }
-
     handleChange(event) {
-        //this.setState({currentYAxis: axis}, this.updateAxis)
-        //this.setState({...this.state.currentAxes, x: axis}, this.updateAxis)
-        //this.setState({...this.state.currentAxes, y: axis}, this.updateAxis)
+
         var target = event.target;
 
         var axis = {
