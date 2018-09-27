@@ -20,8 +20,32 @@ export default class ProbFuncs extends React.Component {
         autosize: true
       },
       normalized: 'false',
-      type: 'cdf'
+      type: 'cdf',
+      windowWidth: '',
+      windowHeight: ''
     };
+  }
+
+  handleResize = (e) => {
+    let layout = this.state.layout;
+    layout.width = window.innerWidth;
+    layout.height = window.innerHeight / 2;
+
+    this.updateLayout(layout);
+  }
+
+  updateLayout = (layout) => {
+    this.setState({
+      layout: layout
+    });
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.handleResize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -86,6 +110,7 @@ export default class ProbFuncs extends React.Component {
 
   render() {
     console.log(this.state.data);
+    console.log(`Window Width: ${this.state.windowWidth}`);
     let normCheckBox = (this.state.type === 'pdf') ? <Checkbox name="normalized" label="Normalized" onChange={this.handleNormChange} value={this.state.normalized}/> : null;
     return (
       <div>
