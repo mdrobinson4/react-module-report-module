@@ -37,11 +37,11 @@ export default class ProbFuncs extends React.Component {
       this.setState((prevState) => ({
         data: {
           x: this.props.records[Object.keys(this.props.records)[0]],  // In the FUTURE, the specified values will be stored in this.props.values
-          type: 'cdf',
           cumulative: {enabled: true},
           histonorm: '',
           marker: {}
-        }
+        },
+        type: 'cdf'
       }));
     }
 
