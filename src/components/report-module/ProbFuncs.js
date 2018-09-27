@@ -21,16 +21,18 @@ export default class ProbFuncs extends React.Component {
       },
       normalized: 'false',
       type: 'cdf',
-      windowWidth: '',
-      windowHeight: ''
     };
   }
 
   handleResize = (e) => {
     let layout = this.state.layout;
-    layout.width = window.innerWidth;
-    layout.height = window.innerHeight / 2;
+    layout.width = window.innerWidth / 2;
+    layout.height = .6428571429 * layout.width;
 
+    if (layout.height > window.innerHeight) {
+      layout.height = window.innerHeight;
+      layout.width = 1.55556 * layout.height;
+    }
     this.updateLayout(layout);
   }
 
