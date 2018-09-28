@@ -2,12 +2,7 @@ import React from 'react';
 import Button from './Button';
 import DataOptions from './DataOptions'
 import css from './style.css';
-//dataOptions={[
-//  {value: "Y", label: "Yes"},
-//  {value: "N", label: "No"},
-//  {value: "M", label: "Maybe", disabled: true}
-//]}>
-// Returns the graphical interce and sends the fields' values to PLOTLY
+
 export default class GraphUI extends React.Component {
   constructor(props) {
     super(props);
@@ -15,39 +10,55 @@ export default class GraphUI extends React.Component {
       xType: 'categorical',
       yType: 'categorical',
       size: 20,
-      switch: true,
-      frequency: true,
       showAllTicks: '',
-      opacity: 1,
-      xAxisCheckbox: false,
-      yAxisCheckbox: false,
-      xAxisValues: [
-        {value: "A", label: "Yes"},
-        {value: "B", label: "No"}      
-      ]
+      opacity: 1
     };
-    this.handleUIChange = this.handleUIChange.bind(this);
-    this.onToggle = this.onToggle.bind(this);
-    this.toggleCheckbox = this.toggleCheckbox.bind(this);
+    this.getCount = this.getCount.bind(this);
   }
 
-  toggleCheckbox() {
-    var value = this.check.value
-    this.props.changeAxis(value)
-  }
+  getCount(arr) {
+    var lastElement = arr[0];
+    var count = 1;
 
-  onToggle() {
-      this.setState(prevState => ({
-        dropdownOpen: !prevState.dropdownOpen
-      }));
+    var countArr = [];
+
+    for (var x = 1; x <= arr.length; x++) {
+        if (arr[x] === lastElement) {
+            count++;
+        }
+        else {
+            countArr.push(count);
+            count = 1;
+            lastElement = arr[x];
+        }
     }
 
-    handleUIChange(event) {
-    this.setState({
-      [event.target.name]: event.target.type === 'checkbox' ? event.target.checked : event.target.value
-    });
+    return countArr;
+  }
 
-}
+  getFrequency(arr) {
+    
+    var lastElement = arr[0];
+    var count = 1;
+    var percentOf;
+
+    var freqArr = [];
+
+    for (var x = 1; x <= arr.length; x++) {
+      if (arr[x] === lastElement) {
+        count++;
+      }
+      else {
+        percentOf = count / arr.length;
+        freqArr.push(percentOf);
+
+        count = 1;
+        lastElement = arr[x]
+      }
+    }
+
+    return freqArr;
+  }
 
   render() {
     return (
@@ -57,6 +68,8 @@ export default class GraphUI extends React.Component {
             <DataOptions
               axisData={this.props.axisData}
               changeAxis={this.props.changeAxis}
+              getCount={this.getCount}
+              getFreq={this.getFrequency}
             />
             <Button
               label={"Switch Axes"}

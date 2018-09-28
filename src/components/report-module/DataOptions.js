@@ -1,4 +1,5 @@
 import React from "react";
+import Button from './Button';
 
 
 export default class DataOptions extends React.Component {
@@ -17,12 +18,15 @@ export default class DataOptions extends React.Component {
                     values: [ ],
                     active: false
                 }
-            }
+            },
+            currentLabel: 'count',
+            lastLabel: 'frequency'
         }
 
         this.handleChange = this.handleChange.bind(this);
         this.updateAxis = this.updateAxis.bind(this);
-        this.getCount = this.getCount.bind(this);
+        this.switchFreq = this.switchFreq.bind(this);
+        this.removeDuplicates = this.removeDuplicates.bind(this);
     }
 
     handleChange(event) {
@@ -69,8 +73,8 @@ export default class DataOptions extends React.Component {
         axesData.x.values = axesData.x.values.toString().split(",");
         
         if (!axesData.y.active) {
-            axesData.y.values = this.getCount(axesData.x.values);
-            console.log(axesData.y.values);
+            this.state.currentLabel === 'count' ? axesData.y.values = this.props.getCount(axesData.x.values) : axesData.y.values = this.props.getFreq(axesData.x.values);
+            axesData.x.values = this.removeDuplicates(axesData.x.values)
         }
         else {
             axesData.y.values = axesData.y.values.toString().split(",");
@@ -80,25 +84,24 @@ export default class DataOptions extends React.Component {
         this.props.changeAxis(axesData)
     }
 
-    getCount(arr) {
+    switchFreq() {
+        var temp = this.state.lastLabel;
+        this.setState({ lastLabel : this.state.currentLabel })
+        this.setState({ currentLabel : temp })
+    }
 
-        var lastElement;
-        var count = 1;
+    removeDuplicates(arr) {
+        var noDupes = [];
+        noDupes.push(arr[0])
+        var lastElement = arr[0];
 
-        var frequencyArr = [];
-
-        for (var x = 0; x < arr.length; x++) {
-            if (arr[x] === lastElement) {
-                count++;
-            }
-            else {
-                frequencyArr.push(count);
-                count = 1;
+        for (var x = 1; x < arr.length; x++) {
+            if (arr[x] !== lastElement) {
+                noDupes.push(arr[x]);
                 lastElement = arr[x];
             }
         }
-
-        return frequencyArr;
+        return noDupes;
     }
 
     render() {
@@ -118,9 +121,15 @@ export default class DataOptions extends React.Component {
         );
 
         return (
-            <ul>
-                {checkboxList}
-            </ul>
+            <div>
+                <ul>
+                    {checkboxList}
+                </ul>
+                <Button
+                    label={this.state.currentLabel}
+                    onClick={this.switchFreq}
+                />
+            </div>
         );
     }
 }
