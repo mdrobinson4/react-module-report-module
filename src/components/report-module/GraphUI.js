@@ -1,6 +1,7 @@
 import React from 'react';
 import Button from './Button';
 import DataOptions from './DataOptions'
+import Slider from './Slider'
 import css from './style.css';
 
 export default class GraphUI extends React.Component {
@@ -74,6 +75,9 @@ export default class GraphUI extends React.Component {
             <Button
               label={"Switch Axes"}
               onClick={this.props.swapAxes}
+            />
+            <Slider
+              updateOpac={this.props.updateOpac}
             />
           </div>
         </div>

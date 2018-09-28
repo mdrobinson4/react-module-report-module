@@ -11,7 +11,8 @@ export default class App extends React.Component {
             data: [{
                 x: ['Dog', 'Cat', 'Mouse'],
                 y: [1, 2, 3],
-                type: 'bar'
+                type: 'bar',
+                opacity: 1
             }],
             layout: {
                 height: 500,
@@ -55,6 +56,7 @@ export default class App extends React.Component {
         this.componentDidMount = this.componentDidMount.bind(this);
         this.onAxisChange = this.onAxisChange.bind(this);
         this.swapAxes = this.swapAxes.bind(this);
+        this.updateOpacity = this.updateOpacity.bind(this);
     }
 
     onAxisChange(e) {
@@ -63,24 +65,38 @@ export default class App extends React.Component {
         var temp = [{
             x: axes.x.values,
             y: axes.y.values,
-            type: this.state.data[0].type
+            type: this.state.data[0].type,
+            opacity: this.state.data[0].opacity
         }]
 
         this.setState({ data: temp })
     }
 
     swapAxes() {
-        var stateHolder = this.state.data;
-
-        var swap = {
+        var swap = [{
             x: this.state.data[0].y,
             y: this.state.data[0].x,
-            type: this.state.data[0].type
-        }
+            type: this.state.data[0].type,
+            opacity: this.state.data[0].opacity
+        }]
 
-        stateHolder[0] = swap;
+        this.setState({ data: swap })
+    }
 
-        this.setState({ data: stateHolder })
+    updateOpacity(e) {
+        var newOpacity = e.target.value;
+        console.log(newOpacity)
+
+        newOpacity /= 100;
+
+        var temp = [{
+            x: this.state.data[0].x,
+            y: this.state.data[0].y,
+            type: this.state.data[0].type,
+            opacity: newOpacity
+        }]
+
+        this.setState({ data: temp })
     }
 
     componentDidMount() {
@@ -111,14 +127,6 @@ export default class App extends React.Component {
           });
         });
       }
-      changeData = (e) => {
-        this.setState({
-          dataset: {
-            value: e.target.value,
-            name: e.target.label
-          }
-        });
-      }
 
     render() {
         return (
@@ -128,6 +136,8 @@ export default class App extends React.Component {
                     graphData={this.state.data[0]}
                     axisData={this.state.propertyObjectArray}
                     swapAxes={this.swapAxes}
+                    updateOpac={this.updateOpacity}
+                    opacity={this.state.opacity}
                 />
                 <Plot data={this.state.data} layout={this.state.layout}></Plot>
             </div>
