@@ -85,7 +85,6 @@ export default class App extends React.Component {
 
     updateOpacity(e) {
         var newOpacity = e.target.value;
-        console.log(newOpacity)
 
         newOpacity /= 100;
 

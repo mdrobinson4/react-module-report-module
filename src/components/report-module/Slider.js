@@ -1,4 +1,5 @@
 import React from 'react';
+import styles from './style.css'
 
 export default class Slider extends React.Component {
     constructor(props) {
@@ -11,8 +12,8 @@ export default class Slider extends React.Component {
 
     render() {
         return (
-            <div>
-                <input type="range" min="1" max="100" defaultValue={100} onChange={this.props.updateOpac}/>
+            <div className={styles.rangewrapper}>
+                <input className={styles.slider} type="range" min="1" max="100" defaultValue={100} onChange={this.props.updateOpac}/>
             </div>
         );
     }
