@@ -1,7 +1,6 @@
 import React from 'react';
 import GraphUI from './GraphUI';
 import styles from './style.css';
-import RenderGraph from './RenderGraph';
 import Plot from 'react-plotly.js';
 
 export default class App extends React.Component {
