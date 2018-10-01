@@ -2,6 +2,7 @@ import React from 'react';
 import GraphUI from './GraphUI';
 import styles from './style.css';
 import Plot from 'react-plotly.js';
+import GetRecords from './GetRecords';
 
 export default class App extends React.Component {
     constructor(props) {
@@ -91,8 +92,8 @@ export default class App extends React.Component {
         this.setState({ data: temp })
     }
 
-    getRecords() {
-
+    getRecords(dataArr) {
+        this.setState({records: dataArr})
     }
 
     componentDidMount() {
@@ -135,7 +136,12 @@ export default class App extends React.Component {
                     updateOpac={this.updateOpacity}
                     opacity={this.state.opacity}
                 />
-                <Plot data={this.state.data} layout={this.state.layout}></Plot>
+                <Plot data={this.state.data} layout={this.state.layout}/>
+                <GetRecords
+                    getRecords={this.getRecords}
+                    url={this.state.dataSets[0].url}
+                    token={this.state.okapiToken}
+                />
             </div>
         );
     }
