@@ -19,8 +19,7 @@ export default class App extends React.Component {
                 title: 'Sample Graph'
             },
             okapiToken: String,
-            xAxisToggle: false,
-            yAxisToggle: false,
+            records: [],
             xAxisValues: [],
             yAxisValues: [],
             userData: [
@@ -44,18 +43,13 @@ export default class App extends React.Component {
                 'Content-type': 'application/json',
                 'X-Okapi-Tenant': 'diku',
             }),
-            getRecords: (result) => {
-                this.setState({
-                  records: result,
-                  isloaded: true
-                });
-              }
         }
 
         this.componentDidMount = this.componentDidMount.bind(this);
         this.onAxisChange = this.onAxisChange.bind(this);
         this.swapAxes = this.swapAxes.bind(this);
         this.updateOpacity = this.updateOpacity.bind(this);
+        this.getRecords = this.getRecords.bind(this);
     }
 
     onAxisChange(e) {
@@ -95,6 +89,10 @@ export default class App extends React.Component {
         }]
 
         this.setState({ data: temp })
+    }
+
+    getRecords() {
+
     }
 
     componentDidMount() {
