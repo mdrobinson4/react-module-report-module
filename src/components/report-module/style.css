@@ -39,12 +39,10 @@
 
 
 .axisControl {
-  padding-right: .2em
-}
-
-.checkbox {
-  margin-top: 1em;
-  margin-bottom: 1em;
+  display: flex;
+  flex-direction: column;
+  margin: 1em;
+  padding: 0.5em;
 }
 
 .input {
@@ -97,6 +95,38 @@ input[type=range]::-webkit-slider-runnable-track {
   border: 0.2px solid #010101;
 }
 
-.rangewrapper {
+.range_wrapper {
   margin: 20px 0px 0px 15px;
+}
+
+.data_options_wrapper {
+  border: 0.5em solid #6294e5;
+  border-radius: 4px;
+  margin: 2em 2em 1em 0em;
+  padding: 1.3em;
+  display: flex;
+  flex-direction: column;
+}
+
+.button {
+  border: .25em solid #6294e5;
+  border-radius: 4px;
+  width: 110px;
+  height: 40px;
+  margin: .25em;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+}
+
+.button:hover {
+  background-color: #6294e5;
+  color: white;
+}
+
+.checkbox_list {
+  margin: 1em;
+}
+
+.label {
+  margin-right: .5em;
 }

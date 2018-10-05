@@ -10,6 +10,7 @@ export default class Button extends React.Component {
         return (
             <button
                 onClick={this.props.onClick}
+                className={this.props.style}
             >
                 {this.props.label}
             </button>

@@ -33,7 +33,6 @@ export default class GraphUI extends React.Component {
             lastElement = arr[x];
         }
     }
-
     return countArr;
   }
 
@@ -75,6 +74,7 @@ export default class GraphUI extends React.Component {
             <Button
               label={"Switch Axes"}
               onClick={this.props.swapAxes}
+              style={css.button}
             />
             <Slider
               updateOpac={this.props.updateOpac}

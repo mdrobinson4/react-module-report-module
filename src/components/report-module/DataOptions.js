@@ -1,5 +1,6 @@
 import React from "react";
 import Button from './Button';
+import css from './style.css';
 
 
 export default class DataOptions extends React.Component {
@@ -19,8 +20,8 @@ export default class DataOptions extends React.Component {
                     active: false
                 }
             },
-            currentLabel: 'count',
-            lastLabel: 'frequency'
+            currentLabel: 'Count',
+            lastLabel: 'Frequency'
         }
 
         this.handleChange = this.handleChange.bind(this);
@@ -40,6 +41,28 @@ export default class DataOptions extends React.Component {
         }
 
         var stateHolder = this.state.currentAxes;
+
+        //Will eventually refactor this code to be what controls the currentAxes since it is cleaner
+        //if (axis.active) {
+        //    if (!this.state.currentAxes.x.active) {
+        //        stateHolder.x = axis;
+        //        this.setState({currentAxes: stateHolder}, this.updateAxis);
+        //    }
+        //    else {
+        //        stateHolder.y = axis;
+        //        this.setState({currentAxes: stateHolder}, this.updateAxis);
+        //    }
+        //}
+        //else {
+        //    if (this.state.currentAxes.y.active) {
+        //        stateHolder.y = axis
+        //        this.setState({currentAxes: stateHolder}, this.updateAxis);
+        //    }
+        //    else {
+        //        stateHolder.x = axis
+        //        this.setState({currentAxes: stateHolder}, this.updateAxis);
+        //    }
+        //}
         
         if (!this.state.currentAxes.x.active) {
 
@@ -73,7 +96,7 @@ export default class DataOptions extends React.Component {
         axesData.x.values = axesData.x.values.toString().split(",");
         
         if (!axesData.y.active) {
-            this.state.currentLabel === 'count' ? axesData.y.values = this.props.getCount(axesData.x.values) : axesData.y.values = this.props.getFreq(axesData.x.values);
+            this.state.currentLabel === 'Count' ? axesData.y.values = this.props.getCount(axesData.x.values) : axesData.y.values = this.props.getFreq(axesData.x.values);
             axesData.x.values = this.removeDuplicates(axesData.x.values)
         }
         else {
@@ -107,7 +130,7 @@ export default class DataOptions extends React.Component {
     render() {
 
         const checkboxList = this.props.axisData.map((field) =>
-        <li>
+        <div>
             <label>
                 {field.type.toUpperCase() + ":  "}  
                 <input 
@@ -117,17 +140,20 @@ export default class DataOptions extends React.Component {
                     onChange={this.handleChange}
                 />
             </label>
-        </li>
+        </div>
         );
 
         return (
             <div>
-                <ul>
-                    {checkboxList}
-                </ul>
+                <div className={css.data_options_wrapper}>
+                    <div className={css.checkbox_list}>
+                        {checkboxList}
+                    </div>
+                </div>
                 <Button
                     label={this.state.currentLabel}
                     onClick={this.switchFreq}
+                    style={css.button}
                 />
             </div>
         );

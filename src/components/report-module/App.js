@@ -51,6 +51,7 @@ export default class App extends React.Component {
         this.swapAxes = this.swapAxes.bind(this);
         this.updateOpacity = this.updateOpacity.bind(this);
         this.getRecords = this.getRecords.bind(this);
+        this.createGraphData = this.createGraphData.bind(this);
     }
 
     onAxisChange(e) {
@@ -93,29 +94,40 @@ export default class App extends React.Component {
     }
 
     getRecords(dataArr) {
-        this.setState({records: dataArr})
+        this.createGraphData(dataArr.title)
+        this.setState({records: dataArr.title})
     }
 
-    componentDidMount() {
-        let propertyArray = Object.getOwnPropertyNames(this.state.userData[0]);
+    createGraphData(arr) {
+        let propertyArray = Object.getOwnPropertyNames(arr[0]);
 
         propertyArray.forEach(element => {
             var propertyObject = {
                 type: element,
                 data: [ ]
             };
-            this.state.userData.forEach(element => {
+            arr.forEach(element => {
                 var temp = Object.getOwnPropertyDescriptor(element, propertyObject.type)
 
                 propertyObject.data.push(temp.value)
             });
             this.state.propertyObjectArray.push(propertyObject);
         });
+    }
+
+    componentDidMount() {
+        this.createGraphData(this.state.userData);
 
         fetch('http://localhost:9130/authn/login', {
           method: 'POST',
-          body: this.state.body,
-          headers: this.state.headers
+          body: JSON.stringify({
+            'username': 'diku_admin',
+            'password': 'admin'
+          }),
+          headers: new Headers({
+            'Content-type': 'application/json',
+            'X-Okapi-Tenant': 'diku',
+          })
         })
         .then((res) => {
           this.setState({
