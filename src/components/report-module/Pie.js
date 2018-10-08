@@ -33,13 +33,12 @@ export default class Pie extends React.Component {
     componentDidMount() {
       this.getStats();
       this.initPie();  // Initializes plotly data array with the records and sets title in layout
+      console.log(this.stats);
     }
 
     getStats = () => {
-      let records = [];
       for (let key in this.props.records)
-        records.push(this.abbr(this.props.records[key]));
-      this.records = records;
+        this.records.push(this.abbr(this.props.records[key]));
       this.summaryCategorical();  // Get record's stats
     }
 
@@ -52,7 +51,7 @@ export default class Pie extends React.Component {
             type: 'pie'
           }
         ],
-        size: this.stats[d2Index].count
+        size: this.stats[0].count
       });
     }
 
@@ -63,18 +62,16 @@ export default class Pie extends React.Component {
       let layout = {...this.state.layout};
 
       let d3Index = e.target.selectedIndex;
-      let newChart = {};
-      let newAnnotation = {};
 
-      for (let i = 0; i < this.stats[d2Index].count; i++) {
-        newChart = {
+      for (let i = 0; i < this.stats[this.state.d2Index].count; i++) {
+        let newChart = {
           values: this.stats[d3Index].values[i],
           labels: this.stats[d3Index].labels[i],
           domain: {}
         };
 
-        newAnnotation = [{
-            text: stats[d2Index].label[i]
+        let newAnnotation = [{
+            text: stats[d3Index].label[i]
           }];
 
         newChart.domain.row = row;
@@ -82,7 +79,7 @@ export default class Pie extends React.Component {
 
         column += 1;
 
-        if (row === column) {
+        if (column === 3) {
           column = 0;
           row += 1;
         }
@@ -95,13 +92,15 @@ export default class Pie extends React.Component {
 
     // Change the number of slices in PIE chart
     updateViewNum = (e) => {
-      this.setState({viewNum: e.target.value}, () => {
+      this.setState({
+        viewNum: e.target.value
+      }, () => {
         let data = [...this.state.data];
-        data.forEach((set) => ({
-          set.values = this.stats[d3Index].Count.slice(0, this.state.viewNum);
-          set.labels = this.stats[d3Index].Label.slice(0, this.state.viewNum);
-        }));
-        updateState(data);
+        data.forEach((set) => {
+          set.values = this.stats[this.state.d3Index].values.slice(0, this.state.viewNum);
+          set.labels = this.stats[this.state.d3Index].labels.slice(0, this.state.viewNum);
+        });
+        this.updateState(data);
       });
     }
 
@@ -133,11 +132,11 @@ export default class Pie extends React.Component {
           'labels': records,
           'values': count,
         };
+
         this.records[i] = records;
         this.stats[i] = dictionary;
       }
     }
-
 
     // Abbreviate records. 99.999 % sure this will not be needed in the future. It's just here to prevent text from blocking pie chart
     abbr = (records) => {
