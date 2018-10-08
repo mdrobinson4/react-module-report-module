@@ -21,8 +21,6 @@ export default class App extends React.Component {
             },
             okapiToken: String,
             records: [],
-            xAxisValues: [],
-            yAxisValues: [],
             userData: [
                 {id: 5, username: 'John', enrollmentData: new Date(2018, 11)},
                 {id: 8, username: 'John', enrollmentData: new Date(2017, 11)},
@@ -52,6 +50,7 @@ export default class App extends React.Component {
         this.updateOpacity = this.updateOpacity.bind(this);
         this.getRecords = this.getRecords.bind(this);
         this.createGraphData = this.createGraphData.bind(this);
+        this.getCount = this.getCount.bind(this);
     }
 
     onAxisChange(e) {
@@ -65,6 +64,40 @@ export default class App extends React.Component {
         }]
 
         this.setState({ data: temp })
+    }
+
+    getCount(arr) {
+        var lastElement = arr[0];
+        var count = 1;
+    
+        var countArr = [];
+    
+        for (var x = 1; x <= arr.length; x++) {
+            if (arr[x] === lastElement) {
+                count++;
+                console.log(arr[x] + ' ' + arr[x-1])
+            }
+            else {
+                countArr.push(count);
+                count = 1;
+                lastElement = arr[x];
+            }
+        }
+        return countArr;
+      }
+
+      removeDuplicates = (arr) => {
+        var noDupes = [];
+        noDupes.push(arr[0])
+        var lastElement = arr[0];
+
+        for (var x = 1; x < arr.length; x++) {
+            if (arr[x] !== lastElement) {
+                noDupes.push(arr[x]);
+                lastElement = arr[x];
+            }
+        }
+        return noDupes;
     }
 
     swapAxes() {
@@ -94,8 +127,16 @@ export default class App extends React.Component {
     }
 
     getRecords(dataArr) {
-        this.createGraphData(dataArr.title)
-        this.setState({records: dataArr.title})
+        console.log(dataArr)
+        var title = {
+            x: {
+                values: this.removeDuplicates(dataArr.title)
+            },
+            y: {
+                values: this.getCount(dataArr.title)
+            }
+        }
+        this.onAxisChange(title)
     }
 
     createGraphData(arr) {
