@@ -26,7 +26,6 @@ export default class GetRecords extends React.Component {
     .then(result => result.json())
     .then(
       (result) => {
-        console.log(result);
         // Access the items stored in the first key, which contains the data we want
         this.mergeRecords(result[Object.keys(result)[0]]);
     })
@@ -40,7 +39,6 @@ export default class GetRecords extends React.Component {
   }
 
   mergeRecords = (records) => {
-    console.log('Merging Records');
     // Access each key in the instance object
     let dataArr = {};
     let key = Object.keys(records[0]);

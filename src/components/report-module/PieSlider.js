@@ -8,7 +8,6 @@ export default class PieSlider extends React.Component {
     }
 
     render() {
-      console.log(this.props.value);
       if (this.props.size > 10) {
         return (
           <fieldset>

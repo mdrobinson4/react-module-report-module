@@ -7,83 +7,137 @@ export default class Pie extends React.Component {
       super(props);
       this.state = {
         data: [],
-
         layout: {
           title: this.props.title,
           autosize: true
         },
-
         style: {
           width: '100%',
           height: '100%'
         },
-
         useResizeHandler: true,
         viewNum: 10,
-        abbrRecords: this.abbr(this.props.records.title),
-        size: 0
-      }
+        records: [],
+        size: 0,
+        row: 0,
+        column: 0,
+        charCount: 0,
+        d2Index: 0,
+        d3Index: 0
+      },
+
+      this.records = [];
+      this.stats = [];
     }
 
     componentDidMount() {
-      //  window.addEventListener('resize', this.handleResize);
-      let SumStat = this.summaryCategorical();  // Get record's stats
-      this.cookPie(SumStat);  // Initializes plotly data array with the records and sets title in layout
+      this.getStats();
+      this.initPie();  // Initializes plotly data array with the records and sets title in layout
     }
 
-    cookPie = (SumStat) => {
+    getStats = () => {
+      let records = [];
+      for (let key in this.props.records)
+        records.push(this.abbr(this.props.records[key]));
+      this.records = records;
+      this.summaryCategorical();  // Get record's stats
+    }
+
+    initPie = () => {
       this.setState({
         data: [
           {
-            values: SumStat.Count,
-            labels: SumStat.Label,
+            values: this.stats[0].values.slice(0, this.state.viewNum),
+            labels: this.stats[0].labels.slice(0, this.state.viewNum),
             type: 'pie'
           }
         ],
-
-        size: SumStat.Level
+        size: this.stats[d2Index].count
       });
     }
 
-    //  Returns an object with the total number of records, unique labels, and each label's frequency
-    summaryCategorical = () => {
-      let records = this.state.abbrRecords.reduce(this.countDuplicates, {});  // Stores the unique records
-      let count = [];
+    addChart = (e) => {
+      let row = this.state.row;
+      let column = this.state.column;
+      let data = [...this.state.data];
+      let layout = {...this.state.layout};
 
-      for (let key in records)
-        count.push(records[key]); // store count of each item in array
+      let d3Index = e.target.selectedIndex;
+      let newChart = {};
+      let newAnnotation = {};
 
-      count = count.sort((a, b) => b - a);  // Sorts the count of each item from [High -> Low]
-      records = Object.keys(records).sort((a, b) => records[b] - records[a]);  // Sorts the records by the number of duplicates [High -> Low]
+      for (let i = 0; i < this.stats[d2Index].count; i++) {
+        newChart = {
+          values: this.stats[d3Index].values[i],
+          labels: this.stats[d3Index].labels[i],
+          domain: {}
+        };
 
-      let dictionary = {
-        'Level': Object.keys(records).length,
-        'Label': records.slice(0,(this.state.viewNum)),
-        'Count': count.slice(0,(this.state.viewNum)),
-      };
-      return dictionary;
+        newAnnotation = [{
+            text: stats[d2Index].label[i]
+          }];
+
+        newChart.domain.row = row;
+        newChart.domain.column = column;
+
+        column += 1;
+
+        if (row === column) {
+          column = 0;
+          row += 1;
+        }
+
+        data.push(newChart);
+        layout.push(newAnnotation);
+      }
+      this.updateState(data, layout, row, column, this.state.chartCount + 1, d3Index);
     }
 
     // Change the number of slices in PIE chart
     updateViewNum = (e) => {
       this.setState({viewNum: e.target.value}, () => {
-        let SumStat = this.summaryCategorical();
-        let data = [
-          {
-            values: SumStat.Count,
-            labels: SumStat.Label,
-            type: 'pie'
-        }
-      ]
-        this.updatePie(data);
+        let data = [...this.state.data];
+        data.forEach((set) => ({
+          set.values = this.stats[d3Index].Count.slice(0, this.state.viewNum);
+          set.labels = this.stats[d3Index].Label.slice(0, this.state.viewNum);
+        }));
+        updateState(data);
       });
     }
 
-    updatePie = (data) => {
-      this.setState({
-        data: data
-      });
+    updateState = (data, ...lrcc) => {
+      this.setState((prevState) =>({
+        data: data,
+        layout: lrcc[0] || prevState.layout,
+        row: lrcc[1] || prevState.row,
+        column: lrcc[2] || prevState.column,
+        charCount: lrcc[3] || prevState.charCount,
+        d3Index: lrcc[4] || prevState.d3Index
+      }));
     }
+
+    //  Returns an object with the total number of records, unique labels, and each label's frequency
+    summaryCategorical = () => {
+      for (let i in this.records) {
+        let records = this.records[i].reduce(this.countDuplicates, {});  // Stores the unique records
+        let count = [];
+
+        for (let key in records)
+          count.push(records[key]); // store count of each item in array
+
+        count = count.sort((a, b) => b - a);  // Sorts the count of each item from [High -> Low]
+        records = Object.keys(records).sort((a, b) => records[b] - records[a]);  // Sorts the records by the number of duplicates [High -> Low]
+
+        let dictionary = {
+          'count': Object.keys(records).length,
+          'labels': records,
+          'values': count,
+        };
+        this.records[i] = records;
+        this.stats[i] = dictionary;
+      }
+    }
+
 
     // Abbreviate records. 99.999 % sure this will not be needed in the future. It's just here to prevent text from blocking pie chart
     abbr = (records) => {
@@ -103,9 +157,12 @@ export default class Pie extends React.Component {
       return obj;
     }
 
-    handleResize = (e) => {
-      //  window.innerWidth
-      //  window.innerHeight
+    handleSelect = (e) => {
+      if (this.state.chartCount) {
+        this.addChart(e);
+        return;
+      }
+      this.initPie();
     }
 
     render() {

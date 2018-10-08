@@ -21,8 +21,6 @@ export default class App extends React.Component {
           name: datasets[0].name
         },
         getRecords: (result) => {
-          console.log('Updating App.js');
-          console.log(JSON.stringify(result));
 
           this.setState({
             records: result,
@@ -87,7 +85,6 @@ export default class App extends React.Component {
 
       // Go to PLOTLY -> this.state.records
       if (isloaded) {
-        console.log(JSON.stringify(records));
         return <Pie records={records} name={this.state.dataset.name} />
       }
 
