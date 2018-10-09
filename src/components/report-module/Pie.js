@@ -41,7 +41,9 @@ export default class Pie extends React.Component {
       console.log('Duplicate Stats');
       console.log(this.dupStats);
       this.initPie();  // Initializes plotly data array with the records and sets title in layout
-      this.addChart(2)
+      this.addChart(2);
+      console.log('Data');
+      console.log(this.state);
     }
 
     initPie = () => {
@@ -53,7 +55,7 @@ export default class Pie extends React.Component {
             type: 'pie'
           }
         ],
-        size: this.stats[0].count
+        size: this.stats[this.state.d2Index].count
       });
     }
 
@@ -63,8 +65,9 @@ export default class Pie extends React.Component {
       while (index !== -1) {
         indices.push(index);
         index = this.dupStats[d2Index].labels.indexOf(element, index + 1);
-
       }
+      console.log('Indices');
+      console.log(indices);
       return indices;
     }
 
@@ -82,7 +85,8 @@ export default class Pie extends React.Component {
         let error = false;
 
         for (let index of indices) {
-          if (this.stats[d3Index].values[index] !== undefined && this.stats[d3Index].values[index] !== undefined) {
+          console.log(index);
+          if (1) {
             values.push(this.stats[d3Index].values[index]);
             labels.push(this.stats[d3Index].labels[index]);
           }
@@ -90,7 +94,7 @@ export default class Pie extends React.Component {
             error = true;
           }
         }
-        if (!error) {
+        if (1) {
           let newChart = {
             values: values,
             labels: labels,
@@ -153,11 +157,14 @@ export default class Pie extends React.Component {
         for (let i in this.records) {
           let records = this.records[i].reduce(this.countDuplicates, {});  // Stores the unique records
 
-          let dupStats = [];
+          let dupStats = {
+            labels: [],
+            values: []
+          };
           let j = 0;
           for (let key of this.records[i]) {
-            let temp = {labels: key, count: records[key]};
-            dupStats.push(temp);
+            dupStats.labels.push(key);
+            dupStats.values.push(records[key]);
             j += 1;
           }
 
@@ -193,7 +200,7 @@ export default class Pie extends React.Component {
 
       let stats = {
         'count': Object.keys(records).length,
-        'labels': [],
+        'labels': Object.keys(records),
         'values': count,
         'frequency': freq
       };
