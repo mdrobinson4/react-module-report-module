@@ -36,12 +36,14 @@ export default class Pie extends React.Component {
       console.log('Records:');
       this.getStats();
       console.log(this.records);
-      console.log('Stats');
-      console.log(this.stats);
-      console.log('Duplicate Stats');
-      console.log(this.dupStats);
       this.initPie();  // Initializes plotly data array with the records and sets title in layout
       this.addChart(2)
+    }
+
+    getStats = () => {
+      for (let key in this.props.records)
+        this.records.push(this.abbr(this.props.records[key]));
+      this.summaryCategorical();  // Get record's stats
     }
 
     initPie = () => {
@@ -59,10 +61,13 @@ export default class Pie extends React.Component {
 
     getDupIndices = (element, d2Index, d3Index) => {
       let indices = [];
-      let index = this.dupStats[d2Index].labels.indexOf(element, 0);
+      let index = this.stats[d2Index].labels.indexOf(element, 0);
+      console.log(this.stats[d2Index].labels);
+      console.log('Element');
+      console.log(element);
       while (index !== -1) {
         indices.push(index);
-        index = this.dupStats[d2Index].labels.indexOf(element, index + 1);
+        index = this.stats[d2Index].labels.indexOf(element, index + 1);
 
       }
       return indices;
@@ -77,12 +82,20 @@ export default class Pie extends React.Component {
 
       for (let element of this.stats[this.state.d2Index].labels.slice(0, this.state.viewNum)) {
         let indices = this.getDupIndices(element, this.state.d2Index, d3Index);
+        console.log(`Indices`);
+        console.log(indices);
         let labels = [];
         let values = [];
         let error = false;
 
         for (let index of indices) {
           if (this.stats[d3Index].values[index] !== undefined && this.stats[d3Index].values[index] !== undefined) {
+
+            console.log('Values:');
+            console.log(this.stats[d3Index].values[index]);
+            console.log('Labels:');
+            console.log(this.stats[d3Index].labels[index]);
+
             values.push(this.stats[d3Index].values[index]);
             labels.push(this.stats[d3Index].labels[index]);
           }
@@ -117,6 +130,11 @@ export default class Pie extends React.Component {
           error = false;
         }
       }
+
+      console.log('Data:');
+      console.log(data);
+      console.log('Layout');
+      console.log(layout);
       this.updateState(data, layout, row, column, this.state.chartCount + 1, d3Index);
     }
 
@@ -146,58 +164,45 @@ export default class Pie extends React.Component {
     }
 
     //  Returns an object with the total number of records, unique labels, and each label's frequency
-    getStats = () => {
-      for (let key in this.props.records)
-        this.records.push(this.abbr(this.props.records[key]));
+    summaryCategorical = () => {
+      for (let i in this.records) {
+        let records = this.records[i].reduce(this.countDuplicates, {});  // Stores the unique records
+        let count = [];
+        let freq = [];
+        let sum = 0;
 
-        for (let i in this.records) {
-          let records = this.records[i].reduce(this.countDuplicates, {});  // Stores the unique records
+        let dupStats = [
+          {value: ' ', count: 0}
+        ];
 
-          let dupStats = [];
-          let j = 0;
-          for (let key of this.records[i]) {
-            let temp = {labels: key, count: records[key]};
-            dupStats.push(temp);
-            j += 1;
-          }
-
-          let uniqueStats = this.getCount(records);
-
-          this.dupStats.push(dupStats);
-          this.stats.push(uniqueStats);
-          this.records.push(records);
+        for (let i of this.records) {
+          dupStats[i].value = records[i];
+          dupStats[i].count = records[dupStats[i]];
         }
-    }
 
-
-
-    getCount = (records) => {
-      let count = [];
-      let sum = 0;
-      let freq = [];
-
-      for (let key in records)
-        count.push(records[key]);
+        for (let key in records)
+          count.push(records[key]); // store count of each item in array
 
         sum = count.reduce((a, b) => a + b, 0);
 
-        count.forEach((value) => {
-          freq.push(value / sum);
+        count.forEach((val) => {
+          freq.push(val / sum);
         });
 
-      count.reduce((a, b) => a + b, 0);
+        count = count.sort((a, b) => b - a);  // Sorts the count of each item from [High -> Low]
+        freq = freq.sort((a, b) => b - a);  // Sorts the frequency of each item from [High -> Low]
+        records = Object.keys(records).sort((a, b) => records[b] - records[a]);  // Sorts the records by the number of duplicates [High -> Low]
 
-      count.forEach((value) => {
-        freq.push(value / sum);
-      });
-
-      let stats = {
-        'count': Object.keys(records).length,
-        'labels': [],
-        'values': count,
-        'frequency': freq
-      };
-      return stats;
+        let dictionary = {
+          'count': Object.keys(records).length,
+          'labels': records,
+          'values': count,
+          'frequency': freq
+        };
+        this.records[i] = records;
+        this.stats[i] = dictionary;
+        this.dupStats[i] = dupStats
+      }
     }
 
     // Abbreviate records. 99.999 % sure this will not be needed in the future. It's just here to prevent text from blocking pie chart
