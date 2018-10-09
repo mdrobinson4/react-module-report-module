@@ -2,6 +2,7 @@ import React from 'react';
 import Button from './Button';
 import DataOptions from './DataOptions'
 import Slider from './Slider'
+import Dropdown from './Dropdown';
 import css from './style.css';
 
 export default class GraphUI extends React.Component {
@@ -60,6 +61,10 @@ export default class GraphUI extends React.Component {
     return freqArr;
   }
 
+  doThing = () => {
+
+  }
+
   render() {
     return (
       <div>
@@ -74,10 +79,12 @@ export default class GraphUI extends React.Component {
             <Button
               label={"Switch Axes"}
               onClick={this.props.swapAxes}
-              style={css.button}
             />
             <Slider
               updateOpac={this.props.updateOpac}
+            />
+            <Dropdown
+              changeType={this.doThing}
             />
           </div>
         </div>

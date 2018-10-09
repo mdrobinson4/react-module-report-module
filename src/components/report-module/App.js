@@ -17,7 +17,13 @@ export default class App extends React.Component {
             layout: {
                 height: 500,
                 width: 1000,
-                title: 'Sample Graph'
+                title: 'Sample Graph',
+                xaxis: {
+                    title: String
+                },
+                yaxis: {
+                    title: String
+                }
             },
             okapiToken: String,
             records: [],
@@ -64,6 +70,22 @@ export default class App extends React.Component {
         }]
 
         this.setState({ data: temp })
+    }
+
+    updateAxesLabels(axes) {
+        let newLayout = {
+            height: this.state.layout.height,
+            width: this.state.layout.width,
+            title: this.state.layout.title,
+            xaxis: {
+                title: axes.x.type
+            },
+            yaxis: {
+                title: axes.y.type
+            }
+        }
+
+        this.setState({layout: newLayout})
     }
 
     getCount(arr) {

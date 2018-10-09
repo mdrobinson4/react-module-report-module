@@ -1,6 +1,6 @@
 import React from "react";
 import Button from './Button';
-import css from './style.css';
+import css from './DataOptions.css';
 
 
 export default class DataOptions extends React.Component {
@@ -31,7 +31,7 @@ export default class DataOptions extends React.Component {
     }
 
     handleChange(event) {
-
+        console.log(event.target)
         var target = event.target;
 
         var axis = {
@@ -72,12 +72,17 @@ export default class DataOptions extends React.Component {
         }
         else if (!axis.active && !this.state.currentAxes.y.active) {
 
+            axis.type = "";
             stateHolder.x = axis;
+
             this.setState({currentAxes: stateHolder}, this.updateAxis);
+            
         }
         else if (!axis.active && this.state.currentAxes.y.active) {
 
+            axis.type = "";
             stateHolder.y = axis;
+
             this.setState({currentAxes: stateHolder}, this.updateAxis);
 
         }
@@ -132,14 +137,17 @@ export default class DataOptions extends React.Component {
         const checkboxList = this.props.axisData.map((field) =>
         <div>
             <label>
-                {field.type.toUpperCase() + ":  "}  
-                <input 
-                    name={field.type}
-                    type="checkbox"
-                    value={field.data}
-                    onChange={this.handleChange}
-                />
-            </label>
+                {field.type.toUpperCase() + ":  "}
+            </label>  
+            <input 
+                name={field.type}
+                type="checkbox"
+                value={field.data}
+                key={field.data}
+                onChange={this.handleChange}
+            />
+            {this.state.currentAxes.x.type === field.type ? <label id={field.type} className={css.label}><b>(X Axis)</b></label> : <label id={field.type}></label>}
+            {this.state.currentAxes.y.type === field.type ? <label id={field.type} className={css.label}><b>(Y Axis)</b></label> : <label id={field.type}></label>}
         </div>
         );
 
@@ -153,7 +161,6 @@ export default class DataOptions extends React.Component {
                 <Button
                     label={this.state.currentLabel}
                     onClick={this.switchFreq}
-                    style={css.button}
                 />
             </div>
         );

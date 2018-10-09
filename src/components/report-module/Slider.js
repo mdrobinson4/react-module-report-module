@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './style.css'
+import styles from './Slider.css'
 
 export default class Slider extends React.Component {
     constructor(props) {

@@ -1,4 +1,5 @@
 import React from "react";
+import css from './Button.css'
 
 export default class Button extends React.Component {
     constructor(props) {
@@ -10,7 +11,8 @@ export default class Button extends React.Component {
         return (
             <button
                 onClick={this.props.onClick}
-                className={this.props.style}
+                className={css.button}
+                value={this.props.value}
             >
                 {this.props.label}
             </button>

@@ -1,4 +1,5 @@
 import React from 'react';
+import css from './Dropdown.css';
 
 export default class Dropdown extends React.Component {
     constructor(props) {
@@ -11,5 +12,20 @@ export default class Dropdown extends React.Component {
                 
             }
         }
+    }
+
+    render() {
+        const typeOptions = this.state.dropdownData.graphType.map((type) =>
+            <option value={type} key={type} onClick={this.props.changeType}>
+                {type.toUpperCase()}
+            </option>
+        )
+        return (
+            <div>
+                <select className={css.select_container}>
+                    {typeOptions}
+                </select>
+            </div>
+        )
     }
 }
