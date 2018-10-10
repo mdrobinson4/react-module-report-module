@@ -6,8 +6,10 @@ export default class Pie extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
-        data: [],
+        data: [
+        ],
         layout: {
+          grid: {rows: 9, columns: 3},
           title: 'Sample Chart',
           autosize: true,
           annotations: []
@@ -24,9 +26,10 @@ export default class Pie extends React.Component {
         column: 0,
         charCount: 0,
         d2Index: 2,
-        d3Index: 1
+        d3Index: 1,
+        chartCount: 0
       },
-
+      this.data = [];
       this.records = [];
       this.stats = [];
       this.dupStats = [];
@@ -40,10 +43,18 @@ export default class Pie extends React.Component {
       console.log(this.stats);
       console.log('Duplicate Stats');
       console.log(this.dupStats);
-      this.initPie();  // Initializes plotly data array with the records and sets title in layout
+      //this.initPie();  // Initializes plotly data array with the records and sets title in layout
       this.addChart(2);
       console.log('Data');
       console.log(this.state);
+
+      console.log('DATA')
+      console.log(this.state.data);
+      console.log('THIS.DATA')
+      console.log(this.data);
+    }
+
+    componentWillUnmount() {
     }
 
     initPie = () => {
@@ -96,15 +107,17 @@ export default class Pie extends React.Component {
         }
         if (1) {
           let newChart = {
+            hole: .6,
             values: values,
             labels: labels,
             type: 'pie',
             domain: {}
           };
 
-          let newAnnotation = [{
-            text: element
-          }];
+          console.log('New Chart');
+          console.log(newChart);
+
+          let newAnnotation = { text: element };
 
           newChart.domain.row = row;
           newChart.domain.column = column;
@@ -112,6 +125,8 @@ export default class Pie extends React.Component {
           column += 1;
 
           if (column === 3) {
+            //y.forEach((val) => val + .5);
+            //x = [0, 0.5];
             column = 0;
             row += 1;
           }
@@ -138,14 +153,17 @@ export default class Pie extends React.Component {
       });
     }
 
-    updateState = (data, ...lrcc) => {
-      this.setState((prevState) =>({
+    updateState = (data, layout, row, column, charCount, d3Index) => {
+      this.data = data;
+      this.setState((prevState, props) => ({
         data: data,
-        layout: lrcc[0] || prevState.layout,
-        row: lrcc[1] || prevState.row,
-        column: lrcc[2] || prevState.column,
-        charCount: lrcc[3] || prevState.charCount,
-        d3Index: lrcc[4] || prevState.d3Index
+        layout: layout,
+        row: row,
+        column: column,
+        charCount: charCount,
+        d3Index: d3Index
+      }, () => {
+        console.log(this.state);
       }));
     }
 
@@ -234,6 +252,7 @@ export default class Pie extends React.Component {
     }
 
     render() {
+
       return (
         <div>
           <PieSlider
@@ -242,7 +261,7 @@ export default class Pie extends React.Component {
             size={this.state.size}
           />
           <Plot
-            data={this.state.data}
+            data={this.data}
             layout={this.state.layout}
             useResizeHandler={this.state.useResizeHandler}
             style={this.state.style}
