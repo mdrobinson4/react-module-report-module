@@ -57,6 +57,8 @@ export default class App extends React.Component {
         this.getRecords = this.getRecords.bind(this);
         this.createGraphData = this.createGraphData.bind(this);
         this.getCount = this.getCount.bind(this);
+        this.changeGraphType = this.changeGraphType.bind(this);
+        this.updateSize = this.updateSize.bind(this)
     }
 
     onAxisChange(e) {
@@ -68,7 +70,7 @@ export default class App extends React.Component {
             type: this.state.data[0].type,
             opacity: this.state.data[0].opacity
         }]
-
+        this.updateAxesLabels(axes)
         this.setState({ data: temp })
     }
 
@@ -88,6 +90,30 @@ export default class App extends React.Component {
         this.setState({layout: newLayout})
     }
 
+    changeGraphType(newType) {
+        let newGraph = [{}];
+
+        if (newType === 'pie') {
+             newGraph = [{
+                labels: this.state.data[0].x,
+                values: this.state.data[0].y,
+                type: newType,
+                opacity: this.state.data[0].opacity
+            }]
+        }
+        else {
+             newGraph = [{
+                x: this.state.data[0].x,
+                y: this.state.data[0].y,
+                type: newType,
+                opacity: this.state.data[0].opacity
+            }]
+        }
+
+
+        this.setState({data: newGraph})
+    }
+
     getCount(arr) {
         var lastElement = arr[0];
         var count = 1;
@@ -97,7 +123,6 @@ export default class App extends React.Component {
         for (var x = 1; x <= arr.length; x++) {
             if (arr[x] === lastElement) {
                 count++;
-                console.log(arr[x] + ' ' + arr[x-1])
             }
             else {
                 countArr.push(count);
@@ -148,8 +173,11 @@ export default class App extends React.Component {
         this.setState({ data: temp })
     }
 
+    updateSize(e) {
+        
+    }
+
     getRecords(dataArr) {
-        console.log(dataArr)
         var title = {
             x: {
                 values: this.removeDuplicates(dataArr.title)
@@ -209,7 +237,9 @@ export default class App extends React.Component {
                     axisData={this.state.propertyObjectArray}
                     swapAxes={this.swapAxes}
                     updateOpac={this.updateOpacity}
+                    updateSize={this.updateSize}
                     opacity={this.state.opacity}
+                    changeType={this.changeGraphType}
                 />
                 <Plot data={this.state.data} layout={this.state.layout}/>
                 <GetRecords

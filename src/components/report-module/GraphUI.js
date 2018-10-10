@@ -61,10 +61,6 @@ export default class GraphUI extends React.Component {
     return freqArr;
   }
 
-  doThing = () => {
-
-  }
-
   render() {
     return (
       <div>
@@ -81,10 +77,15 @@ export default class GraphUI extends React.Component {
               onClick={this.props.swapAxes}
             />
             <Slider
-              updateOpac={this.props.updateOpac}
+              label={"Opacity"}
+              updateValue={this.props.updateOpac}
+            />
+            <Slider
+              label={"Graph Size"}
+              updateValue={this.props.updateSize}
             />
             <Dropdown
-              changeType={this.doThing}
+              changeType={this.props.changeType}
             />
           </div>
         </div>

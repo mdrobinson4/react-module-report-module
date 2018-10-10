@@ -13,8 +13,8 @@ export default class Slider extends React.Component {
     render() {
         return (
             <div className={styles.range_wrapper}>
-                <label className={styles.label}>Opacity</label>
-                <input className={styles.slider} type="range" min="1" max="100" defaultValue={100} onChange={this.props.updateOpac}/>
+                <label className={styles.label}>{this.props.label}</label>
+                <input className={styles.slider} type="range" min="1" max="100" defaultValue={100} onChange={this.props.updateValue}/>
             </div>
         );
     }

@@ -135,7 +135,7 @@ export default class DataOptions extends React.Component {
     render() {
 
         const checkboxList = this.props.axisData.map((field) =>
-        <div>
+        <div key={field.type}>
             <label>
                 {field.type.toUpperCase() + ":  "}
             </label>  
