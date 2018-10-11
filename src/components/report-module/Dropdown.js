@@ -17,18 +17,19 @@ export default class Dropdown extends React.Component {
 
     changeType(e) {
         let newType = e.target.value;
-        
+
         this.props.changeType(newType);
     }
 
     render() {
-        const typeOptions = this.state.dropdownData.graphType.map((type) =>
+        const typeOptions = this.props.values.map((type) =>
             <option value={type} key={type}>
-                {type.toUpperCase()}
+                {type}
             </option>
         )
         return (
             <div>
+                <label className={css.label}>{this.props.label}</label>
                 <select className={css.select_container} onChange={this.changeType}>
                     {typeOptions}
                 </select>

@@ -63,7 +63,7 @@ export default class GetRecords extends React.Component {
       return (
         <div>
           <Button
-            label={"Click Me"}
+            label={"Get Records"}
             onClick={this.getRec}
           />
         </div>

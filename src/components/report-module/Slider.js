@@ -14,7 +14,14 @@ export default class Slider extends React.Component {
         return (
             <div className={styles.range_wrapper}>
                 <label className={styles.label}>{this.props.label}</label>
-                <input className={styles.slider} type="range" min="1" max="100" defaultValue={100} onChange={this.props.updateValue}/>
+                <input 
+                    className={styles.slider}
+                    type="range"
+                    min={this.props.properties.min}
+                    max={this.props.properties.max}
+                    defaultValue={this.props.properties.defaultValue}
+                    onChange={this.props.updateValue}
+                />
             </div>
         );
     }

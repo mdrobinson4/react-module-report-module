@@ -3,17 +3,24 @@ import Button from './Button';
 import DataOptions from './DataOptions'
 import Slider from './Slider'
 import Dropdown from './Dropdown';
-import css from './style.css';
+import css from './GraphUI.css';
 
 export default class GraphUI extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      xType: 'categorical',
-      yType: 'categorical',
-      size: 20,
-      showAllTicks: '',
-      opacity: 1
+      sliderValues: {
+        opacity: {
+          min: 1,
+          max: 100,
+          defaultValue: 100
+        },
+        graphSize: {
+          min: 50,
+          max: 150,
+          defaultValue: 100
+        }
+      }
     };
     this.getCount = this.getCount.bind(this);
   }
@@ -64,7 +71,7 @@ export default class GraphUI extends React.Component {
   render() {
     return (
       <div>
-        <div className={css.ui}>
+        <div>
           <div className={css.axisControl}>
             <DataOptions
               axisData={this.props.axisData}
@@ -78,13 +85,17 @@ export default class GraphUI extends React.Component {
             />
             <Slider
               label={"Opacity"}
+              properties={this.state.sliderValues.opacity}
               updateValue={this.props.updateOpac}
             />
             <Slider
               label={"Graph Size"}
+              properties={this.state.sliderValues.graphSize}
               updateValue={this.props.updateSize}
             />
             <Dropdown
+              label={"Graph Type"}
+              values={this.props.values}
               changeType={this.props.changeType}
             />
           </div>

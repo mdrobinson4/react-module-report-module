@@ -1,4 +1,8 @@
 .select_container {
-    width: 100%;
-    margin: .2em;
+    width: fit-content;
+    margin-top: 1.2em;
+}
+
+.label {
+    margin-right: .3em;
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import GraphUI from './GraphUI';
-import styles from './style.css';
+import styles from './App.css';
 import Plot from 'react-plotly.js';
 import GetRecords from './GetRecords';
 
@@ -25,6 +25,9 @@ export default class App extends React.Component {
                     title: String
                 }
             },
+            defaultHeight: 500,
+            defaultWidth: 1000,
+            graphTypes: ['Bar', 'Line', 'Pie'],
             okapiToken: String,
             records: [],
             userData: [
@@ -93,6 +96,8 @@ export default class App extends React.Component {
     changeGraphType(newType) {
         let newGraph = [{}];
 
+        newType = newType.toLowerCase();
+
         if (newType === 'pie') {
              newGraph = [{
                 labels: this.state.data[0].x,
@@ -101,8 +106,16 @@ export default class App extends React.Component {
                 opacity: this.state.data[0].opacity
             }]
         }
-        else {
+        else if (this.state.data[0].type === 'pie') {
              newGraph = [{
+                x: this.state.data[0].labels,
+                y: this.state.data[0].values,
+                type: newType,
+                opacity: this.state.data[0].opacity
+            }]
+        }
+        else {
+            newGraph = [{
                 x: this.state.data[0].x,
                 y: this.state.data[0].y,
                 type: newType,
@@ -174,7 +187,25 @@ export default class App extends React.Component {
     }
 
     updateSize(e) {
+        let sizeMultiplier = e.target.value;
+
+        let newHeight = this.state.defaultHeight;
+        let newWidth = this.state.defaultWidth;
+
+        newHeight *= (sizeMultiplier / 100);
+        newWidth *= (sizeMultiplier / 100);
+
+        console.log(newHeight + ' ' + newWidth);
+
+        let newLayout = {
+            height: newHeight,
+            width: newWidth,
+            title: this.state.layout.title,
+            xaxis: this.state.layout.xaxis,
+            yaxis: this.state.layout.yaxis
+        }
         
+        this.setState({layout: newLayout})
     }
 
     getRecords(dataArr) {
@@ -240,6 +271,7 @@ export default class App extends React.Component {
                     updateSize={this.updateSize}
                     opacity={this.state.opacity}
                     changeType={this.changeGraphType}
+                    values={this.state.graphTypes}
                 />
                 <Plot data={this.state.data} layout={this.state.layout}/>
                 <GetRecords
