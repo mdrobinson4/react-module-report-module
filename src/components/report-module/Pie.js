@@ -2,6 +2,12 @@ import React from 'react';
 import Plot from 'react-plotly.js';
 import PieSlider from './PieSlider';
 
+/*
+  JARGON -> (1) d2Index --- first set of data (array of values) selected (2) d3Index --- Second set of data (array of values) selected
+  For every element in the array at d2Index, Find another element in the array at d3Index.
+  Each chart represents each (unique) item in the array at d2Index.
+*/
+
 export default class Pie extends React.Component {
     constructor(props) {
       super(props);
@@ -9,8 +15,7 @@ export default class Pie extends React.Component {
         data: [
         ],
         layout: {
-          grid: {rows: 9, columns: 3},
-          title: 'Sample Chart',
+          grid: {rows: 3, columns: 3},
           autosize: true,
           annotations: []
         },
@@ -25,8 +30,8 @@ export default class Pie extends React.Component {
         row: 0,
         column: 0,
         charCount: 0,
-        d2Index: 2,
-        d3Index: 1,
+        d2Index: 1,
+        d3Index: 2,
         chartCount: 0
       },
       this.data = [];
@@ -36,22 +41,12 @@ export default class Pie extends React.Component {
     }
 
     componentDidMount() {
-      console.log('Records:');
       this.getStats();
-      console.log(this.records);
-      console.log('Stats');
-      console.log(this.stats);
-      console.log('Duplicate Stats');
-      console.log(this.dupStats);
       //this.initPie();  // Initializes plotly data array with the records and sets title in layout
       this.addChart(2);
-      console.log('Data');
-      console.log(this.state);
-
-      console.log('DATA')
-      console.log(this.state.data);
-      console.log('THIS.DATA')
       console.log(this.data);
+      console.log(this.records);
+      console.log(this.state);
     }
 
     componentWillUnmount() {
@@ -70,76 +65,89 @@ export default class Pie extends React.Component {
       });
     }
 
-    getDupIndices = (element, d2Index, d3Index) => {
+    /*  return the indices where "element" exists */
+    getDupIndices = (element, d2Index) => {
       let indices = [];
-      let index = this.dupStats[d2Index].labels.indexOf(element, 0);
+      let index = this.dupStats[d2Index].labels.indexOf(element, 0);  // Get first index
+
+      // Continue adding the indices where "element" exists until -1 is returned -> "element" DNE in sub-array
       while (index !== -1) {
-        indices.push(index);
+        indices.push(index);  // add index to indices array
         index = this.dupStats[d2Index].labels.indexOf(element, index + 1);
       }
-      console.log('Indices');
-      console.log(indices);
       return indices;
     }
 
+
     addChart = (e) => {
-      let row = this.state.row;
-      let column = this.state.column;
       let data = [...this.state.data];
-      let layout = {...this.state.layout};
+
+      let layout = {
+        grid: this.state.layout.grid,
+        title: '',
+        annotations: [],
+        autosize: this.state.layout.autosize
+    };
+
       let d3Index = e;//= e.target.selectedIndex;
 
-      for (let element of this.stats[this.state.d2Index].labels.slice(0, this.state.viewNum)) {
-        let indices = this.getDupIndices(element, this.state.d2Index, d3Index);
-        let labels = [];
-        let values = [];
-        let error = false;
+      let row = this.state.row;
+      let column = this.state.column
 
+      let i = 0;
+      let d2Length = this.stats[this.state.d2Index].labels.length;
+      let d3Length = this.stats[d3Index].labels.length;
+
+      // Iterate through item in the array at d2Index
+      while ( (i < d2Length) && (i < d3Length)) {
+        let indices = this.getDupIndices(this.stats[this.state.d2Index].labels[i], this.state.d2Index); // Get the indices where this element exists
+
+        let newChart = {
+          hole: 0.6,
+          values: [],
+          labels: [],
+          type: 'pie',
+          domain: {}
+        };
+
+        // Add the values and labels of the items in the same indices as the previously mentiond elemnt to a new chart which will be stored in data
         for (let index of indices) {
-          console.log(index);
-          if (1) {
-            values.push(this.stats[d3Index].values[index]);
-            labels.push(this.stats[d3Index].labels[index]);
-          }
-          else {
-            error = true;
-          }
+          newChart.values.push(this.stats[d3Index].values[index]);
+          newChart.labels.push(this.stats[d3Index].labels[index]);
         }
-        if (1) {
-          let newChart = {
-            hole: .6,
-            values: values,
-            labels: labels,
-            type: 'pie',
-            domain: {}
-          };
 
-          console.log('New Chart');
-          console.log(newChart);
+        let newAnnotation = {
+          text: this.stats[this.state.d2Index].labels[i],
+          x: 0.82,
+          y: 0.5,
+          font: { size: 20 }
+        }; // Add a new title and style it
 
-          let newAnnotation = { text: element };
+        // Set the rows and columns
+        newChart.domain.row = row;
+        newChart.domain.column = column;
+        newChart.name = this.stats[this.state.d2Index].labels[i];
 
-          newChart.domain.row = row;
-          newChart.domain.column = column;
+        column += 1;
 
-          column += 1;
-
-          if (column === 3) {
-            //y.forEach((val) => val + .5);
-            //x = [0, 0.5];
-            column = 0;
-            row += 1;
-          }
-
-          data.push(newChart);
-          layout.annotations.push(newAnnotation);
-          error = false;
+        // If the last item in a row was just added, go to a lower row and start at the first column
+        if (column === 3) {
+          column = 0;
+          row += 1;
         }
+
+        // Add the new chart and annotations to the data and layout variables (respectively)
+        data.push(newChart);
+        layout.annotations.push(newAnnotation);
+        i += 1;
       }
-      this.updateState(data, layout, row, column, this.state.chartCount + 1, d3Index);
-    }
+      layout.title = Object.keys(this.props.records)[this.state.d2Index];
+      console.log(layout);
+    // Update the state to include the new charts, annotations, row, column, chart count, and d3Index
+    this.updateState(data, layout, row, column, this.state.chartCount + 1, d3Index);
+  }
 
-    // Change the number of slices in PIE chart
+    // Change the number of slices in PIE chart or the number of charts appear (if 3D Pie is selected)
     updateViewNum = (e) => {
       this.setState({
         viewNum: e.target.value
@@ -154,8 +162,9 @@ export default class Pie extends React.Component {
     }
 
     updateState = (data, layout, row, column, charCount, d3Index) => {
+      console.log(layout);
       this.data = data;
-      this.setState((prevState, props) => ({
+      this.setState({
         data: data,
         layout: layout,
         row: row,
@@ -164,7 +173,7 @@ export default class Pie extends React.Component {
         d3Index: d3Index
       }, () => {
         console.log(this.state);
-      }));
+      });
     }
 
     //  Returns an object with the total number of records, unique labels, and each label's frequency
@@ -252,7 +261,7 @@ export default class Pie extends React.Component {
     }
 
     render() {
-
+      console.log(this.state);
       return (
         <div>
           <PieSlider
@@ -261,7 +270,7 @@ export default class Pie extends React.Component {
             size={this.state.size}
           />
           <Plot
-            data={this.data}
+            data={this.state.data}
             layout={this.state.layout}
             useResizeHandler={this.state.useResizeHandler}
             style={this.state.style}
