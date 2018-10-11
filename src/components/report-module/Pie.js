@@ -15,7 +15,7 @@ export default class Pie extends React.Component {
         data: [
         ],
         layout: {
-          grid: {rows: 3, columns: 3},
+          grid: {rows: 1, columns: 2},
           autosize: true,
           annotations: []
         },
@@ -30,8 +30,8 @@ export default class Pie extends React.Component {
         row: 0,
         column: 0,
         charCount: 0,
-        d2Index: 1,
-        d3Index: 2,
+        d2Index: 2,
+        d3Index: 1,
         chartCount: 0
       },
       this.data = [];
@@ -43,10 +43,7 @@ export default class Pie extends React.Component {
     componentDidMount() {
       this.getStats();
       //this.initPie();  // Initializes plotly data array with the records and sets title in layout
-      this.addChart(2);
-      console.log(this.data);
-      console.log(this.records);
-      console.log(this.state);
+      this.addChart(1);
     }
 
     componentWillUnmount() {
@@ -89,6 +86,8 @@ export default class Pie extends React.Component {
         autosize: this.state.layout.autosize
     };
 
+      layout.title = (Object.keys(this.props.records)[this.state.d2Index]).toUpperCase();
+
       let d3Index = e;//= e.target.selectedIndex;
 
       let row = this.state.row;
@@ -104,6 +103,7 @@ export default class Pie extends React.Component {
 
         let newChart = {
           hole: 0.6,
+          textposition: 'inside',
           values: [],
           labels: [],
           type: 'pie',
@@ -116,12 +116,14 @@ export default class Pie extends React.Component {
           newChart.labels.push(this.stats[d3Index].labels[index]);
         }
 
+         // Add a new title and style it
         let newAnnotation = {
           text: this.stats[this.state.d2Index].labels[i],
-          x: 0.82,
-          y: 0.5,
-          font: { size: 20 }
-        }; // Add a new title and style it
+          x: 0.228,
+          y: 1,
+          font: { size: 20 },
+          showarrow: false
+        };
 
         // Set the rows and columns
         newChart.domain.row = row;
@@ -134,6 +136,9 @@ export default class Pie extends React.Component {
         if (column === 3) {
           column = 0;
           row += 1;
+          layout.grid.rows += 1;
+          newAnnotation.x += 1;
+          newAnnotation.y += 1;
         }
 
         // Add the new chart and annotations to the data and layout variables (respectively)
@@ -141,8 +146,6 @@ export default class Pie extends React.Component {
         layout.annotations.push(newAnnotation);
         i += 1;
       }
-      layout.title = Object.keys(this.props.records)[this.state.d2Index];
-      console.log(layout);
     // Update the state to include the new charts, annotations, row, column, chart count, and d3Index
     this.updateState(data, layout, row, column, this.state.chartCount + 1, d3Index);
   }
@@ -162,7 +165,6 @@ export default class Pie extends React.Component {
     }
 
     updateState = (data, layout, row, column, charCount, d3Index) => {
-      console.log(layout);
       this.data = data;
       this.setState({
         data: data,
@@ -171,8 +173,6 @@ export default class Pie extends React.Component {
         column: column,
         charCount: charCount,
         d3Index: d3Index
-      }, () => {
-        console.log(this.state);
       });
     }
 
@@ -261,7 +261,6 @@ export default class Pie extends React.Component {
     }
 
     render() {
-      console.log(this.state);
       return (
         <div>
           <PieSlider
