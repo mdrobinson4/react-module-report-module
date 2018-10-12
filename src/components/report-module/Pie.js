@@ -1,6 +1,7 @@
 import React from 'react';
 import Plot from 'react-plotly.js';
 import PieSlider from './PieSlider';
+import update from 'immutability-helper';
 
 /*
   JARGON -> (1) d2Index --- first set of data (array of values) selected (2) d3Index --- Second set of data (array of values) selected
@@ -77,25 +78,20 @@ export default class Pie extends React.Component {
 
 
     addChart = (e) => {
-      let data = [...this.state.data];
-
-      let layout = {
-        grid: this.state.layout.grid,
-        title: '',
-        annotations: [],
-        autosize: this.state.layout.autosize
-    };
-
-      layout.title = (Object.keys(this.props.records)[this.state.d2Index]).toUpperCase();
+      let data = [];
+      let row = 0;
+      let column = 0;
+      let rowCount = 0;
 
       let d3Index = e;//= e.target.selectedIndex;
-
-      let row = this.state.row;
-      let column = this.state.column
 
       let i = 0;
       let d2Length = this.stats[this.state.d2Index].labels.length;
       let d3Length = this.stats[d3Index].labels.length;
+
+      let chartTitle = (Object.keys(this.props.records)[this.state.d2Index]).toUpperCase();
+      let newAnnotations = [];
+
 
       // Iterate through item in the array at d2Index
       while ( (i < d2Length) && (i < d3Length)) {
@@ -117,37 +113,59 @@ export default class Pie extends React.Component {
         }
 
          // Add a new title and style it
-        let newAnnotation = {
+        let annotation = {
           text: this.stats[this.state.d2Index].labels[i],
-          x: 0.228,
-          y: 1,
+          xref: 'paper',
+          x: 1,
+          y: 0.5,
           font: { size: 20 },
           showarrow: false
         };
 
+        if (i % 2 === 0)
+          annotation.x = 0;
+
         // Set the rows and columns
         newChart.domain.row = row;
-        newChart.domain.column = column;
+        newChart.domain.column = column++;
         newChart.name = this.stats[this.state.d2Index].labels[i];
-
-        column += 1;
 
         // If the last item in a row was just added, go to a lower row and start at the first column
         if (column === 3) {
           column = 0;
           row += 1;
-          layout.grid.rows += 1;
-          newAnnotation.x += 1;
-          newAnnotation.y += 1;
+          rowCount += 1;
+          annotation.x += 1;
+          annotation.y += 1;
         }
 
-        // Add the new chart and annotations to the data and layout variables (respectively)
+        //////////////////////////////////////////////
+
         data.push(newChart);
-        layout.annotations.push(newAnnotation);
+        newAnnotations.push(annotation);
         i += 1;
       }
+      console.log(newAnnotations);
+
+      let newData = update(this.state, {data: {$push: data}});
+
+      let newLayout = update(this.state, {
+        layout: {title: {$set: chartTitle}},
+        layout: {grid: {rows: {$set: rowCount}}},
+        //layout: {annotations: {$push: newAnnotations}}
+      });
+
     // Update the state to include the new charts, annotations, row, column, chart count, and d3Index
-    this.updateState(data, layout, row, column, this.state.chartCount + 1, d3Index);
+    this.setState({
+      data: data,
+      layout: newLayout,
+      row: row,
+      column: column,
+      d3Index: d3Index
+    });
+
+    //this.setState({data: newData});
+    //this.updateState(newData, layout, row, column, this.state.chartCount + 1, d3Index);
   }
 
     // Change the number of slices in PIE chart or the number of charts appear (if 3D Pie is selected)
@@ -261,6 +279,7 @@ export default class Pie extends React.Component {
     }
 
     render() {
+      console.log(this.state);
       return (
         <div>
           <PieSlider
