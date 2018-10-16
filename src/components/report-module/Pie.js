@@ -2,6 +2,7 @@ import React from 'react';
 import Plot from 'react-plotly.js';
 import PieSlider from './PieSlider';
 import update from 'immutability-helper';
+import ChooseSet from './ChooseSet';
 
 /*
   JARGON -> (1) d2Index --- first set of data (array of values) selected (2) d3Index --- Second set of data (array of values) selected
@@ -13,9 +14,9 @@ export default class Pie extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
-        data: [
-        ],
+        data: [],
         layout: {
+          title: '',
           grid: {rows: 1, columns: 2},
           autosize: true,
           annotations: []
@@ -28,11 +29,8 @@ export default class Pie extends React.Component {
         viewNum: 10,
         records: [],
         size: 0,
-        row: 0,
-        column: 0,
-        charCount: 0,
-        d2Index: 2,
-        d3Index: 1,
+        d2Index: 0,
+        d3Index: 0,
         chartCount: 0
       },
       this.data = [];
@@ -44,10 +42,7 @@ export default class Pie extends React.Component {
     componentDidMount() {
       this.getStats();
       //this.initPie();  // Initializes plotly data array with the records and sets title in layout
-      this.addChart(1);
-    }
-
-    componentWillUnmount() {
+      this.addChart(3);
     }
 
     initPie = () => {
@@ -76,9 +71,62 @@ export default class Pie extends React.Component {
       return indices;
     }
 
+    getD2Length = () => {
+      return this.stats[this.state.d2Index].labels.length;
+    }
 
+    getD3Length = (i) => {
+      return this.stats[i].labels.length;
+    }
+
+    getChartTitle = () => {
+      return (Object.keys(this.props.records)[this.state.d2Index]).toUpperCase();
+    }
+
+    // Create new pie chart and set location
+    createChart = (indices, i, row, column, d3Index) => {
+      let newChart = {
+        hole: 0.6,
+        textposition: 'inside',
+        values: [],
+        labels: [],
+        type: 'pie',
+        domain: {}
+      };
+
+      // Add the values and labels of the items in the same indices as the previously mentiond elemnt to a new chart which will be stored in data
+      for (let index of indices) {
+        newChart.values.push(this.stats[d3Index].values[index]);
+        newChart.labels.push(this.stats[d3Index].labels[index]);
+      }
+
+      // Set the rows and columns
+      newChart.domain.row = row;
+      newChart.domain.column = column;
+      newChart.name = this.stats[this.state.d2Index].labels[i];
+
+      return newChart;
+    }
+
+    /*  Create new annotation, set the text, its position, and style  */
+    createAnnotation = (i) => {
+      let annotation = {
+        text: this.stats[this.state.d2Index].labels[i],
+        xref: 'paper',
+        x: 1,
+        y: 0.5,
+        font: { size: 20 },
+        showarrow: false
+      };
+
+      if (i % 2 === 0)
+        annotation.x = 0;
+
+      return annotation;
+    }
+
+    /*  Add new pie chart to group  */
     addChart = (e) => {
-      let data = [];
       let row = 0;
       let column = 0;
       let rowCount = 0;
@@ -86,49 +134,17 @@ export default class Pie extends React.Component {
       let d3Index = e;//= e.target.selectedIndex;
 
       let i = 0;
-      let d2Length = this.stats[this.state.d2Index].labels.length;
-      let d3Length = this.stats[d3Index].labels.length;
-
-      let chartTitle = (Object.keys(this.props.records)[this.state.d2Index]).toUpperCase();
+      let data = [];
       let newAnnotations = [];
 
-
       // Iterate through item in the array at d2Index
-      while ( (i < d2Length) && (i < d3Length)) {
+      while ( (i < this.getD2Length()) && (i < this.getD3Length(d3Index)) ) {
         let indices = this.getDupIndices(this.stats[this.state.d2Index].labels[i], this.state.d2Index); // Get the indices where this element exists
 
-        let newChart = {
-          hole: 0.6,
-          textposition: 'inside',
-          values: [],
-          labels: [],
-          type: 'pie',
-          domain: {}
-        };
+        let newChart = this.createChart(indices, i, row, column, d3Index);
+        column += 1;
 
-        // Add the values and labels of the items in the same indices as the previously mentiond elemnt to a new chart which will be stored in data
-        for (let index of indices) {
-          newChart.values.push(this.stats[d3Index].values[index]);
-          newChart.labels.push(this.stats[d3Index].labels[index]);
-        }
-
-         // Add a new title and style it
-        let annotation = {
-          text: this.stats[this.state.d2Index].labels[i],
-          xref: 'paper',
-          x: 1,
-          y: 0.5,
-          font: { size: 20 },
-          showarrow: false
-        };
-
-        if (i % 2 === 0)
-          annotation.x = 0;
-
-        // Set the rows and columns
-        newChart.domain.row = row;
-        newChart.domain.column = column++;
-        newChart.name = this.stats[this.state.d2Index].labels[i];
+        let annotation = this.createAnnotation(i);
 
         // If the last item in a row was just added, go to a lower row and start at the first column
         if (column === 3) {
@@ -139,33 +155,17 @@ export default class Pie extends React.Component {
           annotation.y += 1;
         }
 
-        //////////////////////////////////////////////
-
         data.push(newChart);
         newAnnotations.push(annotation);
         i += 1;
       }
-      console.log(newAnnotations);
 
-      let newData = update(this.state, {data: {$push: data}});
-
-      let newLayout = update(this.state, {
-        layout: {title: {$set: chartTitle}},
-        layout: {grid: {rows: {$set: rowCount}}},
-        //layout: {annotations: {$push: newAnnotations}}
-      });
-
-    // Update the state to include the new charts, annotations, row, column, chart count, and d3Index
-    this.setState({
-      data: data,
-      layout: newLayout,
-      row: row,
-      column: column,
-      d3Index: d3Index
-    });
-
-    //this.setState({data: newData});
-    //this.updateState(newData, layout, row, column, this.state.chartCount + 1, d3Index);
+      /*  update the d3Index, row, data object and layout object  */
+      this.updateState(update(this.state, {
+        d3Index: {$set: d3Index},
+        data: {$push: data},
+        layout: {title: {$set: this.getChartTitle()}, grid: {rows: {$set: rowCount}}, annotations: {$set: newAnnotations}},
+      }));
   }
 
     // Change the number of slices in PIE chart or the number of charts appear (if 3D Pie is selected)
@@ -182,16 +182,8 @@ export default class Pie extends React.Component {
       });
     }
 
-    updateState = (data, layout, row, column, charCount, d3Index) => {
-      this.data = data;
-      this.setState({
-        data: data,
-        layout: layout,
-        row: row,
-        column: column,
-        charCount: charCount,
-        d3Index: d3Index
-      });
+    updateState = (newState) => {
+      this.setState(newState);
     }
 
     //  Returns an object with the total number of records, unique labels, and each label's frequency
@@ -213,7 +205,7 @@ export default class Pie extends React.Component {
             j += 1;
           }
 
-          let uniqueStats = this.getCount(records);
+          let uniqueStats = this.statHelp(records);
 
           this.dupStats.push(dupStats);
           this.stats.push(uniqueStats);
@@ -221,9 +213,7 @@ export default class Pie extends React.Component {
         }
     }
 
-
-
-    getCount = (records) => {
+    statHelp = (records) => {
       let count = [];
       let sum = 0;
       let freq = [];
@@ -278,10 +268,20 @@ export default class Pie extends React.Component {
       this.initPie();
     }
 
+    handleSetChange = (e) => {
+      index = e.target.selectedIndex;
+      addChart(index);
+    }
+
     render() {
-      console.log(this.state);
+      console.log(this.records);
       return (
         <div>
+          <ChooseSet
+            handleSetChange={this.handleSetChange}
+            records={this.records}
+            index={this.state.d3Index}
+          />
           <PieSlider
             value={this.state.viewNum}
             handleNumChange={this.updateViewNum}
