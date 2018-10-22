@@ -1,91 +1,103 @@
 import React from 'react';
-import Checkbox from '@folio/stripes-components/lib/Checkbox';
-import Select from '@folio/stripes-components/lib/Select';
-import css from './style.css';
-//dataOptions={[
-//  {value: "Y", label: "Yes"},
-//  {value: "N", label: "No"},
-//  {value: "M", label: "Maybe", disabled: true}
-//]}>
-// Returns the graphical interce and sends the fields' values to PLOTLY
+import Button from './Button';
+import DataOptions from './DataOptions'
+import Slider from './Slider'
+import Dropdown from './Dropdown';
+import css from './GraphUI.css';
+
 export default class GraphUI extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      xType: 'categorical',
-      yType: 'categorical',
-      size: 20,
-      switch: true,
-      frequency: true,
-      showAllTicks: '',
-      opacity: 1,
-      xAxisCheckbox: false,
-      yAxisCheckbox: false,
-      xAxisValues: [
-        {value: "A", label: "Yes"},
-        {value: "B", label: "No"}
-      ]
-    };
-    this.handleUIChange = this.handleUIChange.bind(this);
-    this.handleAxisChange = this.handleAxisChange.bind(this);
-    this.onToggle = this.onToggle.bind(this);
-    this.toggleCheckbox = this.toggleCheckbox.bind(this);
-  }
-
-  toggleCheckbox(e) {
-    let boxState = {}
-
-    boxState[e.target.name] = e.target.value
-    this.setState(boxState)
-  }
-
-  onToggle() {
-      this.setState(prevState => ({
-        dropdownOpen: !prevState.dropdownOpen
-      }));
-    }
-
-    handleAxisChange(event) {
-      this.setState({
-        [event.target.name]: {
-          values: this.props.records.data[event.target.value],
-          name: event.target.value
+      sliderValues: {
+        opacity: {
+          min: 1,
+          max: 100,
+          defaultValue: 100
+        },
+        graphSize: {
+          min: 50,
+          max: 150,
+          defaultValue: 100
         }
-      });
+      }
+    };
+    this.getCount = this.getCount.bind(this);
+  }
+
+  getCount(arr) {
+    var lastElement = arr[0];
+    var count = 1;
+
+    var countArr = [];
+
+    for (var x = 1; x <= arr.length; x++) {
+        if (arr[x] === lastElement) {
+            count++;
+        }
+        else {
+            countArr.push(count);
+            count = 1;
+            lastElement = arr[x];
+        }
+    }
+    return countArr;
+  }
+
+  getFrequency(arr) {
+    
+    var lastElement = arr[0];
+    var count = 1;
+    var percentOf;
+
+    var freqArr = [];
+
+    for (var x = 1; x <= arr.length; x++) {
+      if (arr[x] === lastElement) {
+        count++;
+      }
+      else {
+        percentOf = count / arr.length;
+        freqArr.push(percentOf);
+
+        count = 1;
+        lastElement = arr[x]
+      }
     }
 
-    handleUIChange(event) {
-    this.setState({
-      [event.target.name]: event.target.type === 'checkbox' ? event.target.checked : event.target.value
-    });
-}
+    return freqArr;
+  }
 
   render() {
-    //// Creates the option elements for the graph types
-    //const graphType = ['bar', 'line', 'pie'];
-    //let graphTypeOp = graphType.map((type) =>
-    //  <option key={type} value={type}>{type.toUpperCase()}</option>
-    //);
-//
-    //// Creates the option elements for each row of data
-    //const keys = Object.keys(this.props.records.data);
-    //let columns = keys.map((col) =>
-    //  <option type="button" key={col} value={col} >{col.toUpperCase()}</option>
-    //);
-//
-    //// Creates the option elements for data types
-    //const dataType = ['continuous', 'categorical'];
-    //let dataTypeOp = dataType.map((type) =>
-    //  <option key={type} value={type}>{type.toUpperCase()}</option>
-    //);
-
     return (
       <div>
-        <div className={css.ui}>
+        <div>
           <div className={css.axisControl}>
-
-            <Checkbox name="xAxisCheckbox" label="X-Axis" onChange={this.toggleCheckbox} value={this.state.xAxisCheckbox}/>
-            <Checkbox name="yAxisCheckbox" label="Y-Axis" onChange={this.toggleCheckbox} value={this.state.yAxisCheckbox}/>
+            <DataOptions
+              axisData={this.props.axisData}
+              changeAxis={this.props.changeAxis}
+              getCount={this.getCount}
+              getFreq={this.getFrequency}
+            />
+            <Button
+              label={"Switch Axes"}
+              onClick={this.props.swapAxes}
+            />
+            <Slider
+              label={"Opacity"}
+              properties={this.state.sliderValues.opacity}
+              updateValue={this.props.updateOpac}
+            />
+            <Slider
+              label={"Graph Size"}
+              properties={this.state.sliderValues.graphSize}
+              updateValue={this.props.updateSize}
+            />
+            <Dropdown
+              label={"Graph Type"}
+              values={this.props.values}
+              changeType={this.props.changeType}
+            />
           </div>
         </div>
       </div>

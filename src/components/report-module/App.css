@@ -1,0 +1,14 @@
+@import 'fonts.css';
+
+.componentFlexRow {
+  font-family: 'Source Sans Pro', sans-serif;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+}
+
+.componentFlexColumn {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+}

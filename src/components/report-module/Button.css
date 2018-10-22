@@ -1,0 +1,18 @@
+@import 'fonts.css';
+
+.button {
+    border-radius: 6px;
+    background-color: #2b75bb;
+    color: white;
+    width: 110px;
+    height: 40px;
+    margin: .25em;
+    -webkit-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+  
+  .button:hover {
+    background-color: #6294e5;
+    color: white;
+  }

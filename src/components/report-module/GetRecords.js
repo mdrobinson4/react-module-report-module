@@ -1,10 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import Select from '@folio/stripes-components/lib/Select';
-
-
-let dataArr = {};
-let records = [];
+import Button from './Button';
 
 export default class GetRecords extends React.Component {
   constructor(props) {
@@ -16,27 +11,22 @@ export default class GetRecords extends React.Component {
   }
 
   // Gets the records and stores them in this.state.records
-  getRecords = () => {
-    let dataset = this.props.info.dataset.url;
+  getRec = () => {
+    let dataset = this.props.url;
     fetch(dataset, {
       method: 'GET',
       headers: new Headers({
         'Content-type': 'application/json',
         'X-Okapi-Tenant': 'diku',
-        'X-Okapi-Token': this.props.info.okapiToken
+        'X-Okapi-Token': this.props.token
       })
     })
     .then(result => result.json())
     .then(
       (result) => {
         // Access the items stored in the first key, which contains the data we want
-        records = result[Object.keys(result)[0]];
+        this.mergeRecords(result[Object.keys(result)[0]]);
     })
-    .then(
-      () => {
-        this.mergeRecords(records);
-      }
-    )
     .catch(
       (error) => {
         this.setState({
@@ -48,6 +38,7 @@ export default class GetRecords extends React.Component {
 
   mergeRecords = (records) => {
     // Access each key in the instance object
+    let dataArr = {};
     let key = Object.keys(records[0]);
     for (let i in records)
       for (let obj in records[i]) {
@@ -58,6 +49,7 @@ export default class GetRecords extends React.Component {
     for (let i in records)
       for (let obj in records[i])
         dataArr[obj].push(records[i][obj]);
+    this.props.getRecords(dataArr);
     this.handleMerge();
   }
 
@@ -67,25 +59,14 @@ export default class GetRecords extends React.Component {
     });
   }
 
-  componentDidMount() {
-    this.getRecords();
-    this.props.info.getRecords(dataArr);
-  }
-
-  // Called whenever a new dataset is loaded
-  componentDidUpdate(prevProps) {
-  if (this.props.info.dataset !== prevProps.info.dataset)
-    this.getRecords();
-}
-
   render() {
-    let {isloaded, error} = this.state;
-    if (error)
-      return (<p>{error}</p>)
-    else if (isloaded)
-      return (<div>Done</div>)
-    else {
-      return (<p>Loading...</p>)
-    }
+      return (
+        <div>
+          <Button
+            label={"Get Records"}
+            onClick={this.getRec}
+          />
+        </div>
+      )
   }
 }
