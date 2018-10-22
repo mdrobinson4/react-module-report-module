@@ -1,3 +1,5 @@
+@import 'fonts.css';
+
 .range_wrapper {
   margin-top: 1.2em;
   display: flex;
@@ -7,6 +9,7 @@
 .label {
   margin-right: .5em;
   width: 5em;
+  font-family: 'Source Sans Pro', sans-serif;
 }
 
 input[type=range] {

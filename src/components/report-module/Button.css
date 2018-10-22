@@ -1,3 +1,5 @@
+@import 'fonts.css';
+
 .button {
     border-radius: 6px;
     background-color: #2b75bb;
@@ -13,9 +15,4 @@
   .button:hover {
     background-color: #6294e5;
     color: white;
-  }
-
-  @font-face {
-    font-family: 'Source Sans Pro', sans-serif;
-    src: local('Source Sans Pro'), url(https://fonts.googleapis.com/css?family=Source+Sans+Pro)
   }

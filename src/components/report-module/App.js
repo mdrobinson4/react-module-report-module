@@ -1,4 +1,5 @@
 import React from 'react';
+import './fonts.css';
 import GraphUI from './GraphUI';
 import styles from './App.css';
 import Plot from 'react-plotly.js';
