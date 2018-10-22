@@ -1,8 +1,10 @@
 .select_container {
     width: fit-content;
     margin-top: 1.2em;
+    font-weight: 600;
 }
 
 .label {
     margin-right: .3em;
+    font-weight: 600;
 }

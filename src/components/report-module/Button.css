@@ -10,6 +10,7 @@
     -webkit-transition-duration: 0.3s;
     transition-duration: 0.3s;
     font-family: 'Source Sans Pro', sans-serif;
+    font-weight: 600;
   }
   
   .button:hover {
