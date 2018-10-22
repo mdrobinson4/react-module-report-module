@@ -1,4 +1,10 @@
+@font-face {
+  font-family: 'Source Sans Pro', sans-serif;
+  src: local('Source Sans Pro'), url(https://fonts.googleapis.com/css?family=Source+Sans+Pro)
+}
+
 .componentFlexRow {
+  font-family: 'Source Sans Pro', sans-serif;
   margin-top: 20px;
   display: flex;
   flex-direction: row;

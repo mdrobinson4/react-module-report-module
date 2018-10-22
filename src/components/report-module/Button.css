@@ -7,9 +7,15 @@
     margin: .25em;
     -webkit-transition-duration: 0.3s;
     transition-duration: 0.3s;
+    font-family: 'Source Sans Pro', sans-serif;
   }
   
   .button:hover {
     background-color: #6294e5;
     color: white;
+  }
+
+  @font-face {
+    font-family: 'Source Sans Pro', sans-serif;
+    src: local('Source Sans Pro'), url(https://fonts.googleapis.com/css?family=Source+Sans+Pro)
   }

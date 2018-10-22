@@ -21,7 +21,9 @@ export default class DataOptions extends React.Component {
                 }
             },
             currentLabel: 'Count',
-            lastLabel: 'Frequency'
+            lastLabel: 'Frequency',
+            freqActive: false,
+            xDefaultValues: []
         }
 
         this.handleChange = this.handleChange.bind(this);
@@ -67,8 +69,11 @@ export default class DataOptions extends React.Component {
         if (!this.state.currentAxes.x.active) {
 
             stateHolder.x = axis;
-            this.setState({currentAxes: stateHolder}, this.updateAxis);
 
+            this.setState({freqActive : true})
+            this.setState({xDefaultValues : axis.values.toString().split(",")})
+
+            this.setState({currentAxes: stateHolder}, this.updateAxis);
         }
         else if (!axis.active && !this.state.currentAxes.y.active) {
 
@@ -76,6 +81,7 @@ export default class DataOptions extends React.Component {
             stateHolder.x = axis;
 
             this.setState({currentAxes: stateHolder}, this.updateAxis);
+            this.setState({freqActive : true})
             
         }
         else if (!axis.active && this.state.currentAxes.y.active) {
@@ -84,13 +90,14 @@ export default class DataOptions extends React.Component {
             stateHolder.y = axis;
 
             this.setState({currentAxes: stateHolder}, this.updateAxis);
+            this.setState({freqActive : true})
 
         }
         else if (axis.active && !this.state.currentAxes.y.active) {
 
             stateHolder.y = axis
             this.setState({currentAxes: stateHolder}, this.updateAxis)
-
+            this.setState({freqActive : false})
         }
 
     }
@@ -98,7 +105,9 @@ export default class DataOptions extends React.Component {
     updateAxis() {
         var axesData = this.state.currentAxes;
 
-        axesData.x.values = axesData.x.values.toString().split(",");
+        this.state.freqActive ? axesData.x.values = this.state.xDefaultValues : //none
+        
+        axesData.x.values = axesData.x.values.toString().split(",")
         
         if (!axesData.y.active) {
             this.state.currentLabel === 'Count' ? axesData.y.values = this.props.getCount(axesData.x.values) : axesData.y.values = this.props.getFreq(axesData.x.values);

@@ -195,17 +195,19 @@ export default class App extends React.Component {
         newHeight *= (sizeMultiplier / 100);
         newWidth *= (sizeMultiplier / 100);
 
-        console.log(newHeight + ' ' + newWidth);
+        let newLayout = this.state.layout;
+        newLayout.height = newHeight;
+        newLayout.width = newWidth;
 
-        let newLayout = {
-            height: newHeight,
-            width: newWidth,
-            title: this.state.layout.title,
-            xaxis: this.state.layout.xaxis,
-            yaxis: this.state.layout.yaxis
-        }
+        //let newLayout = {
+        //    height: newHeight,
+        //    width: newWidth,
+        //    title: this.state.layout.title,
+        //    xaxis: this.state.layout.xaxis,
+        //    yaxis: this.state.layout.yaxis
+        //}
         
-        this.setState({layout: newLayout})
+        this.setState({layout: newLayout});
     }
 
     getRecords(dataArr) {
