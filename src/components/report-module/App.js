@@ -4,14 +4,13 @@ import GraphUI from './GraphUI';
 import styles from './App.css';
 import Plot from 'react-plotly.js';
 import GetRecords from './GetRecords';
+import update from 'immutability-helper';
 
 export default class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             data: [{
-                x: ['Dog', 'Cat', 'Mouse'],
-                y: [1, 2, 3],
                 type: 'bar',
                 opacity: 1
             }],
@@ -62,7 +61,7 @@ export default class App extends React.Component {
         this.createGraphData = this.createGraphData.bind(this);
         this.getCount = this.getCount.bind(this);
         this.changeGraphType = this.changeGraphType.bind(this);
-        this.updateSize = this.updateSize.bind(this)
+        this.updateSize = this.updateSize.bind(this);
     }
 
     onAxisChange(e) {
@@ -131,9 +130,9 @@ export default class App extends React.Component {
     getCount(arr) {
         var lastElement = arr[0];
         var count = 1;
-    
+
         var countArr = [];
-    
+
         for (var x = 1; x <= arr.length; x++) {
             if (arr[x] === lastElement) {
                 count++;
@@ -207,11 +206,13 @@ export default class App extends React.Component {
         //    xaxis: this.state.layout.xaxis,
         //    yaxis: this.state.layout.yaxis
         //}
-        
+
         this.setState({layout: newLayout});
     }
 
     getRecords(dataArr) {
+      this.createGraphData1(dataArr);
+        /*
         var title = {
             x: {
                 values: this.removeDuplicates(dataArr.title)
@@ -220,19 +221,30 @@ export default class App extends React.Component {
                 values: this.getCount(dataArr.title)
             }
         }
+        this.setState({records: dataArr});
         this.onAxisChange(title)
+        */
     }
 
+    // arr is an array of objects with data with identical properties
     createGraphData(arr) {
-        let propertyArray = Object.getOwnPropertyNames(arr[0]);
+      console.log(arr);
+        let propertyArray = Object.getOwnPropertyNames(arr[0]); // array of properties from the first set of data in arr
+        console.log(propertyArray);
 
+        // iterate through each property from arr
         propertyArray.forEach(element => {
             var propertyObject = {
                 type: element,
                 data: [ ]
             };
+            console.log(propertyObject);
+
+            // Iterate each dataset, storing each object of data in element
             arr.forEach(element => {
+              console.log(element);
                 var temp = Object.getOwnPropertyDescriptor(element, propertyObject.type)
+                console.log(temp);
 
                 propertyObject.data.push(temp.value)
             });
@@ -240,8 +252,32 @@ export default class App extends React.Component {
         });
     }
 
+
+    // arr is an array of objects with data with identical properties
+    createGraphData1 = (recordObj) => {
+        let propertyArray = Object.keys(recordObj); // array of properties from the first set of data in arr
+        console.log(recordObj);
+        let res = [];
+        for (let prop of propertyArray) {
+          let propertyObject = {
+            type: prop,
+            data: []
+          }
+          for (let val of recordObj[prop])
+            propertyObject.data.push(val);
+          res.push(propertyObject);
+        }
+        console.log(res);
+        this.updateRecords(update(this.state, {propertyObjectArray: {$set: res}}));
+        console.log(this.state);
+    }
+
+    updateRecords = (newRecords) => {
+      this.setState(newRecords);
+    }
+
     componentDidMount() {
-        this.createGraphData(this.state.userData);
+        //this.createGraphData(this.state.userData);
 
         fetch('http://localhost:9130/authn/login', {
           method: 'POST',
@@ -263,9 +299,10 @@ export default class App extends React.Component {
       }
 
     render() {
+      console.log(this.state);
         return (
             <div className={styles.componentFlexRow}>
-                <GraphUI 
+                <GraphUI
                     changeAxis={this.onAxisChange}
                     graphData={this.state.data[0]}
                     axisData={this.state.propertyObjectArray}
@@ -286,4 +323,3 @@ export default class App extends React.Component {
         );
     }
 }
-    
