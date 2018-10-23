@@ -4,7 +4,7 @@ import GraphUI from './GraphUI';
 import styles from './App.css';
 import Plot from 'react-plotly.js';
 import GetRecords from './GetRecords';
-import update from 'immutability-helper';
+import update from './immutability-helper';
 
 export default class App extends React.Component {
     constructor(props) {
@@ -62,9 +62,12 @@ export default class App extends React.Component {
         this.getCount = this.getCount.bind(this);
         this.changeGraphType = this.changeGraphType.bind(this);
         this.updateSize = this.updateSize.bind(this);
+
+        this.xxx = {};
     }
 
     onAxisChange(e) {
+      console.log(e);
         var axes = e;
 
         var temp = [{
@@ -81,7 +84,7 @@ export default class App extends React.Component {
         let newLayout = {
             height: this.state.layout.height,
             width: this.state.layout.width,
-            title: this.state.layout.title,
+            title: axes.x.type,
             xaxis: {
                 title: axes.x.type
             },
@@ -210,22 +213,6 @@ export default class App extends React.Component {
         this.setState({layout: newLayout});
     }
 
-    getRecords(dataArr) {
-      this.createGraphData1(dataArr);
-        /*
-        var title = {
-            x: {
-                values: this.removeDuplicates(dataArr.title)
-            },
-            y: {
-                values: this.getCount(dataArr.title)
-            }
-        }
-        this.setState({records: dataArr});
-        this.onAxisChange(title)
-        */
-    }
-
     // arr is an array of objects with data with identical properties
     createGraphData(arr) {
       console.log(arr);
@@ -253,32 +240,63 @@ export default class App extends React.Component {
     }
 
 
-    // arr is an array of objects with data with identical properties
-    createGraphData1 = (recordObj) => {
-        let propertyArray = Object.keys(recordObj); // array of properties from the first set of data in arr
-        console.log(recordObj);
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    createGraph = () => {
+        let propertyArray = Object.keys(this.xxx); // array of properties from the first set of data in arr
         let res = [];
         for (let prop of propertyArray) {
           let propertyObject = {
             type: prop,
             data: []
           }
-          for (let val of recordObj[prop])
+          for (let val of this.xxx[prop])
             propertyObject.data.push(val);
           res.push(propertyObject);
         }
-        console.log(res);
         this.updateRecords(update(this.state, {propertyObjectArray: {$set: res}}));
-        console.log(this.state);
     }
 
     updateRecords = (newRecords) => {
       this.setState(newRecords);
     }
 
-    componentDidMount() {
-        //this.createGraphData(this.state.userData);
+    getRecords = (okapiToken) => {
+      let dataset = this.state.dataSets[0].url;
+      fetch(dataset, {
+        method: 'GET',
+        headers: new Headers({
+          'Content-type': 'application/json',
+          'X-Okapi-Tenant': 'diku',
+          'X-Okapi-Token': okapiToken
+        })
+      })
+      .then(result => result.json())
+      .then(
+        (result) => {
+          // Access the items stored in the first key, which contains the data we want
+          this.mergeRecords(result[Object.keys(result)[0]]);
+      })
+      .then(
+        (result) => {
+          // Access the items stored in the first key, which contains the data we want
+          this.createGraph();
+      })
+    }
 
+    mergeRecords = (records) => {
+      // Access each key in the instance object
+      let dataArr = {};
+      for (let i in records)
+        for (let obj in records[i])
+          dataArr[obj] = [];
+      // Store values in arrays
+      for (let i in records)
+        for (let obj in records[i])
+          dataArr[obj].push(records[i][obj]);
+      this.xxx = dataArr;
+    }
+
+    componentDidMount() {
         fetch('http://localhost:9130/authn/login', {
           method: 'POST',
           body: JSON.stringify({
@@ -291,15 +309,11 @@ export default class App extends React.Component {
           })
         })
         .then((res) => {
-          this.setState({
-            okapiToken: res.headers.get('x-okapi-token'),
-            isLoaded: true
-          });
-        });
+          this.getRecords(res.headers.get('x-okapi-token'));
+        })
       }
 
     render() {
-      console.log(this.state);
         return (
             <div className={styles.componentFlexRow}>
                 <GraphUI
@@ -314,11 +328,6 @@ export default class App extends React.Component {
                     values={this.state.graphTypes}
                 />
                 <Plot data={this.state.data} layout={this.state.layout}/>
-                <GetRecords
-                    getRecords={this.getRecords}
-                    url={this.state.dataSets[0].url}
-                    token={this.state.okapiToken}
-                />
             </div>
         );
     }

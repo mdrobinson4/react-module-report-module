@@ -27,13 +27,6 @@ export default class GetRecords extends React.Component {
         // Access the items stored in the first key, which contains the data we want
         this.mergeRecords(result[Object.keys(result)[0]]);
     })
-    .catch(
-      (error) => {
-        this.setState({
-          error: error
-        });
-      }
-    )
   }
 
   mergeRecords = (records) => {
