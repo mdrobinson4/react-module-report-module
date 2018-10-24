@@ -4,7 +4,7 @@ import GraphUI from './GraphUI';
 import styles from './App.css';
 import Plot from 'react-plotly.js';
 import GetRecords from './GetRecords';
-import update from './immutability-helper';
+import update from 'immutability-helper';
 
 export default class App extends React.Component {
     constructor(props) {
@@ -67,7 +67,6 @@ export default class App extends React.Component {
     }
 
     onAxisChange(e) {
-      console.log(e);
         var axes = e;
 
         var temp = [{
@@ -215,9 +214,7 @@ export default class App extends React.Component {
 
     // arr is an array of objects with data with identical properties
     createGraphData(arr) {
-      console.log(arr);
         let propertyArray = Object.getOwnPropertyNames(arr[0]); // array of properties from the first set of data in arr
-        console.log(propertyArray);
 
         // iterate through each property from arr
         propertyArray.forEach(element => {
@@ -225,13 +222,10 @@ export default class App extends React.Component {
                 type: element,
                 data: [ ]
             };
-            console.log(propertyObject);
 
             // Iterate each dataset, storing each object of data in element
             arr.forEach(element => {
-              console.log(element);
                 var temp = Object.getOwnPropertyDescriptor(element, propertyObject.type)
-                console.log(temp);
 
                 propertyObject.data.push(temp.value)
             });
