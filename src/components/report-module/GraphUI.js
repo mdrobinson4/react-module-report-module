@@ -3,6 +3,7 @@ import Button from './Button';
 import DataOptions from './DataOptions'
 import Slider from './Slider'
 import Dropdown from './Dropdown';
+import SetDropdown from './SetDropdown';
 import css from './GraphUI.css';
 
 export default class GraphUI extends React.Component {
@@ -45,7 +46,7 @@ export default class GraphUI extends React.Component {
   }
 
   getFrequency(arr) {
-    
+
     var lastElement = arr[0];
     var count = 1;
     var percentOf;
@@ -73,6 +74,11 @@ export default class GraphUI extends React.Component {
       <div>
         <div>
           <div className={css.axisControl}>
+            <SetDropdown
+              label={'Dataset'}
+              values={this.props.sets}
+              changeSet={this.props.changeSet}
+            />
             <DataOptions
               axisData={this.props.axisData}
               changeAxis={this.props.changeAxis}

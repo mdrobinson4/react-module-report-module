@@ -3,7 +3,6 @@ import './fonts.css';
 import GraphUI from './GraphUI';
 import styles from './App.css';
 import Plot from 'react-plotly.js';
-import GetRecords from './GetRecords';
 import update from 'immutability-helper';
 
 export default class App extends React.Component {
@@ -40,7 +39,7 @@ export default class App extends React.Component {
             propertyObjectArray: [],
             isLoaded: Boolean,
             dataSets: [
-                {name: 'Circulation', url: 'http://localhost:9130/instance-storage/instances?limit=500&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title'},
+                {name: 'Inventory', url: 'http://localhost:9130/instance-storage/instances?limit=500&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title'},
                 {name: 'Users', url: 'http://localhost:9130/users?limit=500&query=%28cql.allRecords%3D1%29%20sortby%20personal.lastName%20personal.firstName'}
             ],
             body: JSON.stringify({
@@ -51,6 +50,7 @@ export default class App extends React.Component {
                 'Content-type': 'application/json',
                 'X-Okapi-Tenant': 'diku',
             }),
+            xxx: []
         }
 
         this.componentDidMount = this.componentDidMount.bind(this);
@@ -62,8 +62,6 @@ export default class App extends React.Component {
         this.getCount = this.getCount.bind(this);
         this.changeGraphType = this.changeGraphType.bind(this);
         this.updateSize = this.updateSize.bind(this);
-
-        this.xxx = {};
     }
 
     onAxisChange(e) {
@@ -83,7 +81,7 @@ export default class App extends React.Component {
         let newLayout = {
             height: this.state.layout.height,
             width: this.state.layout.width,
-            title: axes.x.type,
+            title: this.state.dataSets[1].name.toUpperCase(),
             xaxis: {
                 title: axes.x.type
             },
@@ -127,6 +125,12 @@ export default class App extends React.Component {
 
 
         this.setState({data: newGraph})
+    }
+
+    changeSet = (e) => {
+      console.log(`Createing Graph -> New Set: ${e.target.value}`);
+      this.createGraph(e.target.value);
+      this.onAxisChange()
     }
 
     getCount(arr) {
@@ -233,17 +237,15 @@ export default class App extends React.Component {
         });
     }
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    createGraph = () => {
-        let propertyArray = Object.keys(this.xxx); // array of properties from the first set of data in arr
+    createGraph = (title) => {
+        let propertyArray = Object.keys(this.state.xxx[title]); // array of properties from the first set of data in arr
         let res = [];
         for (let prop of propertyArray) {
           let propertyObject = {
             type: prop,
             data: []
           }
-          for (let val of this.xxx[prop])
+          for (let val of this.state.xxx[title][prop])
             propertyObject.data.push(val);
           res.push(propertyObject);
         }
@@ -255,39 +257,41 @@ export default class App extends React.Component {
     }
 
     getRecords = (okapiToken) => {
-      let dataset = this.state.dataSets[0].url;
-      fetch(dataset, {
-        method: 'GET',
-        headers: new Headers({
-          'Content-type': 'application/json',
-          'X-Okapi-Tenant': 'diku',
-          'X-Okapi-Token': okapiToken
+      for (let obj of this.state.dataSets) {
+        fetch(obj.url, {
+          method: 'GET',
+          headers: new Headers({
+            'Content-type': 'application/json',
+            'X-Okapi-Tenant': 'diku',
+            'X-Okapi-Token': okapiToken
+          })
         })
-      })
-      .then(result => result.json())
-      .then(
-        (result) => {
-          // Access the items stored in the first key, which contains the data we want
-          this.mergeRecords(result[Object.keys(result)[0]]);
-      })
-      .then(
-        (result) => {
-          // Access the items stored in the first key, which contains the data we want
-          this.createGraph();
-      })
+        .then(result => result.json())
+        .then(
+          (result) => {
+            // Access the items stored in the first key, which contains the data we want
+            this.mergeRecords(result[Object.keys(result)[0]], obj.name);
+        })
+        .then(
+          () => {
+            this.createGraph(obj.name)
+          }
+        )
+      }
     }
 
-    mergeRecords = (records) => {
+    // Pass through each object which has several sub-objects with data and store data with dup names together
+    mergeRecords = (records, title) => {
       // Access each key in the instance object
       let dataArr = {};
-      for (let i in records)
-        for (let obj in records[i])
-          dataArr[obj] = [];
-      // Store values in arrays
-      for (let i in records)
-        for (let obj in records[i])
-          dataArr[obj].push(records[i][obj]);
-      this.xxx = dataArr;
+      for (let obj of records) {
+        for (let prop of Object.keys(obj)) {
+          if (!dataArr.hasOwnProperty(prop))
+            dataArr[prop] = [];
+          dataArr[prop].push(obj[prop]);
+        }
+      }
+      this.updateRecords( update(this.state, {xxx: {[title]: {$set: dataArr}}}) );
     }
 
     componentDidMount() {
@@ -320,6 +324,8 @@ export default class App extends React.Component {
                     opacity={this.state.opacity}
                     changeType={this.changeGraphType}
                     values={this.state.graphTypes}
+                    sets={Object.keys(this.state.xxx)}
+                    changeSet={this.changeSet}
                 />
                 <Plot data={this.state.data} layout={this.state.layout}/>
             </div>

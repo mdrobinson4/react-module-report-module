@@ -1,6 +1,7 @@
 import React from "react";
 import Button from './Button';
 import css from './DataOptions.css';
+import update from 'immutability-helper';
 
 
 export default class DataOptions extends React.Component {
@@ -33,7 +34,6 @@ export default class DataOptions extends React.Component {
     }
 
     handleChange(event) {
-        console.log(event.target)
         var target = event.target;
 
         var axis = {
@@ -42,30 +42,8 @@ export default class DataOptions extends React.Component {
             active: target.checked
         }
 
-        var stateHolder = this.state.currentAxes;
+       var stateHolder = this.state.currentAxes;
 
-        //Will eventually refactor this code to be what controls the currentAxes since it is cleaner
-        //if (axis.active) {
-        //    if (!this.state.currentAxes.x.active) {
-        //        stateHolder.x = axis;
-        //        this.setState({currentAxes: stateHolder}, this.updateAxis);
-        //    }
-        //    else {
-        //        stateHolder.y = axis;
-        //        this.setState({currentAxes: stateHolder}, this.updateAxis);
-        //    }
-        //}
-        //else {
-        //    if (this.state.currentAxes.y.active) {
-        //        stateHolder.y = axis
-        //        this.setState({currentAxes: stateHolder}, this.updateAxis);
-        //    }
-        //    else {
-        //        stateHolder.x = axis
-        //        this.setState({currentAxes: stateHolder}, this.updateAxis);
-        //    }
-        //}
-        
         if (!this.state.currentAxes.x.active) {
 
             stateHolder.x = axis;
@@ -82,7 +60,7 @@ export default class DataOptions extends React.Component {
 
             this.setState({currentAxes: stateHolder}, this.updateAxis);
             this.setState({freqActive : true})
-            
+
         }
         else if (!axis.active && this.state.currentAxes.y.active) {
 
@@ -106,9 +84,9 @@ export default class DataOptions extends React.Component {
         var axesData = this.state.currentAxes;
 
         this.state.freqActive ? axesData.x.values = this.state.xDefaultValues : //none
-        
+
         axesData.x.values = axesData.x.values.toString().split(",")
-        
+
         if (!axesData.y.active) {
             this.state.currentLabel === 'Count' ? axesData.y.values = this.props.getCount(axesData.x.values) : axesData.y.values = this.props.getFreq(axesData.x.values);
             axesData.x.values = this.removeDuplicates(axesData.x.values)
@@ -116,7 +94,7 @@ export default class DataOptions extends React.Component {
         else {
             axesData.y.values = axesData.y.values.toString().split(",");
         }
-        
+
 
         this.props.changeAxis(axesData)
     }
@@ -147,8 +125,8 @@ export default class DataOptions extends React.Component {
         <div key={field.type}>
             <label>
                 {field.type.toUpperCase() + ":  "}
-            </label>  
-            <input 
+            </label>
+            <input
                 name={field.type}
                 type="checkbox"
                 value={field.data}
