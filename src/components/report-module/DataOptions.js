@@ -24,7 +24,8 @@ export default class DataOptions extends React.Component {
             currentLabel: 'Count',
             lastLabel: 'Frequency',
             freqActive: false,
-            xDefaultValues: []
+            xDefaultValues: [],
+            checked: true
         }
 
         this.handleChange = this.handleChange.bind(this);
@@ -120,7 +121,7 @@ export default class DataOptions extends React.Component {
     }
 
     render() {
-
+      let x = this.props.axisData;
         const checkboxList = this.props.axisData.map((field) =>
         <div key={field.type}>
             <label>
@@ -133,7 +134,7 @@ export default class DataOptions extends React.Component {
                 key={field.data}
                 onChange={this.handleChange}
             />
-            {this.state.currentAxes.x.type === field.type ? <label id={field.type} className={css.label}><b>(X Axis)</b></label> : <label id={field.type}></label>}
+            {((this.state.currentAxes.x.type === field.type) ) ? <label id={field.type} className={css.label}><b>(X Axis)</b></label> : <label id={field.type}></label>}
             {this.state.currentAxes.y.type === field.type ? <label id={field.type} className={css.label}><b>(Y Axis)</b></label> : <label id={field.type}></label>}
         </div>
         );

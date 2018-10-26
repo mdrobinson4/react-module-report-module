@@ -127,10 +127,20 @@ export default class App extends React.Component {
         this.setState({data: newGraph})
     }
 
+    getDefault = e => {
+      let defaultSet = {
+        x: {values: e},
+        y: {values: this.getCount(e)} // Set the y axis as the count of the x value
+      }
+      return defaultSet;
+    }
+
     changeSet = (e) => {
-      console.log(`Createing Graph -> New Set: ${e.target.value}`);
+      console.log(e.target.value);
       this.createGraph(e.target.value);
-      this.onAxisChange()
+      let set = this.state.propertyObjectArray[0].data;
+      console.log(this.state.propertyObjectArray);
+      this.onAxisChange(this.getDefault(set));
     }
 
     getCount(arr) {
@@ -237,56 +247,62 @@ export default class App extends React.Component {
         });
     }
 
-    createGraph = (title) => {
-        let propertyArray = Object.keys(this.state.xxx[title]); // array of properties from the first set of data in arr
-        let res = [];
-        for (let prop of propertyArray) {
-          let propertyObject = {
-            type: prop,
-            data: []
-          }
-          for (let val of this.state.xxx[title][prop])
-            propertyObject.data.push(val);
-          res.push(propertyObject);
-        }
-        this.updateRecords(update(this.state, {propertyObjectArray: {$set: res}}));
+  /*  Store the records in state as an array of objects and store the name of the data and the actual data in the each object */
+  createGraph = (title) => {
+    let propertyArray = Object.keys(this.state.xxx[title]); // array of properties from the first key's value
+    let res = [];
+    // Iterate the properties
+    for (let prop of propertyArray) {
+      let propertyObject = {
+        type: prop,
+        data: []
+      }
+      // Pass through the corresponding array of data and push values into propertyObject
+      for (let val of this.state.xxx[title][prop])
+        propertyObject.data.push(val);
+      res.push(propertyObject);
     }
+    this.updateRecords(update(this.state, {propertyObjectArray: {$set: res}}));
+  }
 
+    /* Update state */
     updateRecords = (newRecords) => {
       this.setState(newRecords);
     }
 
-    getRecords = (okapiToken) => {
-      for (let obj of this.state.dataSets) {
-        fetch(obj.url, {
-          method: 'GET',
-          headers: new Headers({
-            'Content-type': 'application/json',
-            'X-Okapi-Tenant': 'diku',
-            'X-Okapi-Token': okapiToken
-          })
-        })
-        .then(result => result.json())
-        .then(
-          (result) => {
-            // Access the items stored in the first key, which contains the data we want
-            this.mergeRecords(result[Object.keys(result)[0]], obj.name);
-        })
-        .then(
-          () => {
-            this.createGraph(obj.name)
-          }
-        )
+    /*  Make an API request to the backend to get the records   */
+    getRecords = (okapiToken, i) => {
+      // Base case -> graph the first key in the first datatset
+      if (i == 1) {
+        this.createGraph(this.state.dataSets[i - 1].name);  // Create graph for first set
+        let set = this.state.propertyObjectArray[0].data;
+        this.onAxisChange(this.getDefault(set));
       }
+
+      // Base case -> return if you reach the end of the dataSets array
+      if (i === this.state.dataSets.length)
+        return;
+
+      // Iterate through the dataset URLs provided in state
+      fetch(this.state.dataSets[i].url, {
+        method: 'GET',
+        headers: new Headers({
+          'Content-type': 'application/json',
+          'X-Okapi-Tenant': 'diku',
+          'X-Okapi-Token': okapiToken
+        })
+      })
+      .then(result => result.json())  // Parse json to javascript
+      .then(result => this.mergeRecords(result[Object.keys(result)[0]], this.state.dataSets[i].name))  // Organize the data into an object of arrays where the keys are the names of the column of data and the values are the data
+      .then(() => this.getRecords(okapiToken, i + 1)) // Recursively get records
     }
 
     // Pass through each object which has several sub-objects with data and store data with dup names together
     mergeRecords = (records, title) => {
-      // Access each key in the instance object
       let dataArr = {};
       for (let obj of records) {
         for (let prop of Object.keys(obj)) {
-          if (!dataArr.hasOwnProperty(prop))
+          if (!dataArr.hasOwnProperty(prop))  // Check to see if the key already exists
             dataArr[prop] = [];
           dataArr[prop].push(obj[prop]);
         }
@@ -306,9 +322,7 @@ export default class App extends React.Component {
             'X-Okapi-Tenant': 'diku',
           })
         })
-        .then((res) => {
-          this.getRecords(res.headers.get('x-okapi-token'));
-        })
+        .then((res) => this.getRecords(res.headers.get('x-okapi-token'), 0))  // Use the okapi-token to make an api request to the backend and get the records
       }
 
     render() {
