@@ -30,14 +30,21 @@ export default class DataOptions extends React.Component {
         this.updateAxis = this.updateAxis.bind(this);
         this.switchFreq = this.switchFreq.bind(this);
         this.removeDuplicates = this.removeDuplicates.bind(this);
+        this.clone = this.clone.bind(this);
     }
 
-    handleChange(event) {
-        console.log(event.target)
+    async clone(axis) {
+        let array = axis;
+
+        return array;
+    }
+
+    async handleChange(event) {
+        //console.log(event.target)
         var target = event.target;
 
         var axis = {
-            type: target.name,
+            type: target.name.toString(),
             values: target.value,
             active: target.checked
         }
@@ -65,8 +72,31 @@ export default class DataOptions extends React.Component {
         //        this.setState({currentAxes: stateHolder}, this.updateAxis);
         //    }
         //}
-        
-        if (!this.state.currentAxes.x.active) {
+        //console.log(stateHolder.x.type.toString() + ' ' + axis.type)
+        //console.log(this.state.xDefaultValues == axis.values)
+        //console.log(this.state.xDefaultValues + ' ' + axis.values)
+
+        if (this.state.xDefaultValues == axis.values && !this.state.freqActive) {
+            let yAxisClone = stateHolder.y;
+
+            stateHolder.x = {
+                type: yAxisClone.type,
+                values: await this.clone(yAxisClone.values),
+                active: yAxisClone.active
+            }
+            
+            stateHolder.y = {
+                type: "",
+                values: [],
+                active: false
+            }
+            console.log(stateHolder)
+
+            this.setState({xDefaultValues : stateHolder.x.values})
+            this.setState({freqActive: true});
+            this.setState({currentAxes : stateHolder}, this.updateAxis)
+        }
+        else if (!this.state.currentAxes.x.active) {
 
             stateHolder.x = axis;
 
