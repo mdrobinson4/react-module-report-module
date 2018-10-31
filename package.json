@@ -24,6 +24,7 @@
     "@folio/stripes-components": "^2.0.0",
     "flexbox-react": "^4.4.0",
     "immutability-helper": "^2.8.1",
+    "npm": "^6.4.1",
     "plotly": "^1.0.6",
     "plotly.js": "^1.41.3",
     "prop-types": "^15.6.0",

@@ -88,6 +88,10 @@ export default class DataOptions extends React.Component {
 
         axesData.x.values = axesData.x.values.toString().split(",")
 
+        for (let i = 0; i < axesData.x.values.length; i++) {
+            axesData.x.values[i] == "" ? axesData.x.values[i] = "No Value" : console.log('none')
+        }
+
         if (!axesData.y.active) {
             this.state.currentLabel === 'Count' ? axesData.y.values = this.props.getCount(axesData.x.values) : axesData.y.values = this.props.getFreq(axesData.x.values);
             axesData.x.values = this.removeDuplicates(axesData.x.values)
