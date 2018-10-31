@@ -50,47 +50,17 @@ export default class App extends React.Component {
                 'Content-type': 'application/json',
                 'X-Okapi-Tenant': 'diku',
             }),
-            xxx: []
         }
-
+        this.xxx = [];
         this.componentDidMount = this.componentDidMount.bind(this);
         this.onAxisChange = this.onAxisChange.bind(this);
         this.swapAxes = this.swapAxes.bind(this);
         this.updateOpacity = this.updateOpacity.bind(this);
         this.getRecords = this.getRecords.bind(this);
-        this.createGraphData = this.createGraphData.bind(this);
+        this.setGraphObjData = this.setGraphObjData.bind(this);
         this.getCount = this.getCount.bind(this);
         this.changeGraphType = this.changeGraphType.bind(this);
         this.updateSize = this.updateSize.bind(this);
-    }
-
-    onAxisChange(e) {
-        var axes = e;
-
-        var temp = [{
-            x: axes.x.values,
-            y: axes.y.values,
-            type: this.state.data[0].type,
-            opacity: this.state.data[0].opacity
-        }]
-        this.updateAxesLabels(axes)
-        this.setState({ data: temp })
-    }
-
-    updateAxesLabels(axes) {
-        let newLayout = {
-            height: this.state.layout.height,
-            width: this.state.layout.width,
-            title: this.state.dataSets[1].name.toUpperCase(),
-            xaxis: {
-                title: axes.x.type
-            },
-            yaxis: {
-                title: axes.y.type
-            }
-        }
-
-        this.setState({layout: newLayout})
     }
 
     changeGraphType(newType) {
@@ -125,22 +95,6 @@ export default class App extends React.Component {
 
 
         this.setState({data: newGraph})
-    }
-
-    getDefault = e => {
-      let defaultSet = {
-        x: {values: e},
-        y: {values: this.getCount(e)} // Set the y axis as the count of the x value
-      }
-      return defaultSet;
-    }
-
-    changeSet = (e) => {
-      console.log(e.target.value);
-      this.createGraph(e.target.value);
-      let set = this.state.propertyObjectArray[0].data;
-      console.log(this.state.propertyObjectArray);
-      this.onAxisChange(this.getDefault(set));
     }
 
     getCount(arr) {
@@ -227,7 +181,7 @@ export default class App extends React.Component {
     }
 
     // arr is an array of objects with data with identical properties
-    createGraphData(arr) {
+    setGraphObjData(arr) {
         let propertyArray = Object.getOwnPropertyNames(arr[0]); // array of properties from the first set of data in arr
 
         // iterate through each property from arr
@@ -247,42 +201,83 @@ export default class App extends React.Component {
         });
     }
 
-  /*  Store the records in state as an array of objects and store the name of the data and the actual data in the each object */
-  createGraph = (title) => {
-    let propertyArray = Object.keys(this.state.xxx[title]); // array of properties from the first key's value
-    let res = [];
-    // Iterate the properties
-    for (let prop of propertyArray) {
-      let propertyObject = {
-        type: prop,
-        data: []
+    /* Returns an object which contains the data from the first set */
+    selectFirstSet = () => {
+      let e = this.state.propertyObjectArray[0].data;
+      let defaultSet = {
+        x: {values: e},
+        y: {values: this.getCount(e)} // Set the y axis as the count of the x value
       }
-      // Pass through the corresponding array of data and push values into propertyObject
-      for (let val of this.state.xxx[title][prop])
-        propertyObject.data.push(val);
-      res.push(propertyObject);
+      return defaultSet;
     }
-    this.updateRecords(update(this.state, {propertyObjectArray: {$set: res}}));
-  }
+
+    updateAxesLabels(axes) {
+      let newLayout = {
+        height: this.state.layout.height,
+        width: this.state.layout.width,
+        title: this.state.dataSets[1].name.toUpperCase(),
+        xaxis: {
+          title: axes.x.type
+        },
+        yaxis: {
+          title: axes.y.type
+        }
+      }
+      this.setState({layout: newLayout})
+    }
+
+    /* Updates the x and y values and the axis labels */
+    onAxisChange(e) {
+      var axes = e;
+      var temp = [{
+        x: axes.x.values,
+        y: axes.y.values,
+          type: this.state.data[0].type,
+        opacity: this.state.data[0].opacity
+      }]
+      this.updateAxesLabels(axes)
+      this.setState({ data: temp })
+    }
+
+    updateAxis = (e) => {
+      //this.setState(update(this.state, {data: [{x: {$set: e.x.values}, y: {$set: e.y.values}, type: {$set: 'pie'}}], layout: {xaxis: {title: {$set: 'e.x.type'}}, yaxis: {title: {$set: 'e.y.type'}}, title: {$set: 'IDK'}}}));
+    }
+
+    /*  Store the records in state as an array of objects and store the name of the data and the actual data in the each object */
+    setGraphObj = (title) => {
+      let propertyArray = Object.keys(this.xxx[title]); // array of properties from the first key's value
+      let res = [];
+      // Iterate the properties
+      for (let prop of propertyArray) {
+        let propertyObject = {
+          type: prop,
+          data: []
+        }
+        // Pass through the corresponding array of data and push values into propertyObject
+        for (let val of this.xxx[title][prop])
+          propertyObject.data.push(val);
+        res.push(propertyObject);
+      }
+      this.updateRecords(update(this.state, {propertyObjectArray: {$set: res}}));
+    }
+
+    /* Pretty obvious */
+    changeSet = (e) => {
+      this.setGraphObj(e.target.value);
+    }
 
     /* Update state */
     updateRecords = (newRecords) => {
-      this.setState(newRecords);
+      this.setState(newRecords, () => {this.onAxisChange(this.selectFirstSet())});
     }
 
     /*  Make an API request to the backend to get the records   */
     getRecords = (okapiToken, i) => {
-      // Base case -> graph the first key in the first datatset
-      if (i == 1) {
-        this.createGraph(this.state.dataSets[i - 1].name);  // Create graph for first set
-        let set = this.state.propertyObjectArray[0].data;
-        this.onAxisChange(this.getDefault(set));
-      }
-
       // Base case -> return if you reach the end of the dataSets array
-      if (i === this.state.dataSets.length)
+      if (i === this.state.dataSets.length) {
+        this.setGraphObj(this.state.dataSets[0].name);  // Create graph for first set
         return;
-
+      }
       // Iterate through the dataset URLs provided in state
       fetch(this.state.dataSets[i].url, {
         method: 'GET',
@@ -307,25 +302,20 @@ export default class App extends React.Component {
           dataArr[prop].push(obj[prop]);
         }
       }
-      this.updateRecords( update(this.state, {xxx: {[title]: {$set: dataArr}}}) );
+      this.xxx[title] = dataArr;
     }
 
     componentDidMount() {
-        fetch('http://localhost:9130/authn/login', {
-          method: 'POST',
-          body: JSON.stringify({
-            'username': 'diku_admin',
-            'password': 'admin'
-          }),
-          headers: new Headers({
-            'Content-type': 'application/json',
-            'X-Okapi-Tenant': 'diku',
-          })
-        })
-        .then((res) => this.getRecords(res.headers.get('x-okapi-token'), 0))  // Use the okapi-token to make an api request to the backend and get the records
-      }
+      fetch('http://localhost:9130/authn/login', {
+        method: 'POST',
+        body: this.state.body,
+        headers: this.state.headers
+      })
+      .then((res) => this.getRecords(res.headers.get('x-okapi-token'), 0))  // Use the okapi-token to make an api request to the backend and get the records
+    }
 
     render() {
+      console.log(this.state);
         return (
             <div className={styles.componentFlexRow}>
                 <GraphUI
@@ -338,7 +328,7 @@ export default class App extends React.Component {
                     opacity={this.state.opacity}
                     changeType={this.changeGraphType}
                     values={this.state.graphTypes}
-                    sets={Object.keys(this.state.xxx)}
+                    sets={Object.keys(this.xxx)}
                     changeSet={this.changeSet}
                 />
                 <Plot data={this.state.data} layout={this.state.layout}/>
