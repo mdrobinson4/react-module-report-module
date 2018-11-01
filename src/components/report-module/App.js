@@ -14,9 +14,9 @@ export default class App extends React.Component {
                 opacity: 1
             }],
             layout: {
-                height: 500,
+                height: 1000,
                 width: 1000,
-                title: 'Sample Graph',
+                title: String,
                 xaxis: {
                     title: String
                 },
@@ -52,6 +52,7 @@ export default class App extends React.Component {
             }),
         }
         this.xxx = [];
+        this.graphTitle = '';
         this.componentDidMount = this.componentDidMount.bind(this);
         this.onAxisChange = this.onAxisChange.bind(this);
         this.swapAxes = this.swapAxes.bind(this);
@@ -182,19 +183,16 @@ export default class App extends React.Component {
 
     // arr is an array of objects with data with identical properties
     setGraphObjData(arr) {
-        let propertyArray = Object.getOwnPropertyNames(arr[0]); // array of properties from the first set of data in arr
-
+        var propertyArray = Object.getOwnPropertyNames(arr[0]); // array of properties from the first set of data in arr
         // iterate through each property from arr
         propertyArray.forEach(element => {
             var propertyObject = {
                 type: element,
                 data: [ ]
             };
-
             // Iterate each dataset, storing each object of data in element
             arr.forEach(element => {
                 var temp = Object.getOwnPropertyDescriptor(element, propertyObject.type)
-
                 propertyObject.data.push(temp.value)
             });
             this.state.propertyObjectArray.push(propertyObject);
@@ -213,9 +211,9 @@ export default class App extends React.Component {
 
     updateAxesLabels(axes) {
       let newLayout = {
+        title: this.graphTitle.toUpperCase(),
         height: this.state.layout.height,
         width: this.state.layout.width,
-        title: this.state.dataSets[1].name.toUpperCase(),
         xaxis: {
           title: axes.x.type
         },
@@ -239,12 +237,15 @@ export default class App extends React.Component {
       this.setState({ data: temp })
     }
 
+/*
     updateAxis = (e) => {
       //this.setState(update(this.state, {data: [{x: {$set: e.x.values}, y: {$set: e.y.values}, type: {$set: 'pie'}}], layout: {xaxis: {title: {$set: 'e.x.type'}}, yaxis: {title: {$set: 'e.y.type'}}, title: {$set: 'IDK'}}}));
     }
+*/
 
     /*  Store the records in state as an array of objects and store the name of the data and the actual data in the each object */
     setGraphObj = (title) => {
+      this.graphTitle = title;
       let propertyArray = Object.keys(this.xxx[title]); // array of properties from the first key's value
       let res = [];
       // Iterate the properties
@@ -315,7 +316,6 @@ export default class App extends React.Component {
     }
 
     render() {
-      console.log(this.state);
         return (
             <div className={styles.componentFlexRow}>
                 <GraphUI
