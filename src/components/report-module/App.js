@@ -9,20 +9,27 @@ export default class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+          width: window.innerWidth,
+          height: window.innerHeight,
+          useResizeHandler: true,
+            style: {
+              width: '100%',
+              height: '100%'
+            },
             data: [{
                 type: 'bar',
                 opacity: 1
             }],
             layout: {
-                height: 1000,
-                width: 1000,
-                title: String,
-                xaxis: {
-                    title: String
-                },
-                yaxis: {
-                    title: String
-                }
+              width: window.innerWidth * 0.8,
+              height: window.innerWidth * 0.642857143 * 0.35,
+              title: String,
+              xaxis: {
+                title: 'String'
+              },
+              yaxis: {
+                title: String
+              }
             },
             defaultHeight: 500,
             defaultWidth: 1000,
@@ -62,6 +69,37 @@ export default class App extends React.Component {
         this.getCount = this.getCount.bind(this);
         this.changeGraphType = this.changeGraphType.bind(this);
         this.updateSize = this.updateSize.bind(this);
+    }
+
+    componentDidMount() {
+      window.addEventListener('resize', this.handleResize);
+      fetch('http://localhost:9130/authn/login', {
+        method: 'POST',
+        body: this.state.body,
+        headers: this.state.headers
+      })
+      .then((res) => this.getRecords(res.headers.get('x-okapi-token'), 0))  // Use the okapi-token to make an api request to the backend and get the records
+    }
+
+    componentWillUnmount() {
+      window.removeEventListener('resize', this.handleResize);
+    }
+
+    /*  Updates the height and width of graph  */
+    handleResize = () => {
+      this.setState(update(this.state, {
+        layout: {width: {$set: window.innerWidth * 0.8},
+        height: {$set: window.innerWidth * 0.642857143 * 0.35}
+      }}));
+    }
+
+    updateSize = e => {
+      console.log('Updating Size');
+      this.setState(update(this.state, {
+        layout: {
+          width: {$set: this.state.layout.width * e.target.value},
+          height: {$set: this.state.layout.height * e.target.value}
+        }}));
     }
 
     changeGraphType(newType) {
@@ -157,30 +195,6 @@ export default class App extends React.Component {
         this.setState({ data: temp })
     }
 
-    updateSize(e) {
-        let sizeMultiplier = e.target.value;
-
-        let newHeight = this.state.defaultHeight;
-        let newWidth = this.state.defaultWidth;
-
-        newHeight *= (sizeMultiplier / 100);
-        newWidth *= (sizeMultiplier / 100);
-
-        let newLayout = this.state.layout;
-        newLayout.height = newHeight;
-        newLayout.width = newWidth;
-
-        //let newLayout = {
-        //    height: newHeight,
-        //    width: newWidth,
-        //    title: this.state.layout.title,
-        //    xaxis: this.state.layout.xaxis,
-        //    yaxis: this.state.layout.yaxis
-        //}
-
-        this.setState({layout: newLayout});
-    }
-
     // arr is an array of objects with data with identical properties
     setGraphObjData(arr) {
         var propertyArray = Object.getOwnPropertyNames(arr[0]); // array of properties from the first set of data in arr
@@ -212,8 +226,6 @@ export default class App extends React.Component {
     updateAxesLabels(axes) {
       let newLayout = {
         title: this.graphTitle.toUpperCase(),
-        height: this.state.layout.height,
-        width: this.state.layout.width,
         xaxis: {
           title: axes.x.type
         },
@@ -239,7 +251,12 @@ export default class App extends React.Component {
 
 /*
     updateAxis = (e) => {
-      //this.setState(update(this.state, {data: [{x: {$set: e.x.values}, y: {$set: e.y.values}, type: {$set: 'pie'}}], layout: {xaxis: {title: {$set: 'e.x.type'}}, yaxis: {title: {$set: 'e.y.type'}}, title: {$set: 'IDK'}}}));
+      //this.setState(update(this.state, {
+        data: [{x: {$set: e.x.values}, y: {$set: e.y.values}, type: {$set: 'pie'}}],
+        layout: {xaxis: {title: {$set: 'e.x.type'}}, yaxis: {title: {$set: 'e.y.type'}},
+        title: {$set: 'IDK'}}
+      })
+    );
     }
 */
 
@@ -306,14 +323,7 @@ export default class App extends React.Component {
       this.xxx[title] = dataArr;
     }
 
-    componentDidMount() {
-      fetch('http://localhost:9130/authn/login', {
-        method: 'POST',
-        body: this.state.body,
-        headers: this.state.headers
-      })
-      .then((res) => this.getRecords(res.headers.get('x-okapi-token'), 0))  // Use the okapi-token to make an api request to the backend and get the records
-    }
+
 
     render() {
         return (
@@ -330,8 +340,15 @@ export default class App extends React.Component {
                     values={this.state.graphTypes}
                     sets={Object.keys(this.xxx)}
                     changeSet={this.changeSet}
+                    width={this.state.layout.width}
+                    defaultHeight={this.state.layout.height}
                 />
-                <Plot data={this.state.data} layout={this.state.layout}/>
+                <Plot
+                  data={this.state.data}
+                  layout={this.state.layout}
+                  useResizeHandler={this.state.useResizeHandler}
+                  style={this.state.style}
+                />
             </div>
         );
     }
