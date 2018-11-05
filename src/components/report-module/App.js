@@ -36,6 +36,13 @@ export default class App extends React.Component {
             graphTypes: ['Bar', 'Line', 'Pie'],
             okapiToken: String,
             records: [],
+            userData: [
+                {id: 5, username: 'John', enrollmentData: new Date(2018, 11)},
+                {id: 8, username: 'John', enrollmentData: new Date(2017, 11)},
+                {id: 6, username: 'Terry', enrollmentData: new Date(2018, 5)},
+                {id: 9, username: 'Larry', enrollmentData: new Date(2018, 5)},
+                {id: 7, username: 'Kate', enrollmentData: new Date(2017, 5)}
+            ],
             propertyObjectArray: [],
             isLoaded: Boolean,
             dataSets: [
@@ -188,25 +195,6 @@ export default class App extends React.Component {
         this.setState({ data: temp })
     }
 
-    updateSize(e) {
-        let sizeMultiplier = e.target.value;
-
-        let newHeight = this.state.defaultHeight;
-        let newWidth = this.state.defaultWidth;
-
-        newHeight *= (sizeMultiplier / 100);
-        newWidth *= (sizeMultiplier / 100);
-
-        let newLayout = {
-            height: newHeight,
-            width: newWidth,
-            title: this.state.layout.title,
-            xaxis: this.state.layout.xaxis,
-            yaxis: this.state.layout.yaxis
-        }
-
-        this.setState({layout: newLayout});
-    }
     // arr is an array of objects with data with identical properties
     setGraphObjData(arr) {
         var propertyArray = Object.getOwnPropertyNames(arr[0]); // array of properties from the first set of data in arr
@@ -303,13 +291,6 @@ export default class App extends React.Component {
 
     /*  Make an API request to the backend to get the records   */
     getRecords = (okapiToken, i) => {
-      // Base case -> graph the first key in the first datatset
-      console.log(this.state.propertyObjectArray);
-      if (i == 1) {
-        this.createGraph(this.state.dataSets[i - 1].name);  // Create graph for first set
-        let set = this.state.propertyObjectArray[0].data;
-        this.onAxisChange(this.getDefault(set));
-      }
       // Base case -> return if you reach the end of the dataSets array
       if (i === this.state.dataSets.length) {
         this.setGraphObj(this.state.dataSets[0].name);  // Create graph for first set
@@ -349,6 +330,7 @@ export default class App extends React.Component {
             <div className={styles.componentFlexRow}>
                 <GraphUI
                     changeAxis={this.onAxisChange}
+                    graphData={this.state.data[0]}
                     axisData={this.state.propertyObjectArray}
                     swapAxes={this.swapAxes}
                     updateOpac={this.updateOpacity}
