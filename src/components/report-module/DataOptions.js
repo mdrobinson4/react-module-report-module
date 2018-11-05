@@ -1,6 +1,7 @@
 import React from "react";
 import Button from './Button';
 import css from './DataOptions.css';
+import update from 'immutability-helper';
 
 
 export default class DataOptions extends React.Component {
@@ -23,26 +24,20 @@ export default class DataOptions extends React.Component {
             currentLabel: 'Count',
             lastLabel: 'Frequency',
             freqActive: false,
-            xDefaultValues: []
+            xDefaultValues: [],
+            checked: true
         }
 
         this.handleChange = this.handleChange.bind(this);
         this.updateAxis = this.updateAxis.bind(this);
         this.switchFreq = this.switchFreq.bind(this);
         this.removeDuplicates = this.removeDuplicates.bind(this);
-        this.clone = this.clone.bind(this);
-    }
-
-    async clone(axis) {
-        let array = axis;
-
-        return array;
+        this.removeDuplicatesFromArrayOfArrays = this.removeDuplicatesFromArrayOfArrays.bind(this);
     }
 
     async handleChange(event) {
-        //console.log(event.target)
         var target = event.target;
-
+        console.log(target);
         var axis = {
             type: target.name.toString(),
             values: target.value,
@@ -72,16 +67,13 @@ export default class DataOptions extends React.Component {
         //        this.setState({currentAxes: stateHolder}, this.updateAxis);
         //    }
         //}
-        //console.log(stateHolder.x.type.toString() + ' ' + axis.type)
-        //console.log(this.state.xDefaultValues == axis.values)
-        //console.log(this.state.xDefaultValues + ' ' + axis.values)
 
         if (this.state.xDefaultValues == axis.values && !this.state.freqActive) {
             let yAxisClone = stateHolder.y;
 
             stateHolder.x = {
                 type: yAxisClone.type,
-                values: await this.clone(yAxisClone.values),
+                values: yAxisClone.values,
                 active: yAxisClone.active
             }
             
@@ -90,7 +82,6 @@ export default class DataOptions extends React.Component {
                 values: [],
                 active: false
             }
-            console.log(stateHolder)
 
             this.setState({xDefaultValues : stateHolder.x.values})
             this.setState({freqActive: true});
@@ -112,7 +103,7 @@ export default class DataOptions extends React.Component {
 
             this.setState({currentAxes: stateHolder}, this.updateAxis);
             this.setState({freqActive : true})
-            
+
         }
         else if (!axis.active && this.state.currentAxes.y.active) {
 
@@ -135,18 +126,23 @@ export default class DataOptions extends React.Component {
     updateAxis() {
         var axesData = this.state.currentAxes;
 
-        this.state.freqActive ? axesData.x.values = this.state.xDefaultValues : //none
-        
+        this.state.freqActive ? axesData.x.values = this.state.xDefaultValues : 
+
         axesData.x.values = axesData.x.values.toString().split(",")
-        
+
         if (!axesData.y.active) {
             this.state.currentLabel === 'Count' ? axesData.y.values = this.props.getCount(axesData.x.values) : axesData.y.values = this.props.getFreq(axesData.x.values);
+
             axesData.x.values = this.removeDuplicates(axesData.x.values)
+
+            if (axesData.x.values.length < axesData.y.values.length) {
+                this.state.currentLabel === 'Count' ? axesData.y.values = this.props.getCount(axesData.x.values) : axesData.y.values = this.props.getFreq(axesData.x.values);
+            }
         }
         else {
             axesData.y.values = axesData.y.values.toString().split(",");
         }
-        
+
 
         this.props.changeAxis(axesData)
     }
@@ -156,29 +152,66 @@ export default class DataOptions extends React.Component {
         this.setState({ lastLabel : this.state.currentLabel })
         this.setState({ currentLabel : temp })
     }
+    //this function works with the languages dataset option and can probably be integrated with the other removeDupes function
+    removeDuplicatesFromArrayOfArrays(arr) {
+        let valueMap = new Map();
+        let indexArray = [];
+        let individualArray = []; 
+
+        for (let j = 0; j < arr.length; j++) {
+            if (arr[j].length > 0) {
+
+                individualArray = arr[j]
+
+                for (let i = 0; i < individualArray.length; i++) {
+
+                    if (valueMap.has(individualArray[i])) {
+                        let keyValue = valueMap.get(individualArray[i]);
+                        keyValue++;
+                        
+                        valueMap.set(individualArray[i], keyValue);
+                    }
+                    else {
+                        valueMap.set(individualArray, 1);
+                        indexArray.push(individualArray);
+                    }
+                }
+            }
+        }
+
+        return indexArray;
+    }
 
     removeDuplicates(arr) {
-        var noDupes = [];
-        noDupes.push(arr[0])
-        var lastElement = arr[0];
+        let noDupes = [];
+        let count = 0;
+        let uniqueValues = new Map();
 
-        for (var x = 1; x < arr.length; x++) {
-            if (arr[x] !== lastElement) {
+        while (arr[count] == "") {
+            count ++;
+        }
+
+        noDupes.push(arr[count])
+
+        uniqueValues.set(noDupes[0])
+
+        for (var x = 0; x < arr.length; x++) {
+            if (!uniqueValues.has(arr[x]) && arr[x] !== "") {
                 noDupes.push(arr[x]);
-                lastElement = arr[x];
+                uniqueValues.set(arr[x]);
             }
         }
         return noDupes;
     }
 
     render() {
-
+        let x = this.props.axisData;
         const checkboxList = this.props.axisData.map((field) =>
         <div key={field.type}>
             <label>
                 {field.type.toUpperCase() + ":  "}
-            </label>  
-            <input 
+            </label>
+            <input
                 name={field.type}
                 type="checkbox"
                 value={field.data}
@@ -188,8 +221,7 @@ export default class DataOptions extends React.Component {
             {this.state.currentAxes.x.type === field.type ? <label id={field.type} className={css.label}><b>(X Axis)</b></label> : <label id={field.type}></label>}
             {this.state.currentAxes.y.type === field.type ? <label id={field.type} className={css.label}><b>(Y Axis)</b></label> : <label id={field.type}></label>}
         </div>
-        );
-
+        );  
         return (
             <div>
                 <div className={css.data_options_wrapper}>
