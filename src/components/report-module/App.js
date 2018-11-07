@@ -21,6 +21,7 @@ export default class App extends React.Component {
                 opacity: 1
             }],
             layout: {
+              height: 1000,
               title: String,
               xaxis: {
                 title: 'String'
@@ -88,7 +89,7 @@ export default class App extends React.Component {
     handleResize = () => {
       this.setState(update(this.state, {
         layout: {width: {$set: window.innerWidth * 0.8},
-        height: {$set: window.innerWidth * 0.642857143 * 0.35}
+        height: {$set: window.innerWidth * 0.8 * 0.642857143 }
       }}));
     }
 
@@ -96,7 +97,7 @@ export default class App extends React.Component {
       this.setState(update(this.state, {
         layout: {
           width: {$set: e.target.value},
-          height: {$set: (e.target.value / 0.8)  * 0.642857143 * 0.35}
+          height: {$set: e.target.value * 0.642857143 }
         }}));
     }
 
