@@ -99,6 +99,7 @@ export default class GraphUI extends React.Component {
               properties={this.state.sliderValues.graphSize}
               width={this.props.width}
               updateSize={this.props.updateSize}
+              x={this.props.x}
             />
             <Dropdown
               label={"Graph Type"}

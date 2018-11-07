@@ -21,8 +21,6 @@ export default class App extends React.Component {
                 opacity: 1
             }],
             layout: {
-              width: window.innerWidth * 0.8,
-              height: window.innerWidth * 0.642857143 * 0.35,
               title: String,
               xaxis: {
                 title: 'String'
@@ -79,6 +77,7 @@ export default class App extends React.Component {
         headers: this.state.headers
       })
       .then((res) => this.getRecords(res.headers.get('x-okapi-token'), 0))  // Use the okapi-token to make an api request to the backend and get the records
+      this.handleResize();
     }
 
     componentWillUnmount() {
@@ -94,11 +93,10 @@ export default class App extends React.Component {
     }
 
     updateSize = e => {
-      console.log('Updating Size');
       this.setState(update(this.state, {
         layout: {
-          width: {$set: this.state.layout.width * e.target.value},
-          height: {$set: this.state.layout.height * e.target.value}
+          width: {$set: e.target.value},
+          height: {$set: (e.target.value / 0.8)  * 0.642857143 * 0.35}
         }}));
     }
 
@@ -342,6 +340,7 @@ export default class App extends React.Component {
                     changeSet={this.changeSet}
                     width={this.state.layout.width}
                     defaultHeight={this.state.layout.height}
+                    x={this.props.handleResize}
                 />
                 <Plot
                   data={this.state.data}
