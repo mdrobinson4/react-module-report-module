@@ -215,9 +215,10 @@ export default class App extends React.Component {
     /* Returns an object which contains the data from the first set */
     selectFirstSet = () => {
       let e = this.state.propertyObjectArray[0].data;
+      let type = this.state.propertyObjectArray[0].type;
       let defaultSet = {
-        x: {values: e},
-        y: {values: this.getCount(e)} // Set the y axis as the count of the x value
+        x: {values: e, type: type},
+        y: {values: this.getCount(e), type: type}, // Set the y axis as the count of the x value
       }
       return defaultSet;
     }
