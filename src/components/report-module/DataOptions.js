@@ -37,7 +37,7 @@ export default class DataOptions extends React.Component {
 
     async handleChange(event) {
         var target = event.target;
-        console.log(target);
+        console.log(target.value);
         var axis = {
             type: target.name.toString(),
             values: target.value,
@@ -205,7 +205,6 @@ export default class DataOptions extends React.Component {
     }
 
     render() {
-        let x = this.props.axisData;
         const checkboxList = this.props.axisData.map((field) =>
         <div key={field.type}>
             <label>

@@ -43,7 +43,7 @@ export default class App extends React.Component {
                 'Content-type': 'application/json',
                 'X-Okapi-Tenant': 'diku',
             }),
-            xxx: []
+            datasetArray: []
         }
 
         this.componentDidMount = this.componentDidMount.bind(this);
@@ -238,7 +238,7 @@ export default class App extends React.Component {
 
   /*  Store the records in state as an array of objects and store the name of the data and the actual data in the each object */
   createGraph = (title) => {
-    let propertyArray = Object.keys(this.state.xxx[title]); // array of properties from the first key's value
+    let propertyArray = Object.keys(this.state.datasetArray[title]); // array of properties from the first key's value
     let res = [];
     // Iterate the properties
     for (let prop of propertyArray) {
@@ -247,8 +247,11 @@ export default class App extends React.Component {
         data: []
       }
       // Pass through the corresponding array of data and push values into propertyObject
-      for (let val of this.state.xxx[title][prop])
-        propertyObject.data.push(val);
+      for (let val of this.state.datasetArray[title][prop]) {
+         if (val.length > 0) propertyObject.data.push(val);
+
+         if (typeof val === 'object' && val.length == undefined) console.log(val)
+      }
       res.push(propertyObject);
     }
     this.updateRecords(update(this.state, {propertyObjectArray: {$set: res}}));
@@ -297,7 +300,7 @@ export default class App extends React.Component {
           dataArr[prop].push(obj[prop]);
         }
       }
-      this.updateRecords( update(this.state, {xxx: {[title]: {$set: dataArr}}}) );
+      this.updateRecords( update(this.state, {datasetArray: {[title]: {$set: dataArr}}}) );
     }
 
     componentDidMount() {
@@ -327,7 +330,7 @@ export default class App extends React.Component {
                     opacity={this.state.opacity}
                     changeType={this.changeGraphType}
                     values={this.state.graphTypes}
-                    sets={Object.keys(this.state.xxx)}
+                    sets={Object.keys(this.state.datasetArray)}
                     changeSet={this.changeSet}
                 />
                 <Plot data={this.state.data} layout={this.state.layout}/>
