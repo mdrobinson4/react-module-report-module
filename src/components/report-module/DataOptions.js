@@ -42,49 +42,77 @@ export default class DataOptions extends React.Component {
             values: target.value,
             active: target.checked
         }
-
-       var stateHolder = this.state.currentAxes;
-
-        if (!this.state.currentAxes.x.active) {
-
-            stateHolder.x = axis;
-
-            this.setState({freqActive : true})
-            this.setState({xDefaultValues : axis.values.toString().split(",")})
-
-            this.setState({currentAxes: stateHolder}, this.updateAxis);
+        let stateHolder = this.state.currentAxes;
+        if (axis.active === true) {
+          // Attempting to check third checkbox
+          if (this.state.currentAxes.x.active === true && this.state.currentAxes.y.active === true) {
+            // alert('DESELCT ONE FIRST!!');
+            event.target.checked = false;
+          }
+          // Setting y axis
+          else if (this.state.currentAxes.x.active === true) {
+            this.setState(update(this.state, {
+              currentAxes: {y: {$set: axis}},
+              freqActive: {$set: false}
+            }), this.updateAxis);
+          }
+          // Setting x axis
+          else {
+            this.setState(update(this.state, {
+              xDefaultValues: {$set: axis.values},
+              currentAxes: {x: {$set: axis}},
+              freqActive: {$set: true}
+            }), this.updateAxis);
+          }
         }
-        else if (!axis.active && !this.state.currentAxes.y.active) {
-
-            axis.type = "";
-            stateHolder.x = axis;
-
-            this.setState({currentAxes: stateHolder}, this.updateAxis);
-            this.setState({freqActive : true})
-
+        // Deselected a checkbox
+        else if (axis.active === false) {
+          // Both X and Y Axis Are Set
+          if (this.state.currentAxes.x.active === true && this.state.currentAxes.y.active === true) {
+            let newXaxis = [];
+            // Deselected X Axis
+            if (axis.type === this.state.currentAxes.x.type) {
+              this.setState(update(this.state, {
+                xDefaultValues: {$set: this.state.currentAxes.y.values},
+                freqActive: {$set: true},
+                currentAxes: {
+                  x: {type: {$set: this.state.currentAxes.y.type}, values: {$set: this.state.currentAxes.y.values}, active: {$set: this.state.currentAxes.y.active}},  // Set The X Axis as the Y axis
+                  y: {type: {$set: null}, values: {$set: null}, active: {$set: false}}  // Clear The Y Axis
+                }
+              }), this.updateAxis);
+            }
+            // Deselected The Y Axis
+            else {
+              this.setState(update(this.state, {
+                freqActive: {$set: true},
+                currentAxes: {
+                  y: {type: {$set: null}, values: {$set: null}, active: {$set: false}}
+                }
+              }), this.updateAxis);
+            }
+          }
+          // Deselecting only checkbox
+          else if (this.state.currentAxes.x.active === false || this.state.currentAxes.y.active === false) {
+            this.setState(update(this.state, {
+              currentAxes: {
+                x: {active: {$set: false}, type: {$set: null}, values: {$set: null}},   // Set Both X and Y Axis To Null
+                y: {active: {$set: false}, type: {$set: null}, values: {$set: null}}
+              },
+              xDefaultValues: {$set: null}
+            }), this.updateAxis);
+          }
         }
-        else if (!axis.active && this.state.currentAxes.y.active) {
-
-            axis.type = "";
-            stateHolder.y = axis;
-
-            this.setState({currentAxes: stateHolder}, this.updateAxis);
-            this.setState({freqActive : true})
-
-        }
-        else if (axis.active && !this.state.currentAxes.y.active) {
-
-            stateHolder.y = axis
-            this.setState({currentAxes: stateHolder}, this.updateAxis)
-            this.setState({freqActive : false})
-        }
-
     }
 
     updateAxis() {
+      if (this.state.currentAxes.x.active === false && this.state.currentAxes.y.active === false) {
+        var axesData = this.state.currentAxes;
+        this.props.changeAxis(axesData);
+        return;
+      }
         var axesData = this.state.currentAxes;
 
-        this.state.freqActive ? axesData.x.values = this.state.xDefaultValues : //none
+        this.state.freqActive ? axesData.x.values = this.state.xDefaultValues.toString().split(",") : //none
 
         axesData.x.values = axesData.x.values.toString().split(",")
 

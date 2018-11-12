@@ -57,7 +57,7 @@ export default class App extends React.Component {
                 'X-Okapi-Tenant': 'diku',
             }),
         }
-        this.xxx = [];
+        this.dataArr = [];
         this.graphTitle = '';
         this.componentDidMount = this.componentDidMount.bind(this);
         this.onAxisChange = this.onAxisChange.bind(this);
@@ -263,7 +263,7 @@ export default class App extends React.Component {
     /*  Store the records in state as an array of objects and store the name of the data and the actual data in the each object */
     setGraphObj = (title) => {
       this.graphTitle = title;
-      let propertyArray = Object.keys(this.xxx[title]); // array of properties from the first key's value
+      let propertyArray = Object.keys(this.dataArr[title]); // array of properties from the first key's value
       let res = [];
       // Iterate the properties
       for (let prop of propertyArray) {
@@ -272,7 +272,7 @@ export default class App extends React.Component {
           data: []
         }
         // Pass through the corresponding array of data and push values into propertyObject
-        for (let val of this.xxx[title][prop])
+        for (let val of this.dataArr[title][prop])
           propertyObject.data.push(val);
         res.push(propertyObject);
       }
@@ -320,7 +320,7 @@ export default class App extends React.Component {
           dataArr[prop].push(obj[prop]);
         }
       }
-      this.xxx[title] = dataArr;
+      this.dataArr[title] = dataArr;
     }
 
 
@@ -338,7 +338,7 @@ export default class App extends React.Component {
                     opacity={this.state.opacity}
                     changeType={this.changeGraphType}
                     values={this.state.graphTypes}
-                    sets={Object.keys(this.xxx)}
+                    sets={Object.keys(this.dataArr)}
                     changeSet={this.changeSet}
                     width={this.state.layout.width}
                     defaultHeight={this.state.layout.height}
