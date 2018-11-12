@@ -329,6 +329,7 @@ export default class App extends React.Component {
         return (
             <div className={styles.componentFlexRow}>
                 <GraphUI
+                    name={this.graphTitle}
                     changeAxis={this.onAxisChange}
                     graphData={this.state.data[0]}
                     axisData={this.state.propertyObjectArray}

@@ -34,6 +34,18 @@ export default class DataOptions extends React.Component {
         this.removeDuplicates = this.removeDuplicates.bind(this);
     }
 
+    componentDidUpdate(prevProps, prevState) {
+      if (prevProps.name != this.props.name) {
+        this.setState(update(this.state, {
+          currentAxes: {
+            x: {active: {$set: false}, type: {$set: null}, values: {$set: null}},   // Set Both X and Y Axis To Null
+            y: {active: {$set: false}, type: {$set: null}, values: {$set: null}}
+          },
+          xDefaultValues: {$set: null}
+        }), this.updateAxis);
+      }
+    }
+
     handleChange(event) {
         var target = event.target;
 

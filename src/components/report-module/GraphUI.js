@@ -84,6 +84,7 @@ export default class GraphUI extends React.Component {
               changeAxis={this.props.changeAxis}
               getCount={this.getCount}
               getFreq={this.getFrequency}
+              name={this.props.name}
             />
             <Button
               label={"Switch Axes"}
