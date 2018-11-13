@@ -249,17 +249,6 @@ export default class App extends React.Component {
       this.setState({ data: temp })
     }
 
-/*
-    updateAxis = (e) => {
-      //this.setState(update(this.state, {
-        data: [{x: {$set: e.x.values}, y: {$set: e.y.values}, type: {$set: 'pie'}}],
-        layout: {xaxis: {title: {$set: 'e.x.type'}}, yaxis: {title: {$set: 'e.y.type'}},
-        title: {$set: 'IDK'}}
-      })
-    );
-    }
-*/
-
     /*  Store the records in state as an array of objects and store the name of the data and the actual data in the each object */
     setGraphObj = (title) => {
       this.graphTitle = title;
