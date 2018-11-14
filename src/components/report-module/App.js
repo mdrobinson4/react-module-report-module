@@ -129,29 +129,37 @@ export default class App extends React.Component {
     }
 
     changeSet = (e) => {
-      console.log(e.target.value);
       this.createGraph(e.target.value);
+
       let set = this.state.propertyObjectArray[0].data;
-      console.log(this.state.propertyObjectArray);
+      
       this.onAxisChange(this.getDefault(set));
     }
 
     getCount(arr) {
-        var lastElement = arr[0];
-        var count = 1;
+        let uniqueValues = new Map();
+        let count = 0;
+        let countArr = [];
 
-        var countArr = [];
+        for (var x = 0; x <= arr.length; x++) {
+            if (uniqueValues.has(arr[x])) {
 
-        for (var x = 1; x <= arr.length; x++) {
-            if (arr[x] === lastElement) {
-                count++;
+              count = uniqueValues.get(arr[x])
+              count++;
+              uniqueValues.set(arr[x], count);
+
             }
             else {
-                countArr.push(count);
-                count = 1;
-                lastElement = arr[x];
+
+              uniqueValues.set(arr[x], 1)
+
             }
         }
+
+        uniqueValues.forEach(function (value) {
+          countArr.push(value);
+        })
+        
         return countArr;
       }
 
@@ -248,15 +256,18 @@ export default class App extends React.Component {
       }
       // Pass through the corresponding array of data and push values into propertyObject
       for (let val of this.state.datasetArray[title][prop]) {
-         if (val.length > 0) propertyObject.data.push(val);
-
-         if (typeof val === 'object' && val.length == undefined) console.log(val)
+         //if (val.length > 0) propertyObject.data.push(val);
+         propertyObject.data.push(val);
       }
       res.push(propertyObject);
     }
     this.updateRecords(update(this.state, {propertyObjectArray: {$set: res}}));
   }
 
+  getProperties = (obj) => {
+    let arr = Object.getOwnPropertyNames(obj);
+    console.log(arr)
+  }
     /* Update state */
     updateRecords = (newRecords) => {
       this.setState(newRecords);
@@ -265,7 +276,6 @@ export default class App extends React.Component {
     /*  Make an API request to the backend to get the records   */
     getRecords = (okapiToken, i) => {
       // Base case -> graph the first key in the first datatset
-      console.log(this.state.propertyObjectArray);
       if (i == 1) {
         this.createGraph(this.state.dataSets[i - 1].name);  // Create graph for first set
         let set = this.state.propertyObjectArray[0].data;
@@ -332,6 +342,7 @@ export default class App extends React.Component {
                     values={this.state.graphTypes}
                     sets={Object.keys(this.state.datasetArray)}
                     changeSet={this.changeSet}
+                    getCount={this.getCount}
                 />
                 <Plot data={this.state.data} layout={this.state.layout}/>
             </div>

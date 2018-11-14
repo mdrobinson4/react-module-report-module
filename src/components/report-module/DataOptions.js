@@ -25,7 +25,8 @@ export default class DataOptions extends React.Component {
             lastLabel: 'Frequency',
             freqActive: false,
             xDefaultValues: [],
-            checked: true
+            checked: true,
+            fieldMap: new Map()
         }
 
         this.handleChange = this.handleChange.bind(this);
@@ -37,13 +38,13 @@ export default class DataOptions extends React.Component {
 
     async handleChange(event) {
         var target = event.target;
-        console.log(target.value);
+
         var axis = {
             type: target.name.toString(),
             values: target.value,
             active: target.checked
         }
-
+        this.populateMap();
         var stateHolder = this.state.currentAxes;
 
         //Will eventually refactor this code to be what controls the currentAxes since it is cleaner
@@ -126,7 +127,7 @@ export default class DataOptions extends React.Component {
     updateAxis() {
         var axesData = this.state.currentAxes;
 
-        this.state.freqActive ? axesData.x.values = this.state.xDefaultValues : 
+        if (this.state.freqActive) axesData.x.values = this.state.xDefaultValues;
 
         axesData.x.values = axesData.x.values.toString().split(",")
 
@@ -135,16 +136,12 @@ export default class DataOptions extends React.Component {
 
             axesData.x.values = this.removeDuplicates(axesData.x.values)
 
-            if (axesData.x.values.length < axesData.y.values.length) {
-                this.state.currentLabel === 'Count' ? axesData.y.values = this.props.getCount(axesData.x.values) : axesData.y.values = this.props.getFreq(axesData.x.values);
-            }
         }
         else {
             axesData.y.values = axesData.y.values.toString().split(",");
         }
 
-
-        this.props.changeAxis(axesData)
+        this.props.changeAxis(axesData);
     }
 
     switchFreq() {
@@ -184,28 +181,29 @@ export default class DataOptions extends React.Component {
 
     removeDuplicates(arr) {
         let noDupes = [];
-        let count = 0;
-        let uniqueValues = new Map();
 
-        while (arr[count] == "") {
-            count ++;
+        for (let i = 0; i < arr.length; i++) {
+
+            if (arr[i] == "") arr[i] = "No Value";
+
+            if (!noDupes.includes(arr[i])) noDupes.push(arr[i]);
         }
-
-        noDupes.push(arr[count])
-
-        uniqueValues.set(noDupes[0])
-
-        for (var x = 0; x < arr.length; x++) {
-            if (!uniqueValues.has(arr[x]) && arr[x] !== "") {
-                noDupes.push(arr[x]);
-                uniqueValues.set(arr[x]);
-            }
-        }
+        console.log(noDupes)
         return noDupes;
     }
 
+    populateMap = () => {
+        var fieldData = new Map();
+
+        this.props.axisData.forEach(element => {
+            fieldData.set(element.type, element.data)
+        });
+
+        this.setState({fieldMap : fieldData});
+    }
+
     render() {
-        const checkboxList = this.props.axisData.map((field) =>
+        var checkboxList = this.props.axisData.map((field) =>
         <div key={field.type}>
             <label>
                 {field.type.toUpperCase() + ":  "}
@@ -214,13 +212,13 @@ export default class DataOptions extends React.Component {
                 name={field.type}
                 type="checkbox"
                 value={field.data}
-                key={field.data}
+                key={field.type}
                 onChange={this.handleChange}
             />
             {this.state.currentAxes.x.type === field.type ? <label id={field.type} className={css.label}><b>(X Axis)</b></label> : <label id={field.type}></label>}
             {this.state.currentAxes.y.type === field.type ? <label id={field.type} className={css.label}><b>(Y Axis)</b></label> : <label id={field.type}></label>}
         </div>
-        );  
+        );
         return (
             <div>
                 <div className={css.data_options_wrapper}>

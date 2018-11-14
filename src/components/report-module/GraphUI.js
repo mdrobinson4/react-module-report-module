@@ -82,7 +82,7 @@ export default class GraphUI extends React.Component {
             <DataOptions
               axisData={this.props.axisData}
               changeAxis={this.props.changeAxis}
-              getCount={this.getCount}
+              getCount={this.props.getCount}
               getFreq={this.getFrequency}
             />
             <Button
