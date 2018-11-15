@@ -6,6 +6,9 @@ import Dropdown from './Dropdown';
 import SetDropdown from './SetDropdown';
 import css from './GraphUI.css';
 
+/*
+  GraphUI works as a wrapping component for all components that change the size, opacity, data, etc. of the graph
+*/
 export default class GraphUI extends React.Component {
   constructor(props) {
     super(props);
@@ -23,26 +26,6 @@ export default class GraphUI extends React.Component {
         }
       }
     };
-    this.getCount = this.getCount.bind(this);
-  }
-
-  getCount(arr) {
-    var lastElement = arr[0];
-    var count = 1;
-
-    var countArr = [];
-
-    for (var x = 1; x <= arr.length; x++) {
-        if (arr[x] === lastElement) {
-            count++;
-        }
-        else {
-            countArr.push(count);
-            count = 1;
-            lastElement = arr[x];
-        }
-    }
-    return countArr;
   }
 
   getFrequency(arr) {

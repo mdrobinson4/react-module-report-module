@@ -42,9 +42,9 @@ export default class DataOptions extends React.Component {
         var axis = {
             type: target.name.toString(),
             values: target.value,
-            active: target.checked
+            active: target.checked //because we use checkboxes here, we base our logic on if the incoming axis is checked or not
         }
-        this.populateMap();
+
         var stateHolder = this.state.currentAxes;
 
         //Will eventually refactor this code to be what controls the currentAxes since it is cleaner
@@ -69,7 +69,9 @@ export default class DataOptions extends React.Component {
         //    }
         //}
 
+        //if the current values match the default, the user is deselecting the X axis in which case the Y axis becomes the new X axis
         if (this.state.xDefaultValues == axis.values && !this.state.freqActive) {
+            //we create a new object here because if copy the state directly the plotly component won't update, you can read more about this in their documentation
             let yAxisClone = stateHolder.y;
 
             stateHolder.x = {
@@ -77,7 +79,7 @@ export default class DataOptions extends React.Component {
                 values: yAxisClone.values,
                 active: yAxisClone.active
             }
-            
+
             stateHolder.y = {
                 type: "",
                 values: [],
@@ -88,7 +90,7 @@ export default class DataOptions extends React.Component {
             this.setState({freqActive: true});
             this.setState({currentAxes : stateHolder}, this.updateAxis)
         }
-        else if (!this.state.currentAxes.x.active) {
+        else if (!this.state.currentAxes.x.active) { //if no axis is currently selected
 
             stateHolder.x = axis;
 
@@ -97,7 +99,7 @@ export default class DataOptions extends React.Component {
 
             this.setState({currentAxes: stateHolder}, this.updateAxis);
         }
-        else if (!axis.active && !this.state.currentAxes.y.active) {
+        else if (!axis.active && !this.state.currentAxes.y.active) { 
 
             axis.type = "";
             stateHolder.x = axis;
@@ -123,16 +125,18 @@ export default class DataOptions extends React.Component {
         }
 
     }
-
+    //Simply updates the current axes stored in DataOptions and send them to App.js and the Plot component
     updateAxis() {
         var axesData = this.state.currentAxes;
 
         if (this.state.freqActive) axesData.x.values = this.state.xDefaultValues;
-
+        //the values are stored as strings on the HTML input element and need to be split
         axesData.x.values = axesData.x.values.toString().split(",")
 
         if (!axesData.y.active) {
             this.state.currentLabel === 'Count' ? axesData.y.values = this.props.getCount(axesData.x.values) : axesData.y.values = this.props.getFreq(axesData.x.values);
+
+            axesData.x.active ? axesData.y.type = this.state.currentLabel  : axesData.y.type = "";
 
             axesData.x.values = this.removeDuplicates(axesData.x.values)
 
@@ -143,7 +147,7 @@ export default class DataOptions extends React.Component {
 
         this.props.changeAxis(axesData);
     }
-
+    //switches the current count/frequency label to the opposite option
     switchFreq() {
         var temp = this.state.lastLabel;
         this.setState({ lastLabel : this.state.currentLabel })
@@ -178,7 +182,7 @@ export default class DataOptions extends React.Component {
 
         return indexArray;
     }
-
+    //removes all duplicate values and replace empty values with 'no value' so that it can be properly labeled on the graph
     removeDuplicates(arr) {
         let noDupes = [];
 
@@ -188,21 +192,11 @@ export default class DataOptions extends React.Component {
 
             if (!noDupes.includes(arr[i])) noDupes.push(arr[i]);
         }
-        console.log(noDupes)
+
         return noDupes;
     }
 
-    populateMap = () => {
-        var fieldData = new Map();
-
-        this.props.axisData.forEach(element => {
-            fieldData.set(element.type, element.data)
-        });
-
-        this.setState({fieldMap : fieldData});
-    }
-
-    render() {
+    render() { 
         var checkboxList = this.props.axisData.map((field) =>
         <div key={field.type}>
             <label>
