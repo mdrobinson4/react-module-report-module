@@ -58,6 +58,7 @@ export default class App extends React.Component {
             }),
         }
         this.dataArr = [];
+        this.longRecords = [];
         this.graphTitle = '';
         this.componentDidMount = this.componentDidMount.bind(this);
         this.onAxisChange = this.onAxisChange.bind(this);
@@ -297,6 +298,11 @@ export default class App extends React.Component {
       .then(result => result.json())  // Parse json to javascript
       .then(result => this.mergeRecords(result[Object.keys(result)[0]], this.state.dataSets[i].name))  // Organize the data into an object of arrays where the keys are the names of the column of data and the values are the data
       .then(() => this.getRecords(okapiToken, i + 1)) // Recursively get records
+      .then(result => this.mergeLong(result[Object.keys(result)[0]], this.state.dataSets[i].name))
+    }
+
+    mergeLong = (records, title) => {
+      console.log(records);
     }
 
     // Pass through each object which has several sub-objects with data and store data with dup names together
@@ -310,11 +316,14 @@ export default class App extends React.Component {
         }
       }
       this.dataArr[title] = dataArr;
+      for (let record of records)
+        this.longRecords.push(record);
     }
 
 
 
     render() {
+      console.log(this.longRecords);
         return (
             <div className={styles.componentFlexRow}>
                 <GraphUI
