@@ -24,9 +24,9 @@ export default class App extends React.Component {
                     title: String
                 }
             },
+            yDefaultValues: [],
             defaultHeight: 500,
             defaultWidth: 1000,
-            graphTypes: ['Bar', 'Line', 'Pie'],
             okapiToken: String,
             records: [],
             propertyObjectArray: [],
@@ -98,6 +98,23 @@ export default class App extends React.Component {
                 type: newType,
                 opacity: this.state.data[0].opacity
             }]
+        }
+        else if (newType === 'histogram') {
+          this.setState({yDefaultValues : this.state.data[0].y})
+
+          newGraph = [{
+            x: this.state.data[0].x,
+            type: newType,
+            opacity: this.state.data[0].opacity
+          }]
+        }
+        else if (this.state.data[0].type === 'histogram') {
+          newGraph = [{
+            x: this.state.data[0].x,
+            y: this.state.yDefaultValues,
+            type: newType,
+            opacity: this.state.data[0].opacity
+          }]
         }
         else if (this.state.data[0].type === 'pie') {
              newGraph = [{
@@ -339,7 +356,6 @@ export default class App extends React.Component {
                     updateSize={this.updateSize}
                     opacity={this.state.opacity}
                     changeType={this.changeGraphType}
-                    values={this.state.graphTypes}
                     sets={Object.keys(this.state.datasetArray)}
                     changeSet={this.changeSet}
                     getCount={this.getCount}

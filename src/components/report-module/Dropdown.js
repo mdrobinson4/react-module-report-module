@@ -6,11 +6,8 @@ export default class Dropdown extends React.Component {
         super(props);
 
         this.state = {
-            dropdownData: {
-                graphType: ['bar', 'line', 'pie'],
-                dataType: [], //column names from data goes here
-                
-            }
+            graphType: ['Bar', 'Line', 'Pie', 'Histogram'],
+            dataType: [], //column names from data goes here
         }
         this.changeType = this.changeType.bind(this)
     }
@@ -22,7 +19,7 @@ export default class Dropdown extends React.Component {
     }
 
     render() {
-        const typeOptions = this.props.values.map((type) =>
+        const typeOptions = this.state.graphType.map((type) =>
             <option value={type} key={type}>
                 {type}
             </option>
