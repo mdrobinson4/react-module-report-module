@@ -28,30 +28,6 @@ export default class GraphUI extends React.Component {
     };
   }
 
-  getFrequency(arr) {
-
-    var lastElement = arr[0];
-    var count = 1;
-    var percentOf;
-
-    var freqArr = [];
-
-    for (var x = 1; x <= arr.length; x++) {
-      if (arr[x] === lastElement) {
-        count++;
-      }
-      else {
-        percentOf = count / arr.length;
-        freqArr.push(percentOf);
-
-        count = 1;
-        lastElement = arr[x]
-      }
-    }
-
-    return freqArr;
-  }
-
   render() {
     return (
       <div>
@@ -66,7 +42,7 @@ export default class GraphUI extends React.Component {
               axisData={this.props.axisData}
               changeAxis={this.props.changeAxis}
               getCount={this.props.getCount}
-              getFreq={this.getFrequency}
+              getFreq={this.props.getFreq}
             />
             <Button
               label={"Switch Axes"}

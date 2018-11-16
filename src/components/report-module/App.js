@@ -45,19 +45,9 @@ export default class App extends React.Component {
         }),
         datasetArray: []
     }
-
-    this.componentDidMount = this.componentDidMount.bind(this);
-    this.onAxisChange = this.onAxisChange.bind(this);
-    this.swapAxes = this.swapAxes.bind(this);
-    this.updateOpacity = this.updateOpacity.bind(this);
-    this.getRecords = this.getRecords.bind(this);
-    this.createGraphData = this.createGraphData.bind(this);
-    this.getCount = this.getCount.bind(this);
-    this.changeGraphType = this.changeGraphType.bind(this);
-    this.updateSize = this.updateSize.bind(this);
   }
   //this is called from the DataOptions component when a new checkbox is ticked and the values on the graph change
-  onAxisChange(e) {
+  onAxisChange = (e) => {
       var axes = e;
       var temp = [{
           x: axes.x.values,
@@ -69,7 +59,7 @@ export default class App extends React.Component {
       this.setState({ data: temp })
   }
   //updates the axes when the data changes
-  updateAxesLabels(axes) {
+  updateAxesLabels = (axes) => {
       let newLayout = {
           height: this.state.layout.height,
           width: this.state.layout.width,
@@ -84,7 +74,7 @@ export default class App extends React.Component {
       this.setState({layout: newLayout})
   }
   //called from the Dropdown component when graph type is changed. Might need to be moved into its own component to improve performance if more graph types are incorporated
-  changeGraphType(newType) {
+  changeGraphType = (newType) => {
     let newGraph = [{}];
     newType = newType.toLowerCase();
     if (newType === 'pie') {
@@ -130,20 +120,22 @@ export default class App extends React.Component {
     this.setState({data: newGraph})
   }
 
-  getDefault = e => {
+  getDefault = (e) => {
     let defaultSet = {
       x: {values: e},
       y: {values: this.getCount(e)} // Set the y axis as the count of the x value
     }
     return defaultSet;
   }
+
   changeSet = (e) => {
     this.createGraph(e.target.value);
     let set = this.state.propertyObjectArray[0].data;
     
     this.onAxisChange(this.getDefault(set));
   }
-  getCount(arr) {
+  
+  getCount = (arr) => {
     let uniqueValues = new Map();
     let count = 0;
     let countArr = [];
@@ -164,7 +156,34 @@ export default class App extends React.Component {
     return countArr;
   }
 
-  swapAxes() {
+  getFreq = (arr) => {
+    let uniqueValues = new Map();
+    let count = 0;
+    let freqArr = [];
+    for (var x = 0; x <= arr.length; x++) {
+        if (uniqueValues.has(arr[x])) { //check first to see if the map contains a given value, if not add it and initialize to count of 1
+          count = uniqueValues.get(arr[x]) 
+          count++;
+          uniqueValues.set(arr[x], count);
+        }
+        else {
+          uniqueValues.set(arr[x], 1)
+        }
+    }
+
+    uniqueValues.forEach(function (value) { //iterate over map and push values to new array
+      let freq = value / arr.length;
+
+      freq *=  100;
+      freq = freq.toFixed(2);
+
+      freqArr.push(freq);
+    })
+    
+    return freqArr;
+  }
+
+  swapAxes = () => {
       var swap = [{
           x: this.state.data[0].y,
           y: this.state.data[0].x,
@@ -175,7 +194,7 @@ export default class App extends React.Component {
       this.setState({ data: swap })
   }
 
-  updateOpacity(e) {
+  updateOpacity = (e) => {
       var newOpacity = e.target.value;
 
       newOpacity /= 100;
@@ -190,7 +209,7 @@ export default class App extends React.Component {
       this.setState({ data: temp })
   }
 
-  updateSize(e) {
+  updateSize = (e) => {
       let sizeMultiplier = e.target.value;
 
       let newHeight = this.state.defaultHeight;
@@ -210,7 +229,7 @@ export default class App extends React.Component {
       this.setState({layout: newLayout});
   }
   // arr is an array of objects with data with identical properties
-  createGraphData(arr) {
+  createGraphData = (arr) => {
       let propertyArray = Object.getOwnPropertyNames(arr[0]); // array of properties from the first set of data in arr
       // iterate through each property from arr
       propertyArray.forEach(element => {
@@ -294,7 +313,7 @@ export default class App extends React.Component {
     }
     this.updateRecords( update(this.state, {datasetArray: {[title]: {$set: dataArr}}}) );
   }
-  componentDidMount() {
+  componentDidMount = () => {
     fetch('http://localhost:9130/authn/login', {
       method: 'POST',
       body: JSON.stringify({
@@ -323,6 +342,7 @@ export default class App extends React.Component {
                 sets={Object.keys(this.state.datasetArray)}
                 changeSet={this.changeSet}
                 getCount={this.getCount}
+                getFreq={this.getFreq}
               />
               <Plot
                 data={this.state.data}

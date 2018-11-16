@@ -1,8 +1,6 @@
 import React from "react";
 import Button from './Button';
 import css from './DataOptions.css';
-import update from 'immutability-helper';
-
 
 export default class DataOptions extends React.Component {
     constructor(props) {
@@ -28,16 +26,10 @@ export default class DataOptions extends React.Component {
             checked: true,
             fieldMap: new Map()
         }
-
-        this.handleChange = this.handleChange.bind(this);
-        this.updateAxis = this.updateAxis.bind(this);
-        this.switchFreq = this.switchFreq.bind(this);
-        this.removeDuplicates = this.removeDuplicates.bind(this);
-        this.removeDuplicatesFromArrayOfArrays = this.removeDuplicatesFromArrayOfArrays.bind(this);
     }
 
-    async handleChange(event) {
-        var target = event.target;
+    handleChange = (e) => {
+        var target = e.target;
 
         var axis = {
             type: target.name.toString(),
@@ -126,7 +118,7 @@ export default class DataOptions extends React.Component {
 
     }
     //Simply updates the current axes stored in DataOptions and send them to App.js and the Plot component
-    updateAxis() {
+    updateAxis = () => {
         var axesData = this.state.currentAxes;
 
         if (this.state.freqActive) axesData.x.values = this.state.xDefaultValues;
@@ -134,7 +126,8 @@ export default class DataOptions extends React.Component {
         axesData.x.values = axesData.x.values.toString().split(",")
 
         if (!axesData.y.active) {
-            this.state.currentLabel === 'Count' ? axesData.y.values = this.props.getCount(axesData.x.values) : axesData.y.values = this.props.getFreq(axesData.x.values);
+
+            this.state.currentLabel === 'Count' ? axesData.y.values = this.props.getCount(axesData.x.values) : axesData.y.values = this.props.getFreq(axesData.x.values)
 
             axesData.x.active ? axesData.y.type = this.state.currentLabel  : axesData.y.type = "";
 
@@ -147,14 +140,22 @@ export default class DataOptions extends React.Component {
 
         this.props.changeAxis(axesData);
     }
+
+    updateOnFreqChange = (callback) => {
+
+    }
+
     //switches the current count/frequency label to the opposite option
-    switchFreq() {
+    switchFreq = () => {
         var temp = this.state.lastLabel;
+
         this.setState({ lastLabel : this.state.currentLabel })
         this.setState({ currentLabel : temp })
+
+        this.updateAxis();
     }
     //this function works with the languages dataset option and can probably be integrated with the other removeDupes function
-    removeDuplicatesFromArrayOfArrays(arr) {
+    removeDuplicatesFromArrayOfArrays = (arr) => {
         let valueMap = new Map();
         let indexArray = [];
         let individualArray = []; 
@@ -183,7 +184,7 @@ export default class DataOptions extends React.Component {
         return indexArray;
     }
     //removes all duplicate values and replace empty values with 'no value' so that it can be properly labeled on the graph
-    removeDuplicates(arr) {
+    removeDuplicates = (arr) => {
         let noDupes = [];
 
         for (let i = 0; i < arr.length; i++) {
@@ -221,7 +222,7 @@ export default class DataOptions extends React.Component {
                     </div>
                 </div>
                 <Button
-                    label={this.state.currentLabel}
+                    label={"Switch to " + this.state.lastLabel}
                     onClick={this.switchFreq}
                 />
             </div>

@@ -8,10 +8,9 @@ export default class Dropdown extends React.Component {
         this.state = {
             graphType: ['Bar', 'Line', 'Pie', 'Histogram']
         }
-        this.changeType = this.changeType.bind(this)
     }
 
-    changeType(e) {
+    changeType = (e) => {
         let newType = e.target.value;
 
         this.props.changeType(newType);
