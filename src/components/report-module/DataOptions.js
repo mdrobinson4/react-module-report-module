@@ -1,6 +1,7 @@
 import React from "react";
 import Button from './Button';
 import css from './DataOptions.css';
+import { resolve } from "url";
 
 export default class DataOptions extends React.Component {
     constructor(props) {
@@ -128,7 +129,7 @@ export default class DataOptions extends React.Component {
         if (!axesData.y.active) {
 
             this.state.currentLabel === 'Count' ? axesData.y.values = this.props.getCount(axesData.x.values) : axesData.y.values = this.props.getFreq(axesData.x.values)
-
+            
             axesData.x.active ? axesData.y.type = this.state.currentLabel  : axesData.y.type = "";
 
             axesData.x.values = this.removeDuplicates(axesData.x.values)
@@ -138,7 +139,7 @@ export default class DataOptions extends React.Component {
             axesData.y.values = axesData.y.values.toString().split(",");
         }
 
-        this.props.changeAxis(axesData);
+        this.props.changeAxis(axesData)
     }
 
     updateOnFreqChange = (callback) => {
@@ -150,9 +151,7 @@ export default class DataOptions extends React.Component {
         var temp = this.state.lastLabel;
 
         this.setState({ lastLabel : this.state.currentLabel })
-        this.setState({ currentLabel : temp })
-
-        this.updateAxis();
+        this.setState({ currentLabel : temp }, this.updateAxis);
     }
     //this function works with the languages dataset option and can probably be integrated with the other removeDupes function
     removeDuplicatesFromArrayOfArrays = (arr) => {

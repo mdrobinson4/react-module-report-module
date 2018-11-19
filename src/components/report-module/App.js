@@ -75,9 +75,12 @@ export default class App extends React.Component {
   }
   //called from the Dropdown component when graph type is changed. Might need to be moved into its own component to improve performance if more graph types are incorporated
   changeGraphType = (newType) => {
+
     let newGraph = [{}];
     newType = newType.toLowerCase();
+
     if (newType === 'pie') {
+
          newGraph = [{
             labels: this.state.data[0].x,
             values: this.state.data[0].y,
@@ -87,6 +90,7 @@ export default class App extends React.Component {
     }
     else if (newType === 'histogram') {
       this.setState({yDefaultValues : this.state.data[0].y})
+
       newGraph = [{
         x: this.state.data[0].x,
         type: newType,
@@ -94,6 +98,7 @@ export default class App extends React.Component {
       }]
     }
     else if (this.state.data[0].type === 'histogram') {
+
       newGraph = [{
         x: this.state.data[0].x,
         y: this.state.yDefaultValues,
@@ -102,14 +107,16 @@ export default class App extends React.Component {
       }]
     }
     else if (this.state.data[0].type === 'pie') {
-         newGraph = [{
-            x: this.state.data[0].labels,
-            y: this.state.data[0].values,
-            type: newType,
-            opacity: this.state.data[0].opacity
-        }]
+
+      newGraph = [{
+          x: this.state.data[0].labels,
+          y: this.state.data[0].values,
+          type: newType,
+          opacity: this.state.data[0].opacity
+      }]
     }
     else {
+
         newGraph = [{
             x: this.state.data[0].x,
             y: this.state.data[0].y,
@@ -125,6 +132,7 @@ export default class App extends React.Component {
       x: {values: e},
       y: {values: this.getCount(e)} // Set the y axis as the count of the x value
     }
+
     return defaultSet;
   }
 
@@ -250,19 +258,23 @@ export default class App extends React.Component {
   createGraph = (title) => {
     let propertyArray = Object.keys(this.state.datasetArray[title]); // array of properties from the first key's value
     let res = [];
+
     // Iterate the properties
     for (let prop of propertyArray) {
       let propertyObject = {
         type: prop,
         data: []
       }
+
       // Pass through the corresponding array of data and push values into propertyObject
       for (let val of this.state.datasetArray[title][prop]) {
          //if (val.length > 0) propertyObject.data.push(val);
          propertyObject.data.push(val);
       }
+
       res.push(propertyObject);
     }
+
     this.updateRecords(update(this.state, {propertyObjectArray: {$set: res}}));
   }
 
@@ -304,6 +316,7 @@ export default class App extends React.Component {
     // Pass through each object which has several sub-objects with data and store data with dup names together
   mergeRecords = (records, title) => {
     let dataArr = {};
+
     for (let obj of records) {
       for (let prop of Object.keys(obj)) {
         if (!dataArr.hasOwnProperty(prop))  // Check to see if the key already exists
@@ -311,6 +324,7 @@ export default class App extends React.Component {
         dataArr[prop].push(obj[prop]);
       }
     }
+    
     this.updateRecords( update(this.state, {datasetArray: {[title]: {$set: dataArr}}}) );
   }
   componentDidMount = () => {
