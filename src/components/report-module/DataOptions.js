@@ -142,10 +142,6 @@ export default class DataOptions extends React.Component {
         this.props.changeAxis(axesData)
     }
 
-    updateOnFreqChange = (callback) => {
-
-    }
-
     //switches the current count/frequency label to the opposite option
     switchFreq = () => {
         var temp = this.state.lastLabel;
@@ -194,6 +190,25 @@ export default class DataOptions extends React.Component {
         }
 
         return noDupes;
+    }
+
+    findMode = (arr) => {
+
+    }
+
+    findLargestValue = (arr) => {
+        if (arr.length === 0) return -1;
+
+        var max = arr[0];
+        var maxIndex = 0;
+
+        for (let j = 0; j < arr.length; j++) {
+            if (arr[i] > max) {
+                maxIndex = j;
+                max = arr[j];
+            }
+        }
+        return maxIndex;
     }
 
     render() { 

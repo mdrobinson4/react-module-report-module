@@ -43,7 +43,11 @@ export default class App extends React.Component {
             'Content-type': 'application/json',
             'X-Okapi-Tenant': 'diku',
         }),
-        datasetArray: []
+        datasetArray: [],
+        xAxisMode: {
+          key: '',
+          value: 0
+        }
     }
   }
   //this is called from the DataOptions component when a new checkbox is ticked and the values on the graph change
@@ -147,6 +151,7 @@ export default class App extends React.Component {
     let uniqueValues = new Map();
     let count = 0;
     let countArr = [];
+
     for (var x = 0; x <= arr.length; x++) {
         if (uniqueValues.has(arr[x])) { //check first to see if the map contains a given value, if not add it and initialize to count of 1
           count = uniqueValues.get(arr[x]) 
@@ -154,14 +159,37 @@ export default class App extends React.Component {
           uniqueValues.set(arr[x], count);
         }
         else {
-          uniqueValues.set(arr[x], 1)
+          if (arr[x] !== undefined) uniqueValues.set(arr[x], 1)
         }
     }
+
     uniqueValues.forEach(function (value) { //iterate over map and push values to new array
       countArr.push(value);
     })
     
+    let initialMode = {
+      key: arr[0],
+      value: countArr[0]
+    }
+
+    this.findMode(uniqueValues, initialMode);
+
     return countArr;
+  }
+
+  findMode = (map, initialMode) => {
+    let max = initialMode.value;
+    let mode = initialMode;
+
+    map.forEach(function (value, key) {
+      if (value > max) {
+        mode.key = key;
+        mode.value = value;
+        max = value;
+      }
+    })
+    console.log(mode);
+    this.setState({xAxisMode : mode});
   }
 
   getFreq = (arr) => {
@@ -324,7 +352,7 @@ export default class App extends React.Component {
         dataArr[prop].push(obj[prop]);
       }
     }
-    
+
     this.updateRecords( update(this.state, {datasetArray: {[title]: {$set: dataArr}}}) );
   }
   componentDidMount = () => {
@@ -362,6 +390,11 @@ export default class App extends React.Component {
                 data={this.state.data}
                 layout={this.state.layout}
               />
+              <label>X Axis Mode</label>
+              <br/>
+              <p>Key: {this.state.xAxisMode.key}</p>
+              <br/>
+              <p>Value: {this.state.xAxisMode.value}</p>
           </div>
       );
   }
