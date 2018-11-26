@@ -2,13 +2,18 @@
 
 .componentFlexRow {
   font-family: 'Source Sans Pro', sans-serif;
-  margin-top: 20px;
+  margin-top: .2em;
   display: flex;
   flex-direction: row;
 }
 
 .componentFlexColumn {
-  margin-top: 20px;
+  margin-top: .2em;
+  margin-left: 1em;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+}
+
+.modeText {
+  font-size: 1.5em;
 }

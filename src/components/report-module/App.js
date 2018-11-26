@@ -382,6 +382,7 @@ export default class App extends React.Component {
 
       return (
           <div className={styles.componentFlexRow}>
+            <div className={styles.componentFlexColumn}>
               <GraphUI
                 changeAxis={this.onAxisChange}
                 axisData={this.state.propertyObjectArray}
@@ -395,15 +396,15 @@ export default class App extends React.Component {
                 getCount={this.getCount}
                 getFreq={this.getFreq}
               />
-              <Plot
-                data={this.state.data}
-                layout={this.state.layout}
-              />
-              <label>X Axis Mode</label>
-              <ul>
-                <li>Key: {this.state.xAxisMode.key}</li>
-                <li>Value: {this.state.xAxisMode.value}</li>
-              </ul>
+              <div className={styles.componentFlexColumn}>
+                <div className={styles.modeText}>X Axis Mode: {this.state.xAxisMode.key}</div>
+                <div className={styles.modeText}>Occurences: {this.state.xAxisMode.value}</div>
+              </div>
+            </div>
+            <Plot
+              data={this.state.data}
+              layout={this.state.layout}
+            />
           </div>
       );
   }
