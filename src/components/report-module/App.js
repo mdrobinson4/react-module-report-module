@@ -167,7 +167,7 @@ export default class App extends React.Component {
       countArr.push(value);
     })
     
-    let initialMode = {
+    let initialMode = { //create a base pair from the map and initial array
       key: arr[0],
       value: countArr[0]
     }
@@ -181,13 +181,14 @@ export default class App extends React.Component {
     let max = initialMode.value;
     let mode = initialMode;
 
-    map.forEach(function (value, key) {
+    map.forEach(function (value, key) { //iterate over the map and find the max value
       if (value > max) {
         mode.key = key;
         mode.value = value;
         max = value;
       }
     })
+
     console.log(mode);
     this.setState({xAxisMode : mode});
   }
@@ -371,6 +372,14 @@ export default class App extends React.Component {
   }
 
   render() {
+    if (this.state.xAxisMode.key == "") {
+      let blankKeyMode = {
+        key: "No Value",
+        value: this.state.xAxisMode.value
+      }
+      this.setState({xAxisMode : blankKeyMode});
+    }
+
       return (
           <div className={styles.componentFlexRow}>
               <GraphUI
@@ -391,10 +400,10 @@ export default class App extends React.Component {
                 layout={this.state.layout}
               />
               <label>X Axis Mode</label>
-              <br/>
-              <p>Key: {this.state.xAxisMode.key}</p>
-              <br/>
-              <p>Value: {this.state.xAxisMode.value}</p>
+              <ul>
+                <li>Key: {this.state.xAxisMode.key}</li>
+                <li>Value: {this.state.xAxisMode.value}</li>
+              </ul>
           </div>
       );
   }
