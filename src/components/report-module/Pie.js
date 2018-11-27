@@ -1,22 +1,17 @@
 import React from 'react';
 import Plot from 'react-plotly.js';
-import Slider from './Slider'
+import PieSlider from './PieSlider';
 
 export default class Pie extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
-        data: ['dog'],
+        data: [],
         layout: {},
         viewNum: 10,
         abbrRecords: [],
-        records: ['dog'],
-        size: 0,
-        defaultSlices: {
-            min: 1,
-            max: this.props.pieSlices.count,
-            defaultValue: this.props.pieSlices
-        }
+        records: [],
+        size: 0
       }
       this.data = this.props.records.title;
     }
@@ -123,13 +118,14 @@ export default class Pie extends React.Component {
     render() {
       return (
         <div>
-            <Slider
-              label={"Number of Slices"}
-              properties={this.state.defaultSlices}
-              updateValue={this.handleNumChange}
-            />
-            <Plot data={this.state.data} layout={this.state.layout}/>
+          <PieSlider
+            value={this.state.viewNum}
+            handleNumChange={this.handleNumChange}
+            size={this.state.size}
+          />
+          <Plot data={this.state.data} layout={this.state.layout}/>
         </div>
+
       )
     }
   }

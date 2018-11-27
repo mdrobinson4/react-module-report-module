@@ -3,6 +3,7 @@ import GraphUI from './GraphUI';
 import styles from './App.css';
 import Plot from 'react-plotly.js';
 import update from 'immutability-helper';
+import Pie from './Pie'
 import './fonts.css';
 
 export default class App extends React.Component {
