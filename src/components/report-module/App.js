@@ -4,6 +4,7 @@ import GraphUI from './GraphUI';
 import styles from './App.css';
 import Plot from 'react-plotly.js';
 import update from 'immutability-helper';
+import Grid from './Grid.js'
 
 export default class App extends React.Component {
     constructor(props) {
@@ -35,13 +36,6 @@ export default class App extends React.Component {
             graphTypes: ['Bar', 'Line', 'Pie'],
             okapiToken: String,
             records: [],
-            userData: [
-                {id: 5, username: 'John', enrollmentData: new Date(2018, 11)},
-                {id: 8, username: 'John', enrollmentData: new Date(2017, 11)},
-                {id: 6, username: 'Terry', enrollmentData: new Date(2018, 5)},
-                {id: 9, username: 'Larry', enrollmentData: new Date(2018, 5)},
-                {id: 7, username: 'Kate', enrollmentData: new Date(2017, 5)}
-            ],
             propertyObjectArray: [],
             isLoaded: Boolean,
             dataSets: [
@@ -131,8 +125,6 @@ export default class App extends React.Component {
                 opacity: this.state.data[0].opacity
             }]
         }
-
-
         this.setState({data: newGraph})
     }
 
@@ -298,11 +290,7 @@ export default class App extends React.Component {
       .then(result => result.json())  // Parse json to javascript
       .then(result => this.mergeRecords(result[Object.keys(result)[0]], this.state.dataSets[i].name))  // Organize the data into an object of arrays where the keys are the names of the column of data and the values are the data
       .then(() => this.getRecords(okapiToken, i + 1)) // Recursively get records
-      .then(result => this.mergeLong(result[Object.keys(result)[0]], this.state.dataSets[i].name))
-    }
-
-    mergeLong = (records, title) => {
-      console.log(records);
+      //.then(result => this.mergeLong(result[Object.keys(result)[0]], this.state.dataSets[i].name))
     }
 
     // Pass through each object which has several sub-objects with data and store data with dup names together
@@ -316,39 +304,30 @@ export default class App extends React.Component {
         }
       }
       this.dataArr[title] = dataArr;
-      for (let record of records)
-        this.longRecords.push(record);
+      this.longRecords[title] = records;
     }
+
+  makeData = () => {
+  	return [
+  		{
+  			firstName: "judge",
+  			lastName: "babies",
+  			age: 16
+  		},
+  		{
+  			firstName: "quarter",
+  			lastName: "driving",
+  			age: 17
+  		}
+  	];
+  }
 
 
 
     render() {
-      console.log(this.longRecords);
         return (
-            <div className={styles.componentFlexRow}>
-                <GraphUI
-                    name={this.graphTitle}
-                    changeAxis={this.onAxisChange}
-                    graphData={this.state.data[0]}
-                    axisData={this.state.propertyObjectArray}
-                    swapAxes={this.swapAxes}
-                    updateOpac={this.updateOpacity}
-                    updateSize={this.updateSize}
-                    opacity={this.state.opacity}
-                    changeType={this.changeGraphType}
-                    values={this.state.graphTypes}
-                    sets={Object.keys(this.dataArr)}
-                    changeSet={this.changeSet}
-                    width={this.state.layout.width}
-                    defaultHeight={this.state.layout.height}
-                    x={this.props.handleResize}
-                />
-                <Plot
-                  data={this.state.data}
-                  layout={this.state.layout}
-                  useResizeHandler={this.state.useResizeHandler}
-                  style={this.state.style}
-                />
+            <div>
+              <Grid title={this.graphTitle} longData={this.longRecords} />
             </div>
         );
     }

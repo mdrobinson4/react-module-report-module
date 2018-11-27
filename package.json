@@ -29,7 +29,8 @@
     "prop-types": "^15.6.0",
     "react-d3-basic": "^1.6.11",
     "react-plotly.js": "^2.2.0",
-    "react-router-dom": "^4.1.1"
+    "react-router-dom": "^4.1.1",
+    "react-table": "^6.8.6"
   },
   "peerDependencies": {
     "react": "*"
