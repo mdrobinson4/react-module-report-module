@@ -10,9 +10,9 @@ export default class DataOptions extends React.Component {
         this.state = {
             currentAxes: {
                 x: {
-                    type: String,
+                    type: "id", //this is marked as 'id' and 'active' so that when the program loads the first checkbox (id) will be checked
                     values: [ ],
-                    active: false
+                    active: true
                 },
                 y: {
                     type: String,
@@ -211,6 +211,15 @@ export default class DataOptions extends React.Component {
         return maxIndex;
     }
 
+    checkAxes = (type) => {
+       if (type === this.state.currentAxes.x.type || type === this.state.currentAxes.y.type) {
+           return true;
+       }
+       else {
+           return false;
+       }
+    }
+
     render() { 
         var checkboxList = this.props.axisData.map((field) =>
         <div key={field.type}>
@@ -223,6 +232,7 @@ export default class DataOptions extends React.Component {
                 value={field.data}
                 key={field.type}
                 onChange={this.handleChange}
+                checked={this.checkAxes(field.type)}
             />
             {this.state.currentAxes.x.type === field.type ? <label id={field.type} className={css.label}><b>(X Axis)</b></label> : <label id={field.type}></label>}
             {this.state.currentAxes.y.type === field.type ? <label id={field.type} className={css.label}><b>(Y Axis)</b></label> : <label id={field.type}></label>}

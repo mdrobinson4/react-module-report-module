@@ -13,7 +13,7 @@ export default class Pie extends React.Component {
         records: [],
         size: 0
       }
-      this.data = this.props.records.title;
+      this.data = this.props.records;
     }
 
     /*
@@ -30,7 +30,7 @@ export default class Pie extends React.Component {
 
     componentDidUpdate(prevProps, prevState) {
       if ((this.state.viewNum != prevState.viewNum) || (this.state.abbrRecords != prevState.records))
-        this.PiePlot(this.props.records.title); // Graph {title} data set
+        this.PiePlot(this.props.records); // Graph {title} data set
     }
 
     abbr = () => {
@@ -47,7 +47,7 @@ export default class Pie extends React.Component {
     setRecords = () => {
       this.setState({
         abbrRecords: this.data,
-        records: this.data = this.props.records.title
+        records: this.data = this.props.records
       });
     }
 
@@ -63,8 +63,8 @@ export default class Pie extends React.Component {
       ];
       let layout = {
         title: this.props.name,
-        height: 1000,
-        width: 1000,
+        height: 500,
+        width: 500,
         showlegend: true
       };
       let size = SumStat['Level'];

@@ -6,7 +6,7 @@
     color: white;
     width: 110px;
     height: 40px;
-    margin: .25em;
+    margin: .25em .25em .25em 0em;
     -webkit-transition-duration: 0.3s;
     transition-duration: 0.3s;
     font-family: 'Source Sans Pro', sans-serif;

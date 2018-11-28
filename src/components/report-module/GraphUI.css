@@ -1,8 +1,7 @@
 .axisControl {
     display: flex;
     flex-direction: column;
-    margin: 1em;
-    padding: 0.5em;
+    padding: 0.5em 0.5em 0.5em 0em;
     width: 20em;
     min-width: 100%;
   }

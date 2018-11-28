@@ -4,6 +4,7 @@ import styles from './App.css';
 import Plot from 'react-plotly.js';
 import update from 'immutability-helper';
 import Pie from './Pie'
+import Button from './Button';
 import './fonts.css';
 
 export default class App extends React.Component {
@@ -48,7 +49,9 @@ export default class App extends React.Component {
         xAxisMode: {
           key: '',
           value: 0
-        }
+        },
+        temp: [],
+        pieActive: false
     }
   }
   //this is called from the DataOptions component when a new checkbox is ticked and the values on the graph change
@@ -190,7 +193,6 @@ export default class App extends React.Component {
       }
     })
 
-    console.log(mode);
     this.setState({xAxisMode : mode});
   }
 
@@ -310,7 +312,6 @@ export default class App extends React.Component {
 
   getProperties = (obj) => {
     let arr = Object.getOwnPropertyNames(obj);
-    console.log(arr)
   }
 
   /* Update state */
@@ -319,7 +320,7 @@ export default class App extends React.Component {
   }
   
   /*  Make an API request to the backend to get the records   */
-  getRecords = (okapiToken, i) => {
+  getRecords = async (okapiToken, i) => {
     // Base case -> graph the first key in the first datatset
     if (i == 1) {
       this.createGraph(this.state.dataSets[i - 1].name);  // Create graph for first set
@@ -330,7 +331,7 @@ export default class App extends React.Component {
     if (i === this.state.dataSets.length)
       return;
     // Iterate through the dataset URLs provided in state
-    fetch(this.state.dataSets[i].url, {
+    await fetch(this.state.dataSets[i].url, {
       method: 'GET',
       headers: new Headers({
         'Content-type': 'application/json',
@@ -343,7 +344,7 @@ export default class App extends React.Component {
     .then(() => this.getRecords(okapiToken, i + 1)) // Recursively get records
   }
 
-    // Pass through each object which has several sub-objects with data and store data with dup names together
+  // Pass through each object which has several sub-objects with data and store data with dup names together
   mergeRecords = (records, title) => {
     let dataArr = {};
 
@@ -357,8 +358,9 @@ export default class App extends React.Component {
 
     this.updateRecords( update(this.state, {datasetArray: {[title]: {$set: dataArr}}}) );
   }
-  componentDidMount = () => {
-    fetch('http://localhost:9130/authn/login', {
+  //eslint-ignore
+  componentWillMount = async () => {
+    await fetch('http://localhost:9130/authn/login', {
       method: 'POST',
       body: JSON.stringify({
         'username': 'diku_admin',
@@ -372,14 +374,32 @@ export default class App extends React.Component {
     .then((res) => this.getRecords(res.headers.get('x-okapi-token'), 0))  // Use the okapi-token to make an api request to the backend and get the records
   }
 
-  render() {
-    if (this.state.xAxisMode.key == "") {
-      let blankKeyMode = {
-        key: "No Value",
-        value: this.state.xAxisMode.value
-      }
-      this.setState({xAxisMode : blankKeyMode});
+  componentWillUpdate = () => {
+    if (!this.state.pieActive) this.updatePie();
+  }
+
+  updatePie = () => {
+    let thing = [];
+    console.log(this.state.propertyObjectArray)
+    if (!this.state.pieActive && this.state.propertyObjectArray.length > 3) {
+      this.setState({pieActive : true});
+
+      thing = this.state.propertyObjectArray[2].data;
+
+      this.setState({temp: thing})
     }
+  }
+
+  checkNoValueMode = () => {
+    let blankKeyMode = {
+      key: "No Value",
+      value: this.state.xAxisMode.value
+    }
+    this.setState({xAxisMode : blankKeyMode});
+  }
+
+  render() {
+    if (this.state.xAxisMode.key == "") this.checkNoValueMode();
 
       return (
           <div className={styles.componentFlexRow}>
@@ -397,14 +417,20 @@ export default class App extends React.Component {
                 getCount={this.getCount}
                 getFreq={this.getFreq}
               />
-              <div className={styles.componentFlexColumn}>
-                <div className={styles.modeText}>X Axis Mode: {this.state.xAxisMode.key}</div>
-                <div className={styles.modeText}>Occurences: {this.state.xAxisMode.value}</div>
-              </div>
+              <Button
+                onClick={this.updatePie}
+                label={"Update Pie Values"}
+              />
+              <div className={styles.modeText}>X Axis Mode: <span className={styles.valueText}>{this.state.xAxisMode.key}</span></div>
+              <div className={styles.modeText}>Occurences: <span className={styles.valueText}>{this.state.xAxisMode.value}</span></div>
             </div>
             <Plot
               data={this.state.data}
               layout={this.state.layout}
+            />
+            <Pie
+              records={this.state.temp}
+              name={"Hey"}
             />
           </div>
       );

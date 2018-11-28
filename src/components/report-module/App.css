@@ -8,12 +8,15 @@
 }
 
 .componentFlexColumn {
-  margin-top: .2em;
-  margin-left: 1em;
+  margin: .2em 0em 0em 1em;
   display: flex;
   flex-direction: column;
 }
 
 .modeText {
-  font-size: 1.5em;
+  font-weight: 600;
+}
+
+.valueText {
+  font-weight: 400;
 }
