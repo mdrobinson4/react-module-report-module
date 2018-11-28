@@ -2,6 +2,7 @@ import React from 'react'
 import Plot from 'react-plotly.js'
 import update from 'immutability-helper'
 import MultiColumnList from '@folio/stripes-components/lib/MultiColumnList';
+import { Pane, Paneset } from '@folio/stripes-components';
 
 export default class Grid extends React.Component {
   constructor(props) {
@@ -28,7 +29,7 @@ export default class Grid extends React.Component {
   getColumns = () => {
     let columns = [];
     let table = [];
-    for (let property in this.props.longData[0]) {
+    for (let property in this.props.longData.Inventory) {
       columns.push({Header: property.toUpperCase(), accessor: property});
     }
     table.push({Header: this.props.title, columns: columns});
@@ -36,7 +37,7 @@ export default class Grid extends React.Component {
   }
 
   render() {
-    console.log(this.props.longData);
+    //console.log(this.props.longData);
     const catalogResults = [
         { title: 'Biology Today',
           id: '199930490002',
@@ -61,13 +62,12 @@ export default class Grid extends React.Component {
         },
       ];
   const resultsFormatter = {
-    contributor: item => `Name: ${item.contributor.name} Id: ${item.contributor.contributorTypeId} Text: ${item.contributor.contributorTypeText} Name-Id: ${item.contributor.contributorNameTypeId}`,
-    identifiers: item => ``
+    author: item => `${item.author.firstName} ${item.author.lastName}`,
   };
     return (
       <div>
         <MultiColumnList
-            contentData={this.props.longData.Inventory}
+            contentData={catalogResults}
             formatter={resultsFormatter}
         />
 			</div>

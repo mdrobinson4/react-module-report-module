@@ -5,6 +5,7 @@ import styles from './App.css';
 import Plot from 'react-plotly.js';
 import update from 'immutability-helper';
 import Grid from './Grid.js'
+import { Pane, Paneset } from '@folio/stripes-components';
 
 export default class App extends React.Component {
     constructor(props) {
@@ -322,13 +323,75 @@ export default class App extends React.Component {
   	];
   }
 
+  promoteValues = () => {
+    let promRecords = {};
+    if (this.longRecords.hasOwnProperty('Users')) {
+      for (let obj of this.longRecords.Users) {
+        for (let key in obj) {
+          let res = this.getValues(obj, key, obj[key], 0, 0);
+          if (res !== undefined && res !== null && res[0] !== null && res[0] !== undefined)
+            promRecords[res[0]] = res[1];
+        }
+      }
+    }
+    console.log(promRecords);
+    return promRecords;
+  }
 
-
+  getValues = (data, key, value, i, j) => {
+    /*console.log('KEY:');
+    console.log(key);
+    console.log('VALUE:');
+    console.log(value);*/
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      //console.log(`RETURNING: ${key} _______ ${value}`);
+      return [key, value];
+    }
+    else if ( !(Array.isArray(value)) && (typeof value === 'object')) { // Object
+      //console.log('OBJECT');
+      this.getValues(data, Object.keys(value)[i], value[Object.keys(value)[i]], i++, j);
+    }
+    else if (Array.isArray(value)) {
+      //console.log('ARRAY');
+      this.getValues(data, j, value[j], i, j++);
+    }
+    else
+      return null;
+  }
     render() {
+      console.log(this.longRecords.Users);
+      this.promoteValues();
         return (
-            <div>
+          <Paneset>
+            <Pane defaultWidth="20%" paneTitle="Filters">
+              <GraphUI
+                  name={this.graphTitle}
+                  changeAxis={this.onAxisChange}
+                  graphData={this.state.data[0]}
+                  axisData={this.state.propertyObjectArray}
+                  swapAxes={this.swapAxes}
+                  updateOpac={this.updateOpacity}
+                  updateSize={this.updateSize}
+                  opacity={this.state.opacity}
+                  changeType={this.changeGraphType}
+                  values={this.state.graphTypes}
+                  sets={Object.keys(this.dataArr)}
+                  changeSet={this.changeSet}
+                  width={this.state.layout.width}
+                  defaultHeight={this.state.layout.height}
+                  x={this.props.handleResize}
+              />
+            </Pane>
+            <Pane defaultWidth="fill" paneTitle="Search Results">
+              <Plot
+                data={this.state.data}
+                layout={this.state.layout}
+                useResizeHandler={this.state.useResizeHandler}
+                style={this.state.style}
+              />
               <Grid title={this.graphTitle} longData={this.longRecords} />
-            </div>
+            </Pane>
+        </Paneset>
         );
     }
 }
