@@ -1,355 +1,443 @@
 import React from 'react';
-import './fonts.css';
 import GraphUI from './GraphUI';
 import styles from './App.css';
 import Plot from 'react-plotly.js';
 import update from 'immutability-helper';
+import Pie from './Pie'
+import Button from './Button';
+import './fonts.css';
 
 export default class App extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-          width: window.innerWidth,
-          height: window.innerHeight,
-          useResizeHandler: true,
-            style: {
-              width: '100%',
-              height: '100%'
-            },
-            data: [{
-                type: 'bar',
-                opacity: 1
-            }],
-            layout: {
-              width: window.innerWidth * 0.8,
-              height: window.innerWidth * 0.642857143 * 0.35,
-              title: String,
-              xaxis: {
-                title: 'String'
-              },
-              yaxis: {
-                title: String
-              }
-            },
-            defaultHeight: 500,
-            defaultWidth: 1000,
-            graphTypes: ['Bar', 'Line', 'Pie'],
-            okapiToken: String,
-            records: [],
-            userData: [
-                {id: 5, username: 'John', enrollmentData: new Date(2018, 11)},
-                {id: 8, username: 'John', enrollmentData: new Date(2017, 11)},
-                {id: 6, username: 'Terry', enrollmentData: new Date(2018, 5)},
-                {id: 9, username: 'Larry', enrollmentData: new Date(2018, 5)},
-                {id: 7, username: 'Kate', enrollmentData: new Date(2017, 5)}
-            ],
-            propertyObjectArray: [],
-            isLoaded: Boolean,
-            dataSets: [
-                {name: 'Inventory', url: 'http://localhost:9130/instance-storage/instances?limit=500&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title'},
-                {name: 'Users', url: 'http://localhost:9130/users?limit=500&query=%28cql.allRecords%3D1%29%20sortby%20personal.lastName%20personal.firstName'}
-            ],
-            body: JSON.stringify({
-                'username': 'diku_admin',
-                'password': 'admin'
-            }),
-            headers: new Headers({
-                'Content-type': 'application/json',
-                'X-Okapi-Tenant': 'diku',
-            }),
-        }
-        this.xxx = [];
-        this.graphTitle = '';
-        this.componentDidMount = this.componentDidMount.bind(this);
-        this.onAxisChange = this.onAxisChange.bind(this);
-        this.swapAxes = this.swapAxes.bind(this);
-        this.updateOpacity = this.updateOpacity.bind(this);
-        this.getRecords = this.getRecords.bind(this);
-        this.setGraphObjData = this.setGraphObjData.bind(this);
-        this.getCount = this.getCount.bind(this);
-        this.changeGraphType = this.changeGraphType.bind(this);
-        this.updateSize = this.updateSize.bind(this);
-    }
-
-    componentDidMount() {
-      window.addEventListener('resize', this.handleResize);
-      fetch('http://localhost:9130/authn/login', {
-        method: 'POST',
-        body: this.state.body,
-        headers: this.state.headers
-      })
-      .then((res) => this.getRecords(res.headers.get('x-okapi-token'), 0))  // Use the okapi-token to make an api request to the backend and get the records
-    }
-
-    componentWillUnmount() {
-      window.removeEventListener('resize', this.handleResize);
-    }
-
-    /*  Updates the height and width of graph  */
-    handleResize = () => {
-      this.setState(update(this.state, {
-        layout: {width: {$set: window.innerWidth * 0.8},
-        height: {$set: window.innerWidth * 0.642857143 * 0.35}
-      }}));
-    }
-
-    updateSize = e => {
-      console.log('Updating Size');
-      this.setState(update(this.state, {
+  constructor(props) {
+    super(props);
+    this.state = {
+        data: [{
+          type: 'bar',
+          opacity: 1
+        }],
         layout: {
-          width: {$set: this.state.layout.width * e.target.value},
-          height: {$set: this.state.layout.height * e.target.value}
-        }}));
-    }
-
-    changeGraphType(newType) {
-        let newGraph = [{}];
-
-        newType = newType.toLowerCase();
-
-        if (newType === 'pie') {
-             newGraph = [{
-                labels: this.state.data[0].x,
-                values: this.state.data[0].y,
-                type: newType,
-                opacity: this.state.data[0].opacity
-            }]
-        }
-        else if (this.state.data[0].type === 'pie') {
-             newGraph = [{
-                x: this.state.data[0].labels,
-                y: this.state.data[0].values,
-                type: newType,
-                opacity: this.state.data[0].opacity
-            }]
-        }
-        else {
-            newGraph = [{
-                x: this.state.data[0].x,
-                y: this.state.data[0].y,
-                type: newType,
-                opacity: this.state.data[0].opacity
-            }]
-        }
-
-
-        this.setState({data: newGraph})
-    }
-
-    getCount(arr) {
-        var lastElement = arr[0];
-        var count = 1;
-
-        var countArr = [];
-
-        for (var x = 1; x <= arr.length; x++) {
-            if (arr[x] === lastElement) {
-                count++;
+            height: 500,
+            width: 1000,
+            title: 'Sample Graph',
+            xaxis: {
+                title: String
+            },
+            yaxis: {
+                title: String
             }
-            else {
-                countArr.push(count);
-                count = 1;
-                lastElement = arr[x];
-            }
-        }
-        return countArr;
-      }
-
-      removeDuplicates = (arr) => {
-        var noDupes = [];
-        noDupes.push(arr[0])
-        var lastElement = arr[0];
-
-        for (var x = 1; x < arr.length; x++) {
-            if (arr[x] !== lastElement) {
-                noDupes.push(arr[x]);
-                lastElement = arr[x];
-            }
-        }
-        return noDupes;
+        },
+        yDefaultValues: [],
+        defaultHeight: 500,
+        defaultWidth: 1000,
+        okapiToken: String,
+        records: [],
+        propertyObjectArray: [],
+        isLoaded: Boolean,
+        dataSets: [
+            {name: 'Inventory', url: 'http://localhost:9130/instance-storage/instances?limit=500&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title'},
+            {name: 'Users', url: 'http://localhost:9130/users?limit=500&query=%28cql.allRecords%3D1%29%20sortby%20personal.lastName%20personal.firstName'}
+        ],
+        body: JSON.stringify({
+            'username': 'diku_admin',
+            'password': 'admin'
+        }),
+        headers: new Headers({
+            'Content-type': 'application/json',
+            'X-Okapi-Tenant': 'diku',
+        }),
+        datasetArray: [],
+        xAxisMode: {
+          key: '',
+          value: 0
+        },
+        pieRecords: [],
+        pieActive: false
     }
+  }
+  //this is called from the DataOptions component when a new checkbox is ticked and the values on the graph change
+  onAxisChange = (e) => {
+      let axes = e;
 
-    swapAxes() {
-        var swap = [{
-            x: this.state.data[0].y,
-            y: this.state.data[0].x,
-            type: this.state.data[0].type,
+      let newAxes = [{
+          x: axes.x.values,
+          y: axes.y.values,
+          type: this.state.data[0].type,
+          opacity: this.state.data[0].opacity
+      }];
+
+      this.updateAxesLabels(axes);
+      this.setState({ data: newAxes });
+  }
+  //updates the axes when the data changes
+  updateAxesLabels = (axes) => {
+      let newLayout = {
+          height: this.state.layout.height,
+          width: this.state.layout.width,
+          title: this.state.dataSets[1].name.toUpperCase(),
+          xaxis: {
+              title: axes.x.type
+          },
+          yaxis: {
+              title: axes.y.type
+          }
+      };
+
+      this.setState({layout: newLayout});
+  }
+  //called from the Dropdown component when graph type is changed. Might need to be moved into its own component to improve performance if more graph types are incorporated
+  changeGraphType = (newType) => {
+
+    let newGraph = [{}];
+    newType = newType.toLowerCase();
+
+    if (newType === 'pie') {
+
+         newGraph = [{
+            labels: this.state.data[0].x,
+            values: this.state.data[0].y,
+            type: newType,
             opacity: this.state.data[0].opacity
-        }]
-
-        this.setState({ data: swap })
+        }];
     }
+    else if (newType === 'histogram') {
+      this.setState({yDefaultValues : this.state.data[0].y});
 
-    updateOpacity(e) {
-        var newOpacity = e.target.value;
+      newGraph = [{
+        x: this.state.data[0].x,
+        type: newType,
+        opacity: this.state.data[0].opacity
+      }];
+    }
+    else if (this.state.data[0].type === 'histogram') {
 
-        newOpacity /= 100;
+      newGraph = [{
+        x: this.state.data[0].x,
+        y: this.state.yDefaultValues,
+        type: newType,
+        opacity: this.state.data[0].opacity
+      }];
+    }
+    else if (this.state.data[0].type === 'pie') {
 
-        var temp = [{
+      newGraph = [{
+          x: this.state.data[0].labels,
+          y: this.state.data[0].values,
+          type: newType,
+          opacity: this.state.data[0].opacity
+      }];
+    }
+    else {
+
+        newGraph = [{
             x: this.state.data[0].x,
             y: this.state.data[0].y,
-            type: this.state.data[0].type,
-            opacity: newOpacity
-        }]
-
-        this.setState({ data: temp })
+            type: newType,
+            opacity: this.state.data[0].opacity
+        }];
     }
+    this.setState({data: newGraph});
+  }
 
-    // arr is an array of objects with data with identical properties
-    setGraphObjData(arr) {
-        var propertyArray = Object.getOwnPropertyNames(arr[0]); // array of properties from the first set of data in arr
-        // iterate through each property from arr
-        propertyArray.forEach(element => {
-            var propertyObject = {
-                type: element,
-                data: [ ]
-            };
-            // Iterate each dataset, storing each object of data in element
-            arr.forEach(element => {
-                var temp = Object.getOwnPropertyDescriptor(element, propertyObject.type)
-                propertyObject.data.push(temp.value)
-            });
-            this.state.propertyObjectArray.push(propertyObject);
-        });
-    }
+  getDefault = (e) => {
+    let defaultSet = {
+      x: {values: e},
+      y: {values: this.getCount(e)} // Set the y axis as the count of the x value
+    };
 
-    /* Returns an object which contains the data from the first set */
-    selectFirstSet = () => {
-      let e = this.state.propertyObjectArray[0].data;
-      let defaultSet = {
-        x: {values: e},
-        y: {values: this.getCount(e)} // Set the y axis as the count of the x value
-      }
-      return defaultSet;
-    }
+    return defaultSet;
+  }
 
-    updateAxesLabels(axes) {
-      let newLayout = {
-        title: this.graphTitle.toUpperCase(),
-        xaxis: {
-          title: axes.x.type
-        },
-        yaxis: {
-          title: axes.y.type
+  changeSet = (e) => {
+    this.createGraph(e.target.value);
+    let set = this.state.propertyObjectArray[0].data;
+    
+    this.onAxisChange(this.getDefault(set));
+  }
+  
+  getCount = (arr) => {
+    let uniqueValues = new Map();
+    let count = 0;
+    let countArr = [];
+
+    for (var x = 0; x <= arr.length; x++) {
+        if (uniqueValues.has(arr[x])) { //check first to see if the map contains a given value, if not add it and initialize to count of 1
+          count = uniqueValues.get(arr[x]); 
+          count++;
+          uniqueValues.set(arr[x], count);
         }
-      }
-      this.setState({layout: newLayout})
+        else {
+          if (arr[x] !== undefined) uniqueValues.set(arr[x], 1)
+        }
     }
 
-    /* Updates the x and y values and the axis labels */
-    onAxisChange(e) {
-      var axes = e;
-      var temp = [{
-        x: axes.x.values,
-        y: axes.y.values,
+    uniqueValues.forEach(function (value) { //iterate over map and push values to new array
+      countArr.push(value);
+    })
+    
+    let initialMode = { //create a base pair from the map and initial array
+      key: arr[0],
+      value: countArr[0]
+    }
+
+    this.findMode(uniqueValues, initialMode);
+
+    return countArr;
+  }
+
+  findMode = (map, initialMode) => {
+    let max = initialMode.value;
+    let mode = initialMode;
+
+    map.forEach(function (value, key) { //iterate over the map and find the max value
+      if (value > max) {
+        mode.key = key;
+        mode.value = value;
+        max = value;
+      }
+    });
+
+    this.setState({xAxisMode : mode});
+  }
+
+  getFreq = (arr) => {
+    let uniqueValues = new Map();
+    let count = 0;
+    let freqArr = [];
+
+    for (var x = 0; x <= arr.length; x++) {
+        if (uniqueValues.has(arr[x])) { //check first to see if the map contains a given value, if not add it and initialize to count of 1
+          count = uniqueValues.get(arr[x]); 
+          count++;
+          uniqueValues.set(arr[x], count);
+        }
+        else {
+          uniqueValues.set(arr[x], 1);
+        }
+    }
+
+    uniqueValues.forEach(function (value) { //iterate over map and push values to new array
+      let freq = value / arr.length;
+
+      freq *=  100;
+      freq = freq.toFixed(2);
+
+      freqArr.push(freq);
+    });
+    
+    return freqArr;
+  }
+
+  swapAxes = () => {
+      var swap = [{
+          x: this.state.data[0].y,
+          y: this.state.data[0].x,
           type: this.state.data[0].type,
-        opacity: this.state.data[0].opacity
-      }]
-      this.updateAxesLabels(axes)
-      this.setState({ data: temp })
+          opacity: this.state.data[0].opacity
+      }];
+
+      this.setState({ data: swap });
+  }
+
+  updateOpacity = (e) => {
+      var newOpacity = e.target.value;
+
+      newOpacity /= 100;
+
+      var newData = [{
+          x: this.state.data[0].x,
+          y: this.state.data[0].y,
+          type: this.state.data[0].type,
+          opacity: newOpacity
+      }];
+
+      this.setState({ data: newData });
+  }
+
+  updateSize = (e) => {
+      let sizeMultiplier = e.target.value;
+      console.log(sizeMultiplier);
+      let newHeight = this.state.defaultHeight;
+      let newWidth = this.state.defaultWidth;
+
+      newHeight *= (sizeMultiplier / 100);
+      newWidth *= (sizeMultiplier / 100);
+
+      var newLayout = {
+          height: newHeight,
+          width: newWidth,
+          title: this.state.layout.title,
+          xaxis: this.state.layout.xaxis,
+          yaxis: this.state.layout.yaxis
+      };
+
+      this.setState({layout: newLayout});
+  }
+  // arr is an array of objects with data with identical properties
+  createGraphData = (arr) => {
+      let propertyArray = Object.getOwnPropertyNames(arr[0]); // array of properties from the first set of data in arr
+      // iterate through each property from arr
+      propertyArray.forEach(element => {
+          let propertyObject = {
+              type: element,
+              data: [ ]
+          };
+          // Iterate each dataset, storing each object of data in element
+          arr.forEach(element => {
+              let obj = Object.getOwnPropertyDescriptor(element, propertyObject.type);
+              propertyObject.data.push(obj.value);
+          });
+          this.state.propertyObjectArray.push(propertyObject);
+      });
+  }
+
+  /*  Store the records in state as an array of objects and store the name of the data and the actual data in the each object */
+  createGraph = (title) => {
+    let propertyArray = Object.keys(this.state.datasetArray[title]); // array of properties from the first key's value
+    let res = [];
+
+    // Iterate the properties
+    for (let prop of propertyArray) {
+      let propertyObject = {
+        type: prop,
+        data: []
+      };
+
+      // Pass through the corresponding array of data and push values into propertyObject
+      for (let val of this.state.datasetArray[title][prop]) {
+         //if (val.length > 0) propertyObject.data.push(val);
+         propertyObject.data.push(val);
+      }
+
+      res.push(propertyObject);
     }
 
-/*
-    updateAxis = (e) => {
-      //this.setState(update(this.state, {
-        data: [{x: {$set: e.x.values}, y: {$set: e.y.values}, type: {$set: 'pie'}}],
-        layout: {xaxis: {title: {$set: 'e.x.type'}}, yaxis: {title: {$set: 'e.y.type'}},
-        title: {$set: 'IDK'}}
+    this.updateRecords(update(this.state, {propertyObjectArray: {$set: res}}));
+  }
+
+  getProperties = (obj) => {
+    let arr = Object.getOwnPropertyNames(obj);
+  }
+
+  /* Update state */
+  updateRecords = (newRecords) => {
+    this.setState(newRecords);
+  }
+  
+  /*  Make an API request to the backend to get the records   */
+  getRecords = async (okapiToken, i) => {
+    // Base case -> graph the first key in the first datatset
+    if (i == 1) {
+      this.createGraph(this.state.dataSets[i - 1].name);  // Create graph for first set
+
+      let set = this.state.propertyObjectArray[0].data;
+
+      this.onAxisChange(this.getDefault(set));
+    }
+    // Base case -> return if you reach the end of the dataSets array
+    if (i === this.state.dataSets.length)
+      return;
+    // Iterate through the dataset URLs provided in state
+    await fetch(this.state.dataSets[i].url, {
+      method: 'GET',
+      headers: new Headers({
+        'Content-type': 'application/json',
+        'X-Okapi-Tenant': 'diku',
+        'X-Okapi-Token': okapiToken
       })
-    );
-    }
-*/
+    })
+    .then(result => result.json())  // Parse json to javascript
+    .then(result => this.mergeRecords(result[Object.keys(result)[0]], this.state.dataSets[i].name))  // Organize the data into an object of arrays where the keys are the names of the column of data and the values are the data
+    .then(() => this.getRecords(okapiToken, i + 1)) // Recursively get records
+  }
 
-    /*  Store the records in state as an array of objects and store the name of the data and the actual data in the each object */
-    setGraphObj = (title) => {
-      this.graphTitle = title;
-      let propertyArray = Object.keys(this.xxx[title]); // array of properties from the first key's value
-      let res = [];
-      // Iterate the properties
-      for (let prop of propertyArray) {
-        let propertyObject = {
-          type: prop,
-          data: []
-        }
-        // Pass through the corresponding array of data and push values into propertyObject
-        for (let val of this.xxx[title][prop])
-          propertyObject.data.push(val);
-        res.push(propertyObject);
+  // Pass through each object which has several sub-objects with data and store data with dup names together
+  mergeRecords = (records, title) => {
+    let dataArr = {};
+
+    for (let obj of records) {
+      for (let prop of Object.keys(obj)) {
+        if (!dataArr.hasOwnProperty(prop))  // Check to see if the key already exists
+          dataArr[prop] = [];
+        dataArr[prop].push(obj[prop]);
       }
-      this.updateRecords(update(this.state, {propertyObjectArray: {$set: res}}));
     }
 
-    /* Pretty obvious */
-    changeSet = (e) => {
-      this.setGraphObj(e.target.value);
-    }
-
-    /* Update state */
-    updateRecords = (newRecords) => {
-      this.setState(newRecords, () => {this.onAxisChange(this.selectFirstSet())});
-    }
-
-    /*  Make an API request to the backend to get the records   */
-    getRecords = (okapiToken, i) => {
-      // Base case -> return if you reach the end of the dataSets array
-      if (i === this.state.dataSets.length) {
-        this.setGraphObj(this.state.dataSets[0].name);  // Create graph for first set
-        return;
-      }
-      // Iterate through the dataset URLs provided in state
-      fetch(this.state.dataSets[i].url, {
-        method: 'GET',
-        headers: new Headers({
-          'Content-type': 'application/json',
-          'X-Okapi-Tenant': 'diku',
-          'X-Okapi-Token': okapiToken
-        })
+    this.updateRecords(update(this.state, {datasetArray: {[title]: {$set: dataArr}}}));
+  }
+  //eslint-ignore
+  componentWillMount = async () => {
+    await fetch('http://localhost:9130/authn/login', {
+      method: 'POST',
+      body: JSON.stringify({
+        'username': 'diku_admin',
+        'password': 'admin'
+      }),
+      headers: new Headers({
+        'Content-type': 'application/json',
+        'X-Okapi-Tenant': 'diku',
       })
-      .then(result => result.json())  // Parse json to javascript
-      .then(result => this.mergeRecords(result[Object.keys(result)[0]], this.state.dataSets[i].name))  // Organize the data into an object of arrays where the keys are the names of the column of data and the values are the data
-      .then(() => this.getRecords(okapiToken, i + 1)) // Recursively get records
+    })
+    .then((res) => this.getRecords(res.headers.get('x-okapi-token'), 0));  // Use the okapi-token to make an api request to the backend and get the records
+  }
+
+  componentWillUpdate = () => {
+    if (this.state.propertyObjectArray.length > 3) this.updatePie();
+  }
+
+  updatePie = () => {
+    let thing = [];
+    if (!this.state.pieActive && this.state.propertyObjectArray.length > 3) {
+      this.setState({pieActive : true});
+
+      thing = this.state.propertyObjectArray[2].data;
+
+      this.setState({pieRecords: thing});
     }
+  }
 
-    // Pass through each object which has several sub-objects with data and store data with dup names together
-    mergeRecords = (records, title) => {
-      let dataArr = {};
-      for (let obj of records) {
-        for (let prop of Object.keys(obj)) {
-          if (!dataArr.hasOwnProperty(prop))  // Check to see if the key already exists
-            dataArr[prop] = [];
-          dataArr[prop].push(obj[prop]);
-        }
-      }
-      this.xxx[title] = dataArr;
-    }
+  checkNoValueMode = () => {
+    let blankKeyMode = {
+      key: "No Value",
+      value: this.state.xAxisMode.value
+    };
+    this.setState({xAxisMode : blankKeyMode});
+  }
 
+  render() {
+    if (this.state.xAxisMode.key == "") this.checkNoValueMode();
 
-
-    render() {
-        return (
-            <div className={styles.componentFlexRow}>
-                <GraphUI
-                    changeAxis={this.onAxisChange}
-                    graphData={this.state.data[0]}
-                    axisData={this.state.propertyObjectArray}
-                    swapAxes={this.swapAxes}
-                    updateOpac={this.updateOpacity}
-                    updateSize={this.updateSize}
-                    opacity={this.state.opacity}
-                    changeType={this.changeGraphType}
-                    values={this.state.graphTypes}
-                    sets={Object.keys(this.xxx)}
-                    changeSet={this.changeSet}
-                    width={this.state.layout.width}
-                    defaultHeight={this.state.layout.height}
-                />
-                <Plot
-                  data={this.state.data}
-                  layout={this.state.layout}
-                  useResizeHandler={this.state.useResizeHandler}
-                  style={this.state.style}
-                />
+      return (
+          <div className={styles.componentFlexRow}>
+            <div className={styles.componentFlexColumn}>
+              <GraphUI
+                changeAxis={this.onAxisChange}
+                axisData={this.state.propertyObjectArray}
+                swapAxes={this.swapAxes}
+                updateOpac={this.updateOpacity}
+                updateSize={this.updateSize}
+                opacity={this.state.opacity}
+                changeType={this.changeGraphType}
+                sets={Object.keys(this.state.datasetArray)}
+                changeSet={this.changeSet}
+                getCount={this.getCount}
+                getFreq={this.getFreq}
+              />
+              <Button
+                onClick={this.updatePie}
+                label={"Update Pie Values"}
+              />
+              <div className={styles.modeText}>X Axis Mode: <span className={styles.valueText}>{this.state.xAxisMode.key}</span></div>
+              <div className={styles.modeText}>Occurences: <span className={styles.valueText}>{this.state.xAxisMode.value}</span></div>
             </div>
-        );
-    }
+            <Plot
+              data={this.state.data}
+              layout={this.state.layout}
+            />
+            <Pie
+              records={this.state.pieRecords}
+              name={"Pie Component"}
+            />
+          </div>
+      );
+  }
 }
