@@ -50,21 +50,23 @@ export default class App extends React.Component {
           key: '',
           value: 0
         },
-        temp: [],
+        pieRecords: [],
         pieActive: false
     }
   }
   //this is called from the DataOptions component when a new checkbox is ticked and the values on the graph change
   onAxisChange = (e) => {
-      var axes = e;
-      var temp = [{
+      let axes = e;
+
+      let newAxes = [{
           x: axes.x.values,
           y: axes.y.values,
           type: this.state.data[0].type,
           opacity: this.state.data[0].opacity
-      }]
-      this.updateAxesLabels(axes)
-      this.setState({ data: temp })
+      }];
+
+      this.updateAxesLabels(axes);
+      this.setState({ data: newAxes });
   }
   //updates the axes when the data changes
   updateAxesLabels = (axes) => {
@@ -78,8 +80,9 @@ export default class App extends React.Component {
           yaxis: {
               title: axes.y.type
           }
-      }
-      this.setState({layout: newLayout})
+      };
+
+      this.setState({layout: newLayout});
   }
   //called from the Dropdown component when graph type is changed. Might need to be moved into its own component to improve performance if more graph types are incorporated
   changeGraphType = (newType) => {
@@ -94,16 +97,16 @@ export default class App extends React.Component {
             values: this.state.data[0].y,
             type: newType,
             opacity: this.state.data[0].opacity
-        }]
+        }];
     }
     else if (newType === 'histogram') {
-      this.setState({yDefaultValues : this.state.data[0].y})
+      this.setState({yDefaultValues : this.state.data[0].y});
 
       newGraph = [{
         x: this.state.data[0].x,
         type: newType,
         opacity: this.state.data[0].opacity
-      }]
+      }];
     }
     else if (this.state.data[0].type === 'histogram') {
 
@@ -112,7 +115,7 @@ export default class App extends React.Component {
         y: this.state.yDefaultValues,
         type: newType,
         opacity: this.state.data[0].opacity
-      }]
+      }];
     }
     else if (this.state.data[0].type === 'pie') {
 
@@ -121,7 +124,7 @@ export default class App extends React.Component {
           y: this.state.data[0].values,
           type: newType,
           opacity: this.state.data[0].opacity
-      }]
+      }];
     }
     else {
 
@@ -130,16 +133,16 @@ export default class App extends React.Component {
             y: this.state.data[0].y,
             type: newType,
             opacity: this.state.data[0].opacity
-        }]
+        }];
     }
-    this.setState({data: newGraph})
+    this.setState({data: newGraph});
   }
 
   getDefault = (e) => {
     let defaultSet = {
       x: {values: e},
       y: {values: this.getCount(e)} // Set the y axis as the count of the x value
-    }
+    };
 
     return defaultSet;
   }
@@ -158,7 +161,7 @@ export default class App extends React.Component {
 
     for (var x = 0; x <= arr.length; x++) {
         if (uniqueValues.has(arr[x])) { //check first to see if the map contains a given value, if not add it and initialize to count of 1
-          count = uniqueValues.get(arr[x]) 
+          count = uniqueValues.get(arr[x]); 
           count++;
           uniqueValues.set(arr[x], count);
         }
@@ -191,7 +194,7 @@ export default class App extends React.Component {
         mode.value = value;
         max = value;
       }
-    })
+    });
 
     this.setState({xAxisMode : mode});
   }
@@ -200,14 +203,15 @@ export default class App extends React.Component {
     let uniqueValues = new Map();
     let count = 0;
     let freqArr = [];
+
     for (var x = 0; x <= arr.length; x++) {
         if (uniqueValues.has(arr[x])) { //check first to see if the map contains a given value, if not add it and initialize to count of 1
-          count = uniqueValues.get(arr[x]) 
+          count = uniqueValues.get(arr[x]); 
           count++;
           uniqueValues.set(arr[x], count);
         }
         else {
-          uniqueValues.set(arr[x], 1)
+          uniqueValues.set(arr[x], 1);
         }
     }
 
@@ -218,7 +222,7 @@ export default class App extends React.Component {
       freq = freq.toFixed(2);
 
       freqArr.push(freq);
-    })
+    });
     
     return freqArr;
   }
@@ -229,9 +233,9 @@ export default class App extends React.Component {
           y: this.state.data[0].x,
           type: this.state.data[0].type,
           opacity: this.state.data[0].opacity
-      }]
+      }];
 
-      this.setState({ data: swap })
+      this.setState({ data: swap });
   }
 
   updateOpacity = (e) => {
@@ -239,14 +243,14 @@ export default class App extends React.Component {
 
       newOpacity /= 100;
 
-      var temp = [{
+      var newData = [{
           x: this.state.data[0].x,
           y: this.state.data[0].y,
           type: this.state.data[0].type,
           opacity: newOpacity
-      }]
+      }];
 
-      this.setState({ data: temp })
+      this.setState({ data: newData });
   }
 
   updateSize = (e) => {
@@ -264,7 +268,7 @@ export default class App extends React.Component {
           title: this.state.layout.title,
           xaxis: this.state.layout.xaxis,
           yaxis: this.state.layout.yaxis
-      }
+      };
 
       this.setState({layout: newLayout});
   }
@@ -273,14 +277,14 @@ export default class App extends React.Component {
       let propertyArray = Object.getOwnPropertyNames(arr[0]); // array of properties from the first set of data in arr
       // iterate through each property from arr
       propertyArray.forEach(element => {
-          var propertyObject = {
+          let propertyObject = {
               type: element,
               data: [ ]
           };
           // Iterate each dataset, storing each object of data in element
           arr.forEach(element => {
-              var temp = Object.getOwnPropertyDescriptor(element, propertyObject.type)
-              propertyObject.data.push(temp.value)
+              let obj = Object.getOwnPropertyDescriptor(element, propertyObject.type);
+              propertyObject.data.push(obj.value);
           });
           this.state.propertyObjectArray.push(propertyObject);
       });
@@ -296,7 +300,7 @@ export default class App extends React.Component {
       let propertyObject = {
         type: prop,
         data: []
-      }
+      };
 
       // Pass through the corresponding array of data and push values into propertyObject
       for (let val of this.state.datasetArray[title][prop]) {
@@ -324,7 +328,9 @@ export default class App extends React.Component {
     // Base case -> graph the first key in the first datatset
     if (i == 1) {
       this.createGraph(this.state.dataSets[i - 1].name);  // Create graph for first set
+
       let set = this.state.propertyObjectArray[0].data;
+
       this.onAxisChange(this.getDefault(set));
     }
     // Base case -> return if you reach the end of the dataSets array
@@ -356,7 +362,7 @@ export default class App extends React.Component {
       }
     }
 
-    this.updateRecords( update(this.state, {datasetArray: {[title]: {$set: dataArr}}}) );
+    this.updateRecords(update(this.state, {datasetArray: {[title]: {$set: dataArr}}}));
   }
   //eslint-ignore
   componentWillMount = async () => {
@@ -371,22 +377,21 @@ export default class App extends React.Component {
         'X-Okapi-Tenant': 'diku',
       })
     })
-    .then((res) => this.getRecords(res.headers.get('x-okapi-token'), 0))  // Use the okapi-token to make an api request to the backend and get the records
+    .then((res) => this.getRecords(res.headers.get('x-okapi-token'), 0));  // Use the okapi-token to make an api request to the backend and get the records
   }
 
   componentWillUpdate = () => {
-    if (!this.state.pieActive) this.updatePie();
+    if (this.state.propertyObjectArray.length > 3) this.updatePie();
   }
 
   updatePie = () => {
     let thing = [];
-    console.log(this.state.propertyObjectArray)
     if (!this.state.pieActive && this.state.propertyObjectArray.length > 3) {
       this.setState({pieActive : true});
 
       thing = this.state.propertyObjectArray[2].data;
 
-      this.setState({temp: thing})
+      this.setState({pieRecords: thing});
     }
   }
 
@@ -394,7 +399,7 @@ export default class App extends React.Component {
     let blankKeyMode = {
       key: "No Value",
       value: this.state.xAxisMode.value
-    }
+    };
     this.setState({xAxisMode : blankKeyMode});
   }
 
@@ -429,8 +434,8 @@ export default class App extends React.Component {
               layout={this.state.layout}
             />
             <Pie
-              records={this.state.temp}
-              name={"Hey"}
+              records={this.state.pieRecords}
+              name={"Pie Component"}
             />
           </div>
       );

@@ -30,15 +30,15 @@ export default class DataOptions extends React.Component {
     }
 
     handleChange = (e) => {
-        var target = e.target;
+        let target = e.target;
 
-        var axis = {
+        let axis = {
             type: target.name.toString(),
             values: target.value,
             active: target.checked //because we use checkboxes here, we base our logic on if the incoming axis is checked or not
-        }
+        };
 
-        var stateHolder = this.state.currentAxes;
+        let stateHolder = this.state.currentAxes;
 
         //Will eventually refactor this code to be what controls the currentAxes since it is cleaner
         //if (axis.active) {
@@ -71,24 +71,24 @@ export default class DataOptions extends React.Component {
                 type: yAxisClone.type,
                 values: yAxisClone.values,
                 active: yAxisClone.active
-            }
+            };
 
             stateHolder.y = {
                 type: "",
                 values: [],
                 active: false
-            }
+            };
 
-            this.setState({xDefaultValues : stateHolder.x.values})
+            this.setState({xDefaultValues : stateHolder.x.values});
             this.setState({freqActive: true});
-            this.setState({currentAxes : stateHolder}, this.updateAxis)
+            this.setState({currentAxes : stateHolder}, this.updateAxis);
         }
         else if (!this.state.currentAxes.x.active) { //if no axis is currently selected
 
             stateHolder.x = axis;
 
-            this.setState({freqActive : true})
-            this.setState({xDefaultValues : axis.values.toString().split(",")})
+            this.setState({freqActive : true});
+            this.setState({xDefaultValues : axis.values.toString().split(",")});
 
             this.setState({currentAxes: stateHolder}, this.updateAxis);
         }
@@ -98,7 +98,7 @@ export default class DataOptions extends React.Component {
             stateHolder.x = axis;
 
             this.setState({currentAxes: stateHolder}, this.updateAxis);
-            this.setState({freqActive : true})
+            this.setState({freqActive : true});
 
         }
         else if (!axis.active && this.state.currentAxes.y.active) {
@@ -107,14 +107,14 @@ export default class DataOptions extends React.Component {
             stateHolder.y = axis;
 
             this.setState({currentAxes: stateHolder}, this.updateAxis);
-            this.setState({freqActive : true})
+            this.setState({freqActive : true});
 
         }
         else if (axis.active && !this.state.currentAxes.y.active) {
 
-            stateHolder.y = axis
-            this.setState({currentAxes: stateHolder}, this.updateAxis)
-            this.setState({freqActive : false})
+            stateHolder.y = axis;
+            this.setState({currentAxes: stateHolder}, this.updateAxis);
+            this.setState({freqActive : false});
         }
 
     }
@@ -124,29 +124,29 @@ export default class DataOptions extends React.Component {
 
         if (this.state.freqActive) axesData.x.values = this.state.xDefaultValues;
         //the values are stored as strings on the HTML input element and need to be split
-        axesData.x.values = axesData.x.values.toString().split(",")
+        axesData.x.values = axesData.x.values.toString().split(",");
 
         if (!axesData.y.active) {
 
-            this.state.currentLabel === 'Count' ? axesData.y.values = this.props.getCount(axesData.x.values) : axesData.y.values = this.props.getFreq(axesData.x.values)
+            this.state.currentLabel === 'Count' ? axesData.y.values = this.props.getCount(axesData.x.values) : axesData.y.values = this.props.getFreq(axesData.x.values);
             
             axesData.x.active ? axesData.y.type = this.state.currentLabel  : axesData.y.type = "";
 
-            axesData.x.values = this.removeDuplicates(axesData.x.values)
+            axesData.x.values = this.removeDuplicates(axesData.x.values);
 
         }
         else {
             axesData.y.values = axesData.y.values.toString().split(",");
         }
 
-        this.props.changeAxis(axesData)
+        this.props.changeAxis(axesData);
     }
 
     //switches the current count/frequency label to the opposite option
     switchFreq = () => {
         var temp = this.state.lastLabel;
 
-        this.setState({ lastLabel : this.state.currentLabel })
+        this.setState({ lastLabel : this.state.currentLabel });
         this.setState({ currentLabel : temp }, this.updateAxis);
     }
     //this function works with the languages dataset option and can probably be integrated with the other removeDupes function
@@ -158,7 +158,7 @@ export default class DataOptions extends React.Component {
         for (let j = 0; j < arr.length; j++) {
             if (arr[j].length > 0) {
 
-                individualArray = arr[j]
+                individualArray = arr[j];
 
                 for (let i = 0; i < individualArray.length; i++) {
 
@@ -190,10 +190,6 @@ export default class DataOptions extends React.Component {
         }
 
         return noDupes;
-    }
-
-    findMode = (arr) => {
-
     }
 
     findLargestValue = (arr) => {

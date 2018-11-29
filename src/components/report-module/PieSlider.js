@@ -11,7 +11,7 @@ export default class PieSlider extends React.Component {
         return (
           <fieldset>
             <legend>Records Shown: {this.props.value}</legend>
-            <input type="range" name="slices" min="1" max="100" value={this.props.value} onChange={this.props.handleNumChange} />
+            <input type="range" name="slices" min="5" max="130" value={this.props.value} onChange={this.props.handleNumChange} />
         </fieldset>
         )
       }
