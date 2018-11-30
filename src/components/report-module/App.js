@@ -64,6 +64,8 @@ export default class App extends React.Component {
         this.getCount = this.getCount.bind(this);
         this.changeGraphType = this.changeGraphType.bind(this);
         this.updateSize = this.updateSize.bind(this);
+
+        this.flatRecords = {};
     }
 
     componentDidMount() {
@@ -324,42 +326,36 @@ export default class App extends React.Component {
   }
 
   promoteValues = () => {
-    let promRecords = {};
-    if (this.longRecords.hasOwnProperty('Users')) {
-      for (let obj of this.longRecords.Users) {
-        for (let key in obj) {
-          let res = this.getValues(obj, key, obj[key], 0, 0);
-          if (res !== undefined && res !== null && res[0] !== null && res[0] !== undefined)
-            promRecords[res[0]] = res[1];
+    this.flatRecords = {};
+    for (let key in this.longRecords) {
+      if (this.longRecords.hasOwnProperty(key)) {
+        for (let obj of this.longRecords[key]) {
+          if (!this.flatRecords.hasOwnProperty(key))
+            this.flatRecords[key] = [];
+          this.flatRecords[key].push(this.flatten(obj));
         }
       }
     }
-    console.log(promRecords);
-    return promRecords;
   }
 
-  getValues = (data, key, value, i, j) => {
-    /*console.log('KEY:');
-    console.log(key);
-    console.log('VALUE:');
-    console.log(value);*/
-    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-      //console.log(`RETURNING: ${key} _______ ${value}`);
-      return [key, value];
-    }
-    else if ( !(Array.isArray(value)) && (typeof value === 'object')) { // Object
-      //console.log('OBJECT');
-      this.getValues(data, Object.keys(value)[i], value[Object.keys(value)[i]], i++, j);
-    }
-    else if (Array.isArray(value)) {
-      //console.log('ARRAY');
-      this.getValues(data, j, value[j], i, j++);
-    }
-    else
-      return null;
-  }
+  flatten = (ob) => {
+  	let toReturn = {};
+  	for (let i in ob) {
+  		if (!ob.hasOwnProperty(i)) continue;
+  		if ((typeof ob[i]) === 'object') {
+  			let flatObject = this.flatten(ob[i]);
+  			for (let x in flatObject) {
+  				if (!flatObject.hasOwnProperty(x)) continue;
+  			     toReturn[x] = flatObject[x];
+  			}
+  		}
+      else
+  			toReturn[i] = ob[i];
+  	}
+  	return toReturn;
+  };
+
     render() {
-      console.log(this.longRecords.Users);
       this.promoteValues();
         return (
           <Paneset>
@@ -389,7 +385,7 @@ export default class App extends React.Component {
                 useResizeHandler={this.state.useResizeHandler}
                 style={this.state.style}
               />
-              <Grid title={this.graphTitle} longData={this.longRecords} />
+              <Grid title={this.graphTitle} longData={this.flatRecords} />
             </Pane>
         </Paneset>
         );
