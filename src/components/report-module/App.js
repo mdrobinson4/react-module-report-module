@@ -332,7 +332,7 @@ export default class App extends React.Component {
         for (let obj of this.longRecords[key]) {
           if (!this.flatRecords.hasOwnProperty(key))
             this.flatRecords[key] = [];
-          this.flatRecords[key].push(this.flatten(obj));
+            this.flatRecords[key].push(this.flatten(obj));
         }
       }
     }
@@ -385,7 +385,7 @@ export default class App extends React.Component {
                 useResizeHandler={this.state.useResizeHandler}
                 style={this.state.style}
               />
-              <Grid title={this.graphTitle} longData={this.flatRecords} />
+              <Grid title={this.graphTitle} data={this.flatRecords.Inventory} />
             </Pane>
         </Paneset>
         );

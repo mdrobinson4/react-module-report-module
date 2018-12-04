@@ -7,23 +7,9 @@ import { Pane, Paneset } from '@folio/stripes-components';
 export default class Grid extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { }
-  }
-
-  makeData = () => {
-    let data = [
-      {
-        firstName: "judge",
-        lastName: "babies",
-        age: 16
-      },
-      {
-        firstName: "quarter",
-        lastName: "driving",
-        age: 17
-      }
-    ];
-    return data;
+    this.state = {
+      data: {key: 'value'}
+    };
   }
 
   getColumns = () => {
@@ -35,10 +21,17 @@ export default class Grid extends React.Component {
     table.push({Header: this.props.title, columns: columns});
     return table;
   }
-
+/*
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (this.props.data != undefined && this.props.data != this.state.data)
+      this.setState({data: this.props.data});
+    else if (this.props.data == undefined)
+      this.setState({data: this.props.data});
+  }
+*/
   render() {
-    //console.log(this.props.longData);
-    const catalogResults = [
+
+    let catalogResults = [
         { title: 'Biology Today',
           id: '199930490002',
           author: {
@@ -61,14 +54,30 @@ export default class Grid extends React.Component {
           },
         },
       ];
-  const resultsFormatter = {
-    author: item => `${item.author.firstName} ${item.author.lastName}`,
-  };
+
+      //catalogResults = undefined;
+
+
+    console.log(this.state.data);
+    console.log(this.state.title);
+    let visibleColumns = [];
+
+    switch (this.props.title) {
+      case 'Users':
+        visibleColumns = ['active', 'city', 'countryId', 'region', 'postalCode', 'primaryAddress', 'preferredContactTypeId'];
+        break;
+      case 'Inventory':
+        visibleColumns = ['createdByUserId', 'createdDate', 'id', 'source', 'title', 'updatedDate', 'value'];
+        break;
+      default:
+        visibleColumns = null;
+    }
+    console.log(visibleColumns);
     return (
       <div>
         <MultiColumnList
             contentData={catalogResults}
-            formatter={resultsFormatter}
+            visibleColumns={['title', 'id']}
         />
 			</div>
     )
