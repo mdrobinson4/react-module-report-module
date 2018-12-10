@@ -9140,6 +9140,14 @@ postcss-discard-overridden@^4.0.0:
   dependencies:
     postcss "^6.0.0"
 
+postcss-global-import@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/postcss-global-import/-/postcss-global-import-1.0.6.tgz#0ef46c56dd38ba99901052aa9f56f91fbeafa45d"
+  dependencies:
+    css-selector-tokenizer "^0.7.0"
+    postcss "^6.0.14"
+    resolve "^1.1.7"
+
 postcss-import@^12.0.0:
   version "12.0.0"
   resolved "https://registry.yarnpkg.com/postcss-import/-/postcss-import-12.0.0.tgz#149f96a4ef0b27525c419784be8517ebd17e92c5"

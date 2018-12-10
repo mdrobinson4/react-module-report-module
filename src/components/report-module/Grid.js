@@ -6,14 +6,15 @@ import { Pane, Paneset } from '@folio/stripes-components'
 
 // Import React Table
 import ReactTable from "react-table"
-import "./reactTable.css"
+import 'react-table/react-table.css'
 
 export default class Grid extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       data: undefined,
-      columns: []
+      columns: [],
+      loading: false
     };
     // Includes the columns that we want to display
     this.visibleColumns = {
@@ -48,6 +49,8 @@ export default class Grid extends React.Component {
   }
 
   render() {
+    console.log(this.state.columns);
+    console.log(this.state.data);
     return (
           <ReactTable
             data={this.state.data}
