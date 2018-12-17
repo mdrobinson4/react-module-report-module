@@ -11,6 +11,7 @@ export default class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+          title: '',
           width: window.innerWidth,
           height: window.innerHeight,
           useResizeHandler: true,
@@ -54,7 +55,6 @@ export default class App extends React.Component {
         }
         this.dataArr = [];
         this.longRecords = [];
-        this.graphTitle = '';
         this.componentDidMount = this.componentDidMount.bind(this);
         this.onAxisChange = this.onAxisChange.bind(this);
         this.swapAxes = this.swapAxes.bind(this);
@@ -221,7 +221,7 @@ export default class App extends React.Component {
 
     updateAxesLabels(axes) {
       let newLayout = {
-        title: this.graphTitle.toUpperCase(),
+        title: this.state.title.toUpperCase(),
         xaxis: {
           title: axes.x.type
         },
@@ -247,7 +247,7 @@ export default class App extends React.Component {
 
     /*  Store the records in state as an array of objects and store the name of the data and the actual data in the each object */
     setGraphObj = (title) => {
-      this.graphTitle = title;
+      this.setState({title: title});
       let propertyArray = Object.keys(this.dataArr[title]); // array of properties from the first key's value
       let res = [];
       // Iterate the properties
@@ -264,7 +264,6 @@ export default class App extends React.Component {
       this.updateRecords(update(this.state, {propertyObjectArray: {$set: res}}));
     }
 
-    /* Pretty obvious */
     changeSet = (e) => {
       this.setGraphObj(e.target.value);
     }
@@ -310,21 +309,6 @@ export default class App extends React.Component {
       this.longRecords[title] = records;
     }
 
-  makeData = () => {
-  	return [
-  		{
-  			firstName: "judge",
-  			lastName: "babies",
-  			age: 16
-  		},
-  		{
-  			firstName: "quarter",
-  			lastName: "driving",
-  			age: 17
-  		}
-  	];
-  }
-
   promoteValues = () => {
     this.flatRecords = {};
     for (let key in this.longRecords) {
@@ -359,9 +343,9 @@ export default class App extends React.Component {
       this.promoteValues();
         return (
           <Paneset>
-            <Pane defaultWidth="20%" paneTitle="Filters">
+            <Pane defaultWidth="20%" paneTitle="Controls">
               <GraphUI
-                  name={this.graphTitle}
+                  name={this.title}
                   changeAxis={this.onAxisChange}
                   graphData={this.state.data[0]}
                   axisData={this.state.propertyObjectArray}
@@ -378,14 +362,14 @@ export default class App extends React.Component {
                   x={this.props.handleResize}
               />
             </Pane>
-            <Pane defaultWidth="fill" paneTitle="Search Results">
+            <Pane defaultWidth="fill" paneTitle="Plot">
               <Plot
                 data={this.state.data}
                 layout={this.state.layout}
                 useResizeHandler={this.state.useResizeHandler}
                 style={this.state.style}
               />
-              <Grid title={this.graphTitle} data={this.flatRecords.Inventory} />
+              <Grid title={this.state.title} data={this.flatRecords} />
             </Pane>
         </Paneset>
         );

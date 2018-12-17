@@ -35,7 +35,7 @@ export default class Grid extends React.Component {
 
   // Simply updates the data
   updateData = () => {
-    this.setState({data: this.props.data});
+    this.setState({data: this.props.data[this.props.title]});
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -50,7 +50,7 @@ export default class Grid extends React.Component {
 
   render() {
     console.log(this.state.columns);
-    console.log(this.state.data);
+    console.log(this.props.title);
     return (
           <ReactTable
             data={this.state.data}
