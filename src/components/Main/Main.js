@@ -11,21 +11,74 @@ import PropTypes from 'prop-types';
 
 
 export default class Main extends React.Component {
-    static propTypes = {
-      stripes: PropTypes.object.isRequired,
-    };
 
     static manifest = {
-      'formatData': {
+      'users': {
         'type': 'okapi',
-        'path': 'assessment/format'
-      }
+        'path': 'users?limit=1000&query=%28cql.allRecords%3D1%29%20sortby%20personal.lastName%20personal.firstName'
+      },
+      'statisticalCodeTypes': {
+        'type': 'okapi',
+        'path': 'inventory/instances?limit=1000&query=%28title%3D%22undefined%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22undefined%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22undefined%2A%5C%22%22%29%20sortby%20title'
+      },
+      'instances': {
+        'type': 'okapi',
+        'path': 'statistical-code-types?limit=1000&query=cql.allRecords=1%20sortby%20name'
+      },
+      'issuanceModes': {
+        'type': 'okapi',
+        'path': 'modes-of-issuance?limit=1000&query=cql.allRecords=1%20sortby%20name'
+      },
+      'catalogingLevels': {
+        'type': 'okapi',
+        'path': 'cataloging-levels?limit=1000&query=cql.allRecords=1%20sortby%20name'
+      },
+      'instanceStatuses': {
+        'type': 'okapi',
+        'path': 'instance-statuses?limit=1000&query=cql.allRecords=1%20sortby%20name'
+      },
+      'instanceRelationshipTypes': {
+        'type': 'okapi',
+        'path': 'instance-relationship-types?limit=1000&query=cql.allRecords=1%20sortby%20name'
+      },
+      'locations': {
+        'type': 'okapi',
+        'path': 'locations?limit=1000&query=cql.allRecords=1%20sortby%20name'
+      },
+      'classificationTypes': {
+        'type': 'okapi',
+        'path': 'classification-types?limit=1000&query=cql.allRecords=1%20sortby%20name'
+      },
+      'instanceTypes': {
+        'type': 'okapi',
+        'path': 'instance-types?limit=1000&query=cql.allRecords=1%20sortby%20name'
+      },
+      'instanceFormats': {
+        'type': 'okapi',
+        'path': 'instance-formats?limit=1000&query=cql.allRecords=1%20sortby%20name'
+      },
+      'contributorNameTypes': {
+        'type': 'okapi',
+        'path': 'contributor-name-types?limit=1000&query=cql.allRecords=1%20sortby%20ordering'
+      },
+      'contributorTypes': {
+        'type': 'okapi',
+        'path': 'contributor-types?limit=1000&query=cql.allRecords=1%20sortby%20name'
+      },
+      'identifierTypes': {
+        'type': 'okapi',
+        'path': 'identifier-types?limit=1000&query=cql.allRecords=1%20sortby%20name'
+      },
+      'notifications': {
+        'type': 'okapi',
+        'path': 'notify'
+      },
     }
-
     constructor(props) {
         super(props);
+/*        this.connectedPlot = props.stripes.connect(Plot);
         this.connectedGraphUI = props.stripes.connect(GraphUI);
-        this.connectedGrid = props.stripes.connect(Grid);
+        this.connectedGrid = props.stripes.connect(Grid);       */
         this.state = {
           title: '',
           width: window.innerWidth,
@@ -52,22 +105,9 @@ export default class Main extends React.Component {
             defaultHeight: 500,
             defaultWidth: 1000,
             graphTypes: ['Bar', 'Line', 'Pie'],
-            okapiToken: String,
             records: [],
             propertyObjectArray: [],
             isLoaded: Boolean,
-            dataSets: [
-                {name: 'Inventory', url: 'http://localhost:9130/instance-storage/instances?limit=500&query=%28title%3D%22%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22%2A%5C%22%22%29%20sortby%20title'},
-                {name: 'Users', url: 'http://localhost:9130/users?limit=500&query=%28cql.allRecords%3D1%29%20sortby%20personal.lastName%20personal.firstName'}
-            ],
-            body: JSON.stringify({
-                'username': 'diku_admin',
-                'password': 'admin'
-            }),
-            headers: new Headers({
-                'Content-type': 'application/json',
-                'X-Okapi-Tenant': 'diku',
-            }),
         }
         this.dataArr = [];
         this.longRecords = [];
@@ -75,7 +115,6 @@ export default class Main extends React.Component {
         this.onAxisChange = this.onAxisChange.bind(this);
         this.swapAxes = this.swapAxes.bind(this);
         this.updateOpacity = this.updateOpacity.bind(this);
-        this.getRecords = this.getRecords.bind(this);
         this.setGraphObjData = this.setGraphObjData.bind(this); this.getCount = this.getCount.bind(this); this.changeGraphType = this.changeGraphType.bind(this);
         this.updateSize = this.updateSize.bind(this);
 
@@ -84,12 +123,6 @@ export default class Main extends React.Component {
 
     componentDidMount() {
       window.addEventListener('resize', this.handleResize);
-      fetch('http://localhost:9130/authn/login', {
-        method: 'POST',
-        body: this.state.body,
-        headers: this.state.headers
-      })
-      .then((res) => this.getRecords(res.headers.get('x-okapi-token'), 0))  // Use the okapi-token to make an api request to the backend and get the records
       this.handleResize();
     }
 
@@ -287,27 +320,6 @@ export default class Main extends React.Component {
       this.setState(newRecords, () => {this.onAxisChange(this.selectFirstSet())});
     }
 
-    /*  Make an API request to the backend to get the records   */
-    getRecords = (okapiToken, i) => {
-      // Base case -> return if you reach the end of the dataSets array
-      if (i === this.state.dataSets.length) {
-        this.setGraphObj(this.state.dataSets[0].name);  // Create graph for first set return;
-      }
-      // Iterate through the dataset URLs provided in state
-      fetch(this.state.dataSets[i].url, {
-        method: 'GET',
-        headers: new Headers({
-          'Content-type': 'application/json',
-          'X-Okapi-Tenant': 'diku',
-          'X-Okapi-Token': okapiToken
-        })
-      })
-      .then(result => result.json())  // Parse json to javascript
-      .then(result => this.mergeRecords(result[Object.keys(result)[0]], this.state.dataSets[i].name))  // Organize the data into an object of arrays where the keys are the names of the column of data and the values are the data
-      .then(() => this.getRecords(okapiToken, i + 1)) // Recursively get records
-      //.then(result => this.mergeLong(result[Object.keys(result)[0]], this.state.dataSets[i].name))
-    }
-
     // Pass through each object which has several sub-objects with data and store data with dup names together
     mergeRecords = (records, title) => {
       let dataArr = {};
@@ -358,10 +370,10 @@ export default class Main extends React.Component {
         return (
           <Paneset>
             <Pane defaultWidth="20%" paneTitle="Controls">
-              <this.connectedGraphUI
+              <GraphUI
                   name={this.title}
                   changeAxis={this.onAxisChange}
-                  graphData={this.state.data[0]}
+                  data={this.props.resources}
                   axisData={this.state.propertyObjectArray}
                   swapAxes={this.swapAxes}
                   updateOpac={this.updateOpacity}
@@ -369,7 +381,6 @@ export default class Main extends React.Component {
                   opacity={this.state.opacity}
                   changeType={this.changeGraphType}
                   values={this.state.graphTypes}
-                  sets={Object.keys(this.dataArr)}
                   changeSet={this.changeSet}
                   width={this.state.layout.width}
                   defaultHeight={this.state.layout.height}
@@ -378,12 +389,12 @@ export default class Main extends React.Component {
             </Pane>
             <Pane defaultWidth="fill" paneTitle="Plot">
               <Plot
-                data={this.state.data}
+                data={this.p}
                 layout={this.state.layout}
                 useResizeHandler={this.state.useResizeHandler}
                 style={this.state.style}
               />
-              <this.connectedGrid title={this.state.title} data={this.flatRecords} />
+              <Grid title={this.state.title} data={this.flatRecords} />
             </Pane>
         </Paneset>
         );

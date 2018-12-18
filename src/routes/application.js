@@ -4,7 +4,7 @@ import Link from 'react-router-dom/Link';
 import NewAppGreeting from '../components/new-app-greeting';
 import Pane from '@folio/stripes-components/lib/Pane';
 import Paneset from '@folio/stripes-components/lib/Paneset';
-import Main from '../components/Main';
+import Connect from '../components/Connect';
 
 
 export default class Application extends React.Component {
@@ -13,12 +13,11 @@ export default class Application extends React.Component {
   }
 
   render(props) {
-    console.log(this.props);
     return (
       <Paneset>
         <Pane defaultWidth="fill" fluidContentWidth paneTitle="Report Module">
           <NewAppGreeting />
-          <Main {...this.props}/>
+          <Connect {...this.props}/>
           <br />
           <ul>
             <li>View the <Link to={`${this.props.stripes.path}/examples`}>examples page</Link> to see some useful components.</li>

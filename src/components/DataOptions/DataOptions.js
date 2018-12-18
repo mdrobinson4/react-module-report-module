@@ -46,6 +46,23 @@ export default class DataOptions extends React.Component {
       }
     }
 
+    setGraphObj = () => {
+      let propertyArray = Object.keys(this.props.resources[title].records[0][title]); // array of properties from the first key's value
+      let res = [];
+      // Iterate the properties
+      for (let prop of propertyArray) {
+        let propertyObject = {
+          type: prop,
+          data: []
+        }
+        // Pass through the corresponding array of data and push values into propertyObject
+        for (let val of this.dataArr[title][prop])
+          propertyObject.data.push(val);
+        res.push(propertyObject);
+      }
+      this.updateRecords(update(this.state, {propertyObjectArray: {$set: res}}));
+    }
+
     handleChange(event) {
         var target = event.target;
 

@@ -77,7 +77,7 @@ export default class GraphUI extends React.Component {
           <div className={css.axisControl}>
             <SetDropdown
               label={'Dataset'}
-              values={this.props.sets}
+              values={(Object.keys(this.props.data))}
               changeSet={this.props.changeSet}
             />
             <DataOptions
