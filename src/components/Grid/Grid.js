@@ -49,8 +49,6 @@ export default class Grid extends React.Component {
   }
 
   render() {
-    console.log(this.state.columns);
-    console.log(this.props.title);
     return (
           <ReactTable
             data={this.state.data}

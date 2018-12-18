@@ -21,26 +21,6 @@ export default class Main extends React.Component {
         'type': 'okapi',
         'path': 'inventory/instances?limit=1000&query=%28title%3D%22undefined%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22undefined%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22undefined%2A%5C%22%22%29%20sortby%20title'
       },
-      'instances': {
-        'type': 'okapi',
-        'path': 'statistical-code-types?limit=1000&query=cql.allRecords=1%20sortby%20name'
-      },
-      'issuanceModes': {
-        'type': 'okapi',
-        'path': 'modes-of-issuance?limit=1000&query=cql.allRecords=1%20sortby%20name'
-      },
-      'catalogingLevels': {
-        'type': 'okapi',
-        'path': 'cataloging-levels?limit=1000&query=cql.allRecords=1%20sortby%20name'
-      },
-      'instanceStatuses': {
-        'type': 'okapi',
-        'path': 'instance-statuses?limit=1000&query=cql.allRecords=1%20sortby%20name'
-      },
-      'instanceRelationshipTypes': {
-        'type': 'okapi',
-        'path': 'instance-relationship-types?limit=1000&query=cql.allRecords=1%20sortby%20name'
-      },
       'locations': {
         'type': 'okapi',
         'path': 'locations?limit=1000&query=cql.allRecords=1%20sortby%20name'
@@ -108,6 +88,7 @@ export default class Main extends React.Component {
             records: [],
             propertyObjectArray: [],
             isLoaded: Boolean,
+            checkboxData: []
         }
         this.dataArr = [];
         this.longRecords = [];
@@ -115,9 +96,8 @@ export default class Main extends React.Component {
         this.onAxisChange = this.onAxisChange.bind(this);
         this.swapAxes = this.swapAxes.bind(this);
         this.updateOpacity = this.updateOpacity.bind(this);
-        this.setGraphObjData = this.setGraphObjData.bind(this); this.getCount = this.getCount.bind(this); this.changeGraphType = this.changeGraphType.bind(this);
         this.updateSize = this.updateSize.bind(this);
-
+        this.checkboxDataMem;
         this.flatRecords = {};
     }
 
@@ -128,6 +108,12 @@ export default class Main extends React.Component {
 
     componentWillUnmount() {
       window.removeEventListener('resize', this.handleResize);
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+      let keys = Object.keys(this.props.resources);
+      if (this.checkboxDataMem === undefined && this.props.resources[keys[0]].hasLoaded === true)
+        this.setGraphObj('users');
     }
 
     /*  Updates the height and width of graph  */
@@ -237,34 +223,6 @@ export default class Main extends React.Component {
         this.setState({ data: temp })
     }
 
-    // arr is an array of objects with data with identical properties
-    setGraphObjData(arr) { var propertyArray = Object.getOwnPropertyNames(arr[0]); // array of properties from the first set of data in arr
-        // iterate through each property from arr
-        propertyArray.forEach(element => {
-            var propertyObject = {
-                type: element,
-                data: [ ]
-            };
-            // Iterate each dataset, storing each object of data in element
-            arr.forEach(element => {
-                var temp = Object.getOwnPropertyDescriptor(element, propertyObject.type)
-                propertyObject.data.push(temp.value)
-            });
-            this.state.propertyObjectArray.push(propertyObject);
-        });
-    }
-
-    /* Returns an object which contains the data from the first set */
-    selectFirstSet = () => {
-      let e = this.state.propertyObjectArray[0].data;
-      let type = this.state.propertyObjectArray[0].type;
-      let defaultSet = {
-        x: {values: e, type: type},
-        y: {values: this.getCount(e), type: type}, // Set the y axis as the count of the x value
-      }
-      return defaultSet;
-    }
-
     updateAxesLabels(axes) {
       let newLayout = {
         title: this.state.title.toUpperCase(),
@@ -293,31 +251,35 @@ export default class Main extends React.Component {
 
     /*  Store the records in state as an array of objects and store the name of the data and the actual data in the each object */
     setGraphObj = (title) => {
-      this.setState({title: title});
-      let propertyArray = Object.keys(this.dataArr[title]); // array of properties from the first key's value
+    //  console.log(title);
+      let data = this.props.resources;
+      let propertyArray = Object.keys(data[title].records[0][title][0]); // array of properties from the first key's value
       let res = [];
       // Iterate the properties
-      for (let prop of propertyArray) {
+      for (let prop in data[title].records[0][title][0]) {
         let propertyObject = {
           type: prop,
           data: []
         }
         // Pass through the corresponding array of data and push values into propertyObject
-        for (let val of this.dataArr[title][prop])
-          propertyObject.data.push(val);
+        for (let obj of data[title].records[0][title]) {
+          propertyObject.data.push(obj[prop]);
+          //console.log(obj);
+        }
         res.push(propertyObject);
       }
-      this.updateRecords(update(this.state, {propertyObjectArray: {$set: res}}));
+      this.checkboxDataMem[title] = res;
+      this.setState({checkboxData: res});;
     }
 
     changeSet = (e) => {
-      this.setGraphObj(e.target.value);
-      console.log(this.state.propertyObjectArray);
-    }
-
-    /* Update state */
-    updateRecords = (newRecords) => {
-      this.setState(newRecords, () => {this.onAxisChange(this.selectFirstSet())});
+      let title = e.target.value;
+      if (title in this.checkboxDataMem)
+        this.setState({checkboxData: this.checkboxDataMem[title]});
+      else if (!(title in this.checkboxDataMem)) {
+        this.setGraphObj(title);
+        //this.setState({checkboxData: this.checkboxDataMem[title]});
+      }
     }
 
     // Pass through each object which has several sub-objects with data and store data with dup names together
@@ -365,7 +327,6 @@ export default class Main extends React.Component {
   };
 
     render() {
-      console.log(this.props);
       this.promoteValues();
         return (
           <Paneset>
@@ -374,7 +335,7 @@ export default class Main extends React.Component {
                   name={this.title}
                   changeAxis={this.onAxisChange}
                   data={this.props.resources}
-                  axisData={this.state.propertyObjectArray}
+                  checkboxData={this.state.checkboxData}
                   swapAxes={this.swapAxes}
                   updateOpac={this.updateOpacity}
                   updateSize={this.updateSize}

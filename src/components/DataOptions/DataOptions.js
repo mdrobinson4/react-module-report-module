@@ -27,6 +27,7 @@ export default class DataOptions extends React.Component {
             xDefaultValues: [],
             checked: true
         }
+        this.checkboxData = [];
 
         this.handleChange = this.handleChange.bind(this);
         this.updateAxis = this.updateAxis.bind(this);
@@ -35,7 +36,7 @@ export default class DataOptions extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-      if (prevProps.name != this.props.name) {
+      if (prevProps.checkboxData != this.props.checkboxData) {
         this.setState(update(this.state, {
           currentAxes: {
             x: {active: {$set: false}, type: {$set: null}, values: {$set: null}},   // Set Both X and Y Axis To Null
@@ -44,23 +45,6 @@ export default class DataOptions extends React.Component {
           xDefaultValues: {$set: null}
         }), this.updateAxis);
       }
-    }
-
-    setGraphObj = () => {
-      let propertyArray = Object.keys(this.props.resources[title].records[0][title]); // array of properties from the first key's value
-      let res = [];
-      // Iterate the properties
-      for (let prop of propertyArray) {
-        let propertyObject = {
-          type: prop,
-          data: []
-        }
-        // Pass through the corresponding array of data and push values into propertyObject
-        for (let val of this.dataArr[title][prop])
-          propertyObject.data.push(val);
-        res.push(propertyObject);
-      }
-      this.updateRecords(update(this.state, {propertyObjectArray: {$set: res}}));
     }
 
     handleChange(event) {
@@ -178,6 +162,8 @@ export default class DataOptions extends React.Component {
     }
 
     render() {
+      console.log(this.props);
+    {  /*
       let x = this.props.axisData;
         const checkboxList = this.props.axisData.map((field) =>
         <div key={field.type}>
@@ -195,12 +181,13 @@ export default class DataOptions extends React.Component {
             {this.state.currentAxes.y.type === field.type ? <label id={field.type} className={css.label}><b>(Y Axis)</b></label> : <label id={field.type}></label>}
         </div>
         );
+        */}
 
         return (
             <div>
                 <div className={css.data_options_wrapper}>
                     <div className={css.checkbox_list}>
-                        {checkboxList}
+
                     </div>
                 </div>
                 <Button

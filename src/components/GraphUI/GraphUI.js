@@ -70,7 +70,6 @@ export default class GraphUI extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     return (
       <div>
         <div>
@@ -81,7 +80,7 @@ export default class GraphUI extends React.Component {
               changeSet={this.props.changeSet}
             />
             <DataOptions
-              axisData={this.props.axisData}
+              checkboxData={this.props.checkboxData}
               changeAxis={this.props.changeAxis}
               getCount={this.getCount}
               getFreq={this.getFrequency}
