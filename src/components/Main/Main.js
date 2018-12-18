@@ -1,19 +1,18 @@
 import React from 'react';
 import './fonts.css';
-import GraphUI from './GraphUI';
-import styles from './App.css';
+import GraphUI from '../GraphUI';
+import styles from './Main.css';
 import Plot from 'react-plotly.js';
 import update from 'immutability-helper';
-import Grid from './Grid.js'
+import Grid from '../Grid'
 import { Pane, Paneset } from '@folio/stripes-components';
 import { stripesShape } from '@folio/stripes-core/src/Stripes';
 import PropTypes from 'prop-types';
 
 
-export default class App extends React.Component {
+export default class Main extends React.Component {
     static propTypes = {
       stripes: PropTypes.object.isRequired,
-      type: PropTypes.string.isRequired
     };
 
     static manifest = {
@@ -84,7 +83,6 @@ export default class App extends React.Component {
     }
 
     componentDidMount() {
-      console.log(this.props.resources.formData);
       window.addEventListener('resize', this.handleResize);
       fetch('http://localhost:9130/authn/login', {
         method: 'POST',
@@ -355,6 +353,7 @@ export default class App extends React.Component {
   };
 
     render() {
+      console.log(this.props);
       this.promoteValues();
         return (
           <Paneset>
