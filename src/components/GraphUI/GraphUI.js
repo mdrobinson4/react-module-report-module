@@ -81,7 +81,7 @@ export default class GraphUI extends React.Component {
             />
             <DataOptions
               checkboxData={this.props.checkboxData}
-              changeAxis={this.props.changeAxis}
+              updateGraph={this.props.updateGraph}
               getCount={this.getCount}
               getFreq={this.getFrequency}
               name={this.props.name}

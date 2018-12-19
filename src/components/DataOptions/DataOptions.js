@@ -1,7 +1,7 @@
 import React from "react";
-import Button from '../Button';
 import css from './DataOptions.css';
 import update from 'immutability-helper';
+import { Button } from '@folio/stripes-components';
 
 
 export default class DataOptions extends React.Component {
@@ -36,7 +36,7 @@ export default class DataOptions extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-      if (prevProps.checkboxData != this.props.checkboxData) {
+      if ((this.props.checkboxData === undefined) || this.props.checkboxData != prevProps.checkboxData) {
         this.setState(update(this.state, {
           currentAxes: {
             x: {active: {$set: false}, type: {$set: null}, values: {$set: null}},   // Set Both X and Y Axis To Null
@@ -119,26 +119,20 @@ export default class DataOptions extends React.Component {
 
     updateAxis() {
       if (this.state.currentAxes.x.active === false && this.state.currentAxes.y.active === false) {
-        var axesData = this.state.currentAxes;
-        this.props.changeAxis(axesData);
+        this.props.updateGraph(this.state.currentAxes);
         return;
       }
-        var axesData = this.state.currentAxes;
-
-        this.state.freqActive ? axesData.x.values = this.state.xDefaultValues.toString().split(",") : //none
-
-        axesData.x.values = axesData.x.values.toString().split(",")
-
-        if (!axesData.y.active) {
-            this.state.currentLabel === 'Count' ? axesData.y.values = this.props.getCount(axesData.x.values) : axesData.y.values = this.props.getFreq(axesData.x.values);
-            axesData.x.values = this.removeDuplicates(axesData.x.values)
+        let data = this.state.currentAxes;
+        this.state.freqActive ? data.x.values = this.state.xDefaultValues.toString().split(",") : //none
+        data.x.values = data.x.values.toString().split(",")
+        if (!data.y.active) {
+            this.state.currentLabel === 'Count' ? data.y.values = this.props.getCount(data.x.values) : data.y.values = this.props.getFreq(data.x.values);
+            data.x.values = this.removeDuplicates(data.x.values)
         }
         else {
-            axesData.y.values = axesData.y.values.toString().split(",");
+            data.y.values = data.y.values.toString().split(",");
         }
-
-
-        this.props.changeAxis(axesData)
+        this.props.updateGraph(data);
     }
 
     switchFreq() {
@@ -160,15 +154,36 @@ export default class DataOptions extends React.Component {
         }
         return noDupes;
     }
+    cleanCheckboxLabel = (text) => {
+      let newStr = '';
+      let index = 0;
+      for (let char of text) {
+        index = text.indexOf(char);
+        if (index > 0 && char === char.toUpperCase()) {
+          return newStr = text.substring(0, 1).toUpperCase() + text.substring(1, index) + ' ' + text.substring(index);
+        }
+      }
+      return text.substring(0, 1).toUpperCase() + text.substring(1);
+    }
+
+    switchAxis = () => {
+      this.setState({
+        currentAxes: {
+          y: this.state.currentAxes.x,
+          x: this.state.currentAxes.y,
+        },
+        xDefaultValues: this.state.currentAxes.y.values
+      }, this.updateAxis);
+      //this.setState(update(this.state, {currentAxes: {x: {$set: this.state.currentAxes.y}, y: {$set: this.state.currentAxes.x}}, xDefaultValues: {$set: this.state.currentAxes.y}}), this.props.updateGraph(this.state.currentAxes));
+      //this.props.updateGraph(this.state.currentAxes);
+    }
 
     render() {
-      console.log(this.props);
-    {  /*
-      let x = this.props.axisData;
-        const checkboxList = this.props.axisData.map((field) =>
+      let x = this.props.checkboxData;
+        const checkboxList = this.props.checkboxData.map((field) =>
         <div key={field.type}>
             <label>
-                {field.type.toUpperCase() + ":  "}
+                {this.cleanCheckboxLabel(field.type) + ":  "}
             </label>
             <input
                 name={field.type}
@@ -181,19 +196,19 @@ export default class DataOptions extends React.Component {
             {this.state.currentAxes.y.type === field.type ? <label id={field.type} className={css.label}><b>(Y Axis)</b></label> : <label id={field.type}></label>}
         </div>
         );
-        */}
-
         return (
             <div>
                 <div className={css.data_options_wrapper}>
                     <div className={css.checkbox_list}>
-
+                      {checkboxList}
                     </div>
                 </div>
-                <Button
-                    label={this.state.currentLabel}
-                    onClick={this.switchFreq}
-                />
+                <Button onClick={this.switchFreq}>
+                  {this.state.currentLabel}
+                </Button>
+                <Button onClick={this.switchAxis}>
+                  Switch Axis
+                </Button>
             </div>
         );
     }

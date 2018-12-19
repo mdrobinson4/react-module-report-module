@@ -42,7 +42,6 @@ export default class PlotData extends React.Component {
     }
   }
   render() {
-    console.log(this.props);
     return (
       <Plot
         data={this.props.graph.data}

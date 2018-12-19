@@ -93,11 +93,9 @@ export default class Main extends React.Component {
         this.dataArr = [];
         this.longRecords = [];
         this.componentDidMount = this.componentDidMount.bind(this);
-        this.onAxisChange = this.onAxisChange.bind(this);
-        this.swapAxes = this.swapAxes.bind(this);
         this.updateOpacity = this.updateOpacity.bind(this);
         this.updateSize = this.updateSize.bind(this);
-        this.checkboxDataMem;
+        this.checkboxDataMem = [];
         this.flatRecords = {};
     }
 
@@ -197,17 +195,6 @@ export default class Main extends React.Component {
         return noDupes;
     }
 
-    swapAxes() {
-        var swap = [{
-            x: this.state.data[0].y,
-            y: this.state.data[0].x,
-            type: this.state.data[0].type,
-            opacity: this.state.data[0].opacity
-        }]
-
-        this.setState({ data: swap })
-    }
-
     updateOpacity(e) {
         var newOpacity = e.target.value;
 
@@ -237,21 +224,28 @@ export default class Main extends React.Component {
     }
 
     /* Updates the x and y values and the axis labels */
-    onAxisChange(e) {
-      var axes = e;
-      var temp = [{
-        x: axes.x.values,
-        y: axes.y.values,
-          type: this.state.data[0].type,
+    updateGraph = (data) => {
+      let temp = [{
+        x: data.x.values,
+        y: data.y.values,
+        type: this.state.data[0].type,
         opacity: this.state.data[0].opacity
       }]
-      this.updateAxesLabels(axes)
       this.setState({ data: temp })
+      let newLayout = {
+        title: this.state.title.toUpperCase(),
+        xaxis: {
+          title: data.x.type
+        },
+        yaxis: {
+          title: data.y.type
+        }
+      }
+      this.setState({layout: newLayout});
     }
 
     /*  Store the records in state as an array of objects and store the name of the data and the actual data in the each object */
     setGraphObj = (title) => {
-    //  console.log(title);
       let data = this.props.resources;
       let propertyArray = Object.keys(data[title].records[0][title][0]); // array of properties from the first key's value
       let res = [];
@@ -264,7 +258,6 @@ export default class Main extends React.Component {
         // Pass through the corresponding array of data and push values into propertyObject
         for (let obj of data[title].records[0][title]) {
           propertyObject.data.push(obj[prop]);
-          //console.log(obj);
         }
         res.push(propertyObject);
       }
@@ -277,6 +270,7 @@ export default class Main extends React.Component {
       if (title in this.checkboxDataMem)
         this.setState({checkboxData: this.checkboxDataMem[title]});
       else if (!(title in this.checkboxDataMem)) {
+
         this.setGraphObj(title);
         //this.setState({checkboxData: this.checkboxDataMem[title]});
       }
@@ -333,10 +327,9 @@ export default class Main extends React.Component {
             <Pane defaultWidth="20%" paneTitle="Controls">
               <GraphUI
                   name={this.title}
-                  changeAxis={this.onAxisChange}
+                  updateGraph={this.updateGraph}
                   data={this.props.resources}
                   checkboxData={this.state.checkboxData}
-                  swapAxes={this.swapAxes}
                   updateOpac={this.updateOpacity}
                   updateSize={this.updateSize}
                   opacity={this.state.opacity}
@@ -350,7 +343,7 @@ export default class Main extends React.Component {
             </Pane>
             <Pane defaultWidth="fill" paneTitle="Plot">
               <Plot
-                data={this.p}
+                data={this.state.data}
                 layout={this.state.layout}
                 useResizeHandler={this.state.useResizeHandler}
                 style={this.state.style}
