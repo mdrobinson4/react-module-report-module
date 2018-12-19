@@ -56,52 +56,39 @@ export default class Main extends React.Component {
     }
     constructor(props) {
         super(props);
-/*        this.connectedPlot = props.stripes.connect(Plot);
-        this.connectedGraphUI = props.stripes.connect(GraphUI);
-        this.connectedGrid = props.stripes.connect(Grid);       */
         this.state = {
           title: '',
           width: window.innerWidth,
           height: window.innerHeight,
           useResizeHandler: true,
-            style: {
-              width: '100%',
-              height: '100%'
-            },
-            data: [{
-                type: 'bar',
-                opacity: 1
-            }],
-            layout: {
-              height: 1000,
-              title: String,
-              xaxis: {
-                title: 'String'
-              },
-              yaxis: {
-                title: String
-              }
-            },
-            defaultHeight: 500,
-            defaultWidth: 1000,
-            graphTypes: ['Bar', 'Line', 'Pie'],
-            records: [],
-            propertyObjectArray: [],
-            isLoaded: Boolean,
-            checkboxData: []
-        }
+          size: window.innerWidth * 0.8,
+          style: { width: '100%', height: '100%' },
+          data: [{ type: 'bar', opacity: 1 }],
+          layout: {
+            height: 1000,
+            title: '',
+            xaxis: { title: '' },
+            yaxis: {title: String}
+          },
+          defaultHeight: 500,
+          defaultWidth: 1000,
+          graphTypes: ['Bar', 'Line', 'Pie'],
+          records: [],
+          propertyObjectArray: [],
+          isLoaded: Boolean,
+          checkboxData: [],
+        };
+        this.currWidth = window.innerWidth;
+        this.currHeight = window.innerHeight;
         this.dataArr = [];
         this.longRecords = [];
-        this.componentDidMount = this.componentDidMount.bind(this);
-        this.updateOpacity = this.updateOpacity.bind(this);
-        this.updateSize = this.updateSize.bind(this);
         this.checkboxDataMem = [];
         this.flatRecords = {};
     }
 
     componentDidMount() {
       window.addEventListener('resize', this.handleResize);
-      this.handleResize();
+      this.handleWindowResize();
     }
 
     componentWillUnmount() {
@@ -109,13 +96,17 @@ export default class Main extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-      let keys = Object.keys(this.props.resources);
-      if (this.checkboxDataMem === undefined && this.props.resources[keys[0]].hasLoaded === true)
-        this.setGraphObj('users');
+      if (this.currWidth !== window.innerWidth || this.currHeight !== window.innerHeight) {
+        if (!(isNaN(this.props.width)) === true) {
+          this.setState(update(this.state, {size: {$set: Number(this.props.width)}})); // Update the slider with the value from the window changing
+        }
+        this.currWidth = window.innerWidth;
+        this.currHeight = window.innerHeight;
+      }
     }
 
     /*  Updates the height and width of graph  */
-    handleResize = () => {
+    handleWindowResize = () => {
       this.setState(update(this.state, {
         layout: {width: {$set: window.innerWidth * 0.8},
         height: {$set: window.innerWidth * 0.8 * 0.642857143 }
@@ -124,6 +115,7 @@ export default class Main extends React.Component {
 
     updateSize = e => {
       this.setState(update(this.state, {
+        size: {$set: e.target.value},
         layout: {
           width: {$set: e.target.value},
           height: {$set: e.target.value * 0.642857143 }
@@ -195,19 +187,15 @@ export default class Main extends React.Component {
         return noDupes;
     }
 
-    updateOpacity(e) {
-        var newOpacity = e.target.value;
-
-        newOpacity /= 100;
-
-        var temp = [{
-            x: this.state.data[0].x,
-            y: this.state.data[0].y,
-            type: this.state.data[0].type,
-            opacity: newOpacity
-        }]
-
-        this.setState({ data: temp })
+    setOpacity = e => {
+      let opacity = e.target.value / 100;
+      let newData = [{
+          x: this.state.data[0].x,
+          y: this.state.data[0].y,
+          type: this.state.data[0].type,
+          opacity: opacity
+      }];
+      this.setState({ data: newData });
     }
 
     updateAxesLabels(axes) {
@@ -262,7 +250,7 @@ export default class Main extends React.Component {
         res.push(propertyObject);
       }
       this.checkboxDataMem[title] = res;
-      this.setState({checkboxData: res});;
+      this.setState({checkboxData: res, title: title});
     }
 
     changeSet = (e) => {
@@ -324,21 +312,22 @@ export default class Main extends React.Component {
       this.promoteValues();
         return (
           <Paneset>
-            <Pane defaultWidth="20%" paneTitle="Controls">
+            <Pane defaultWidth="fill" paneTitle="Controls">
               <GraphUI
-                  name={this.title}
+                  size={this.state.size}
+                  opacity={this.state.data[0].opacity * 100}
+                  title={this.state.title}
                   updateGraph={this.updateGraph}
                   data={this.props.resources}
                   checkboxData={this.state.checkboxData}
-                  updateOpac={this.updateOpacity}
+                  setOpacity={this.setOpacity}
                   updateSize={this.updateSize}
-                  opacity={this.state.opacity}
                   changeType={this.changeGraphType}
                   values={this.state.graphTypes}
                   changeSet={this.changeSet}
                   width={this.state.layout.width}
                   defaultHeight={this.state.layout.height}
-                  x={this.props.handleResize}
+                  handleWindowResize={this.handleWindowResize}
               />
             </Pane>
             <Pane defaultWidth="fill" paneTitle="Plot">

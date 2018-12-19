@@ -9,30 +9,14 @@ import css from './GraphUI.css';
 export default class GraphUI extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      sliderValues: {
-        opacity: {
-          min: 1,
-          max: 100,
-          defaultValue: 100
-        },
-        graphSize: {
-          min: 50,
-          max: 150,
-          defaultValue: 100
-        }
-      }
-    };
-    this.getCount = this.getCount.bind(this);
+    this.state = {}
   }
 
-  getCount(arr) {
-    var lastElement = arr[0];
-    var count = 1;
-
-    var countArr = [];
-
-    for (var x = 1; x <= arr.length; x++) {
+  getCount = (arr) => {
+    let lastElement = arr[0];
+    let count = 1;
+    let countArr = [];
+    for (let x = 1; x <= arr.length; x++) {
         if (arr[x] === lastElement) {
             count++;
         }
@@ -45,31 +29,27 @@ export default class GraphUI extends React.Component {
     return countArr;
   }
 
-  getFrequency(arr) {
-
-    var lastElement = arr[0];
-    var count = 1;
-    var percentOf;
-
-    var freqArr = [];
-
-    for (var x = 1; x <= arr.length; x++) {
+  getFrequency = (arr) => {
+    let lastElement = arr[0];
+    let count = 1;
+    let percentOf;
+    let freqArr = [];
+    for (let x = 1; x <= arr.length; x++) {
       if (arr[x] === lastElement) {
         count++;
       }
       else {
         percentOf = count / arr.length;
         freqArr.push(percentOf);
-
         count = 1;
         lastElement = arr[x]
       }
     }
-
     return freqArr;
   }
 
   render() {
+    console.log(this.props);
     return (
       <div>
         <div>
@@ -86,22 +66,23 @@ export default class GraphUI extends React.Component {
               getFreq={this.getFrequency}
               name={this.props.name}
             />
-            <Button
-              label={"Switch Axes"}
-              onClick={this.props.swapAxes}
-            />
-            <Slider
-              label={"Opacity"}
-              properties={this.state.sliderValues.opacity}
-              updateValue={this.props.updateOpac}
-            />
-            <Slider
-              label={"Graph Size"}
-              properties={this.state.sliderValues.graphSize}
-              width={this.props.width}
-              updateSize={this.props.updateSize}
-              x={this.props.x}
-            />
+              <Slider
+                label={"Opacity"}
+                onChange={this.props.setOpacity}
+                default={100}
+                max={100}
+                min={1}
+                value={this.props.opacity}
+              />
+              <Slider
+                label={"Graph Size"}
+                onChange={this.props.updateSize}
+                max={2048}
+                min={300}
+                default={1000}
+                value={this.props.size}
+                handleWindowResize={this.props.handleWindowResize}
+              />
             <Dropdown
               label={"Graph Type"}
               values={this.props.values}

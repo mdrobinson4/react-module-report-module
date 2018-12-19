@@ -5,39 +5,24 @@ import update from 'immutability-helper';
 export default class Slider extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-          value: window.innerWidth * 0.8
-        }
-        this.currWidth = window.innerWidth;
-        this.currHeight = window.innerHeight;
-    }
-
-    // Size changed by window resize
-    componentDidUpdate(prevProps, prevState) {
-      if (this.currWidth !== window.innerWidth || this.currHeight !== window.innerHeight) {
-        if (!(isNaN(this.props.width)) === true) {
-          this.setState(update(this.state, {value: {$set: Number(this.props.width)}})); // Update the slider with the value from the window changing
-        }
-        this.currWidth = window.innerWidth;
-        this.currHeight = window.innerHeight;
-      }
+        this.state = {value: 10}
     }
 
     handleChange = e => {
-      this.setState(update(this.state, {value: {$set: e.target.value}}));
-      this.props.updateSize(e);
+      this.props.onChange(e);
     }
 
     render() {
+      let value = this.props.value || this.props.default;
       return (
         <div className={styles.range_wrapper}>
           <label className={styles.label}>{this.props.label}</label>
             <input
               className={styles.slider}
               type="range"
-              min={1}
-              max={2048}
-              value={this.state.value}
+              min={this.props.min}
+              max={this.props.max}
+              value={value}
               onChange={this.handleChange}
             />
         </div>
