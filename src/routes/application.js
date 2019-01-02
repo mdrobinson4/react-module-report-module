@@ -16,13 +16,7 @@ export default class Application extends React.Component {
     return (
       <Paneset>
         <Pane defaultWidth="fill" fluidContentWidth paneTitle="Report Module">
-          <NewAppGreeting />
           <Connect {...this.props}/>
-          <br />
-          <ul>
-            <li>View the <Link to={`${this.props.stripes.path}/examples`}>examples page</Link> to see some useful components.</li>
-            <li>Please refer to the <a href="https://github.com/folio-org/stripes-core/blob/master/doc/dev-guide.md">Stripes Module Developer's Guide</a> for more information.</li>
-          </ul>
         </Pane>
       </Paneset>
     );

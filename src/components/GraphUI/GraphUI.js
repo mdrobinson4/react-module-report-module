@@ -49,7 +49,6 @@ export default class GraphUI extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     return (
       <div>
         <div>
@@ -79,7 +78,7 @@ export default class GraphUI extends React.Component {
                 onChange={this.props.updateSize}
                 max={2048}
                 min={300}
-                default={1000}
+                default={500}
                 value={this.props.size}
                 handleWindowResize={this.props.handleWindowResize}
               />

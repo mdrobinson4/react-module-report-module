@@ -5,10 +5,11 @@ import styles from './Main.css';
 import Plot from 'react-plotly.js';
 import update from 'immutability-helper';
 import Grid from '../Grid'
-import { Pane, Paneset } from '@folio/stripes-components';
+import Paneset from '@folio/stripes-components/lib/Paneset';
+import Pane from '@folio/stripes-components/lib/Pane';
+import { Row, Col } from '@folio/stripes-components/lib/LayoutGrid';
 import { stripesShape } from '@folio/stripes-core/src/Stripes';
 import PropTypes from 'prop-types';
-
 
 export default class Main extends React.Component {
 
@@ -54,6 +55,7 @@ export default class Main extends React.Component {
         'path': 'notify'
       },
     }
+
     constructor(props) {
         super(props);
         this.state = {
@@ -264,55 +266,10 @@ export default class Main extends React.Component {
       }
     }
 
-    // Pass through each object which has several sub-objects with data and store data with dup names together
-    mergeRecords = (records, title) => {
-      let dataArr = {};
-      for (let obj of records) {
-        for (let prop of Object.keys(obj)) {
-          if (!dataArr.hasOwnProperty(prop))  // Check to see if the key already exists
-            dataArr[prop] = [];
-          dataArr[prop].push(obj[prop]);
-        }
-      }
-      this.dataArr[title] = dataArr;
-      this.longRecords[title] = records;
-    }
-
-  promoteValues = () => {
-    this.flatRecords = {};
-    for (let key in this.longRecords) {
-      if (this.longRecords.hasOwnProperty(key)) {
-        for (let obj of this.longRecords[key]) {
-          if (!this.flatRecords.hasOwnProperty(key))
-            this.flatRecords[key] = [];
-            this.flatRecords[key].push(this.flatten(obj));
-        }
-      }
-    }
-  }
-
-  flatten = (ob) => {
-  	let toReturn = {};
-  	for (let i in ob) {
-  		if (!ob.hasOwnProperty(i)) continue;
-  		if ((typeof ob[i]) === 'object') {
-  			let flatObject = this.flatten(ob[i]);
-  			for (let x in flatObject) {
-  				if (!flatObject.hasOwnProperty(x)) continue;
-  			     toReturn[x] = flatObject[x];
-  			}
-  		}
-      else
-  			toReturn[i] = ob[i];
-  	}
-  	return toReturn;
-  };
-
     render() {
-      this.promoteValues();
         return (
-          <Paneset>
-            <Pane defaultWidth="fill" paneTitle="Controls">
+          <Paneset isRoot>
+            <Pane defaultWidth="20%" paneTitle="Graph User Interface" >
               <GraphUI
                   size={this.state.size}
                   opacity={this.state.data[0].opacity * 100}
@@ -329,17 +286,22 @@ export default class Main extends React.Component {
                   defaultHeight={this.state.layout.height}
                   handleWindowResize={this.handleWindowResize}
               />
-            </Pane>
-            <Pane defaultWidth="fill" paneTitle="Plot">
+              </Pane>
+            <Pane defaultWidth="fill" paneTitle="Graph" >
               <Plot
                 data={this.state.data}
                 layout={this.state.layout}
                 useResizeHandler={this.state.useResizeHandler}
                 style={this.state.style}
               />
-              <Grid title={this.state.title} data={this.flatRecords} />
             </Pane>
-        </Paneset>
+            <Pane defaultWidth="fill" paneTitle="Table" >
+              <Grid
+                title={this.state.title}
+                resources={this.props.resources}
+              />
+            </Pane>
+          </Paneset>
         );
     }
 }
