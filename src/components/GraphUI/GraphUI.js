@@ -85,7 +85,7 @@ export default class GraphUI extends React.Component {
             <Dropdown
               label={"Graph Type"}
               values={this.props.values}
-              changeType={this.props.changeType}
+              changeType={this.props.changeGraphType}
             />
           </div>
         </div>

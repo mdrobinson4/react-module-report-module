@@ -125,37 +125,136 @@ export default class Main extends React.Component {
         }}));
     }
 
-    changeGraphType(newType) {
-        let newGraph = [{}];
+    // called from the Dropdown component when graph type is changed. Might need to be moved into its own component to improve performance if more graph types are incorporated
+    changeGraphType = (newType) => {
 
-        newType = newType.toLowerCase();
+      let newGraph = [{}];
+      newType = newType.toLowerCase();
 
-        if (newType === 'pie') {
-             newGraph = [{
-                labels: this.state.data[0].x,
-                values: this.state.data[0].y,
-                type: newType,
-                opacity: this.state.data[0].opacity
-            }]
-        }
-        else if (this.state.data[0].type === 'pie') {
-             newGraph = [{
-                x: this.state.data[0].labels,
-                y: this.state.data[0].values,
-                type: newType,
-                opacity: this.state.data[0].opacity
-            }]
+      if (newType === 'pie') {
+
+           newGraph = [{
+              labels: this.state.data[0].x,
+              values: this.state.data[0].y,
+              type: newType,
+              opacity: this.state.data[0].opacity
+          }];
+      }
+      else if (newType === 'histogram') {
+        this.setState({yDefaultValues : this.state.data[0].y});
+
+        newGraph = [{
+          x: this.state.data[0].x,
+          type: newType,
+          opacity: this.state.data[0].opacity
+        }];
+      }
+      else if (this.state.data[0].type === 'histogram') {
+
+        newGraph = [{
+          x: this.state.data[0].x,
+          y: this.state.yDefaultValues,
+          type: newType,
+          opacity: this.state.data[0].opacity
+        }];
+      }
+      else if (this.state.data[0].type === 'pie') {
+
+        newGraph = [{
+            x: this.state.data[0].labels,
+            y: this.state.data[0].values,
+            type: newType,
+            opacity: this.state.data[0].opacity
+        }];
+      }
+      else {
+
+          newGraph = [{
+              x: this.state.data[0].x,
+              y: this.state.data[0].y,
+              type: newType,
+              opacity: this.state.data[0].opacity
+          }];
+      }
+      this.setState({data: newGraph});
+    }
+
+    getDefault = (e) => {
+      let defaultSet = {
+        x: {values: e},
+        y: {values: this.getCount(e)} // Set the y axis as the count of the x value
+      };
+      return defaultSet;
+    }
+
+  getCount = (arr) => {
+    let uniqueValues = new Map();
+    let count = 0;
+    let countArr = [];
+    for (var x = 0; x <= arr.length; x++) {
+        if (uniqueValues.has(arr[x])) { //check first to see if the map contains a given value, if not add it and initialize to count of 1
+          count = uniqueValues.get(arr[x]);
+          count++;
+          uniqueValues.set(arr[x], count);
         }
         else {
-            newGraph = [{
-                x: this.state.data[0].x,
-                y: this.state.data[0].y,
-                type: newType,
-                opacity: this.state.data[0].opacity
-            }]
+          if (arr[x] !== undefined) uniqueValues.set(arr[x], 1)
         }
-        this.setState({data: newGraph})
     }
+    uniqueValues.forEach(function (value) { //iterate over map and push values to new array
+      countArr.push(value);
+    })
+    let initialMode = { //create a base pair from the map and initial array
+      key: arr[0],
+      value: countArr[0]
+    }
+    this.findMode(uniqueValues, initialMode);
+    return countArr;
+  }
+
+  findMode = (map, initialMode) => {
+    let max = initialMode.value;
+    let mode = initialMode;
+
+    map.forEach(function (value, key) { //iterate over the map and find the max value
+      if (value > max) {
+        mode.key = key;
+        mode.value = value;
+        max = value;
+      }
+    });
+
+    this.setState({xAxisMode : mode});
+  }
+
+  getFreq = (arr) => {
+    let uniqueValues = new Map();
+    let count = 0;
+    let freqArr = [];
+
+    for (var x = 0; x <= arr.length; x++) {
+        if (uniqueValues.has(arr[x])) { //check first to see if the map contains a given value, if not add it and initialize to count of 1
+          count = uniqueValues.get(arr[x]);
+          count++;
+          uniqueValues.set(arr[x], count);
+        }
+        else {
+          uniqueValues.set(arr[x], 1);
+        }
+    }
+
+    uniqueValues.forEach(function (value) { //iterate over map and push values to new array
+      let freq = value / arr.length;
+
+      freq *=  100;
+      freq = freq.toFixed(2);
+
+      freqArr.push(freq);
+    });
+
+    return freqArr;
+  }
+
 
     getCount(arr) {
         var lastElement = arr[0];
@@ -280,7 +379,7 @@ export default class Main extends React.Component {
                   checkboxData={this.state.checkboxData}
                   setOpacity={this.setOpacity}
                   updateSize={this.updateSize}
-                  changeType={this.changeGraphType}
+                  changeGraphType={this.changeGraphType}
                   values={this.state.graphTypes}
                   changeSet={this.changeSet}
                   width={this.state.layout.width}
