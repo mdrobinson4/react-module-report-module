@@ -60,8 +60,6 @@ export default class Main extends React.Component {
         super(props);
         this.state = {
           title: '',
-          width: window.innerWidth,
-          height: window.innerHeight,
           useResizeHandler: true,
           size: window.innerWidth * 0.8,
           style: { width: '100%', height: '100%' },
@@ -90,7 +88,7 @@ export default class Main extends React.Component {
 
     componentDidMount() {
       window.addEventListener('resize', this.handleResize);
-      this.handleWindowResize();
+      //this.handleWindowResize();
     }
 
     componentWillUnmount() {
@@ -108,22 +106,42 @@ export default class Main extends React.Component {
     }
 
     /*  Size is updated by window resizing  */
-    handleWindowResize = () => {
+    /*handleWindowResize = () => {
       this.setState(update(this.state, {
         layout: {width: {$set: window.innerWidth * 0.8},
         height: {$set: window.innerWidth * 0.8 * 0.642857143 }
       }}));
-    }
+    }*/
 
     /*  Size is updated by the slider  */
-    updateSize = e => {
+    /*updateSize = e => {
       this.setState(update(this.state, {
         size: {$set: e.target.value},
         layout: {
           width: {$set: e.target.value},
           height: {$set: e.target.value * 0.642857143 }
         }}));
-    }
+    }*/
+
+    updateSize = (e) => {
+    let sizeMultiplier = e.target.value;
+    console.log(sizeMultiplier);
+    let newHeight = this.state.defaultHeight;
+    let newWidth = this.state.defaultWidth;
+
+    newHeight *= (sizeMultiplier / 100);
+    newWidth *= (sizeMultiplier / 100);
+
+    var newLayout = {
+        height: newHeight,
+        width: newWidth,
+        title: this.state.layout.title,
+        xaxis: this.state.layout.xaxis,
+        yaxis: this.state.layout.yaxis
+    };
+
+    this.setState({layout: newLayout});
+}
 
     // called from the Dropdown component when graph type is changed. Might need to be moved into its own component to improve performance if more graph types are incorporated
     changeGraphType = (newType) => {

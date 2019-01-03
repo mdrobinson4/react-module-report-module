@@ -9,7 +9,20 @@ import css from './GraphUI.css';
 export default class GraphUI extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {}
+    this.state = {
+      sliderValues: {
+        opacity: {
+          min: 1,
+          max: 100,
+          defaultValue: 100
+        },
+        graphSize: {
+          min: 50,
+          max: 150,
+          defaultValue: 100
+        }
+      }
+    };
   }
 
   getCount = (arr) => {
@@ -65,23 +78,16 @@ export default class GraphUI extends React.Component {
               getFreq={this.getFrequency}
               name={this.props.name}
             />
-              <Slider
-                label={"Opacity"}
-                onChange={this.props.setOpacity}
-                default={100}
-                max={100}
-                min={1}
-                value={this.props.opacity}
-              />
-              <Slider
-                label={"Graph Size"}
-                onChange={this.props.updateSize}
-                max={1300}
-                min={300}
-                default={500}
-                value={this.props.size}
-                handleWindowResize={this.props.handleWindowResize}
-              />
+            <Slider
+              label={"Opacity"}
+              properties={this.state.sliderValues.opacity}
+              updateValue={this.props.setOpacity}
+            />
+            <Slider
+              label={"Graph Size"}
+              properties={this.state.sliderValues.graphSize}
+              updateValue={this.props.updateSize}
+            />
             <Dropdown
               label={"Graph Type"}
               values={this.props.values}
