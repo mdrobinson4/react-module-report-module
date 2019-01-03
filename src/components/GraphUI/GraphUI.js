@@ -6,6 +6,9 @@ import Dropdown from '../Dropdown';
 import SetDropdown from '../SetDropdown';
 import css from './GraphUI.css';
 
+/*
+  GraphUI works as a wrapping component for all components that change the size, opacity, data, etc. of the graph
+*/
 export default class GraphUI extends React.Component {
   constructor(props) {
     super(props);
@@ -25,42 +28,6 @@ export default class GraphUI extends React.Component {
     };
   }
 
-  getCount = (arr) => {
-    let lastElement = arr[0];
-    let count = 1;
-    let countArr = [];
-    for (let x = 1; x <= arr.length; x++) {
-        if (arr[x] === lastElement) {
-            count++;
-        }
-        else {
-            countArr.push(count);
-            count = 1;
-            lastElement = arr[x];
-        }
-    }
-    return countArr;
-  }
-
-  getFrequency = (arr) => {
-    let lastElement = arr[0];
-    let count = 1;
-    let percentOf;
-    let freqArr = [];
-    for (let x = 1; x <= arr.length; x++) {
-      if (arr[x] === lastElement) {
-        count++;
-      }
-      else {
-        percentOf = count / arr.length;
-        freqArr.push(percentOf);
-        count = 1;
-        lastElement = arr[x]
-      }
-    }
-    return freqArr;
-  }
-
   render() {
     return (
       <div>
@@ -74,8 +41,8 @@ export default class GraphUI extends React.Component {
             <DataOptions
               checkboxData={this.props.checkboxData}
               updateGraph={this.props.updateGraph}
-              getCount={this.getCount}
-              getFreq={this.getFrequency}
+              getCount={this.props.getCount}
+              getFreq={this.props.getFreq}
               name={this.props.name}
             />
             <Slider

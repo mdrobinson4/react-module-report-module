@@ -2,13 +2,21 @@
 
 .componentFlexRow {
   font-family: 'Source Sans Pro', sans-serif;
-  margin-top: 20px;
+  margin-top: .2em;
   display: flex;
   flex-direction: row;
 }
 
 .componentFlexColumn {
-  margin-top: 20px;
+  margin: .2em 0em 0em 1em;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+}
+
+.modeText {
+  font-weight: 600;
+}
+
+.valueText {
+  font-weight: 400;
 }
