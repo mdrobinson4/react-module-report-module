@@ -75,15 +75,12 @@ export default class Main extends React.Component {
           graphTypes: ['Bar', 'Line', 'Pie'],
           records: [],
           propertyObjectArray: [],
-          isLoaded: Boolean,
+          hasLoaded: false,
           checkboxData: [],
         };
         this.currWidth = window.innerWidth;
         this.currHeight = window.innerHeight;
-        this.dataArr = [];
-        this.longRecords = [];
         this.checkboxDataMem = [];
-        this.flatRecords = {};
     }
 
     componentDidMount() {
@@ -102,6 +99,13 @@ export default class Main extends React.Component {
         }
         this.currWidth = window.innerWidth;
         this.currHeight = window.innerHeight;
+      }
+
+      let keys = Object.keys(this.props.resources);
+      let initialSet = {target: {value: 'users'}};   // Set users as the default set
+      if (this.state.hasLoaded === false && this.props.resources[keys[0]].hasLoaded === true) {
+        this.changeSet(initialSet);
+        this.setState({hasLoaded: true});
       }
     }
 
@@ -125,7 +129,6 @@ export default class Main extends React.Component {
 
     updateSize = (e) => {
     let sizeMultiplier = e.target.value;
-    console.log(sizeMultiplier);
     let newHeight = this.state.defaultHeight;
     let newWidth = this.state.defaultWidth;
 
@@ -318,28 +321,15 @@ export default class Main extends React.Component {
       this.setState({ data: newData });
     }
 
-    updateAxesLabels(axes) {
-      let newLayout = {
-        title: this.state.title.toUpperCase(),
-        xaxis: {
-          title: axes.x.type
-        },
-        yaxis: {
-          title: axes.y.type
-        }
-      }
-      this.setState({layout: newLayout})
-    }
-
     /* Updates the x and y values and the axis labels */
     updateGraph = (data) => {
-      let temp = [{
+      let newData = [{
         x: data.x.values,
         y: data.y.values,
         type: this.state.data[0].type,
         opacity: this.state.data[0].opacity
-      }]
-      this.setState({ data: temp })
+      }];
+
       let newLayout = {
         title: this.state.title.toUpperCase(),
         xaxis: {
@@ -349,7 +339,7 @@ export default class Main extends React.Component {
           title: data.y.type
         }
       }
-      this.setState({layout: newLayout});
+      this.setState({layout: newLayout, data: newData});
     }
 
     /*  Store the records in state as an array of objects and store the name of the data and the actual data in the each object */
@@ -389,6 +379,8 @@ export default class Main extends React.Component {
           <Paneset isRoot>
             <Pane defaultWidth="20%" paneTitle="Graph Controls" >
               <GraphUI
+                  getCount={this.getCount}
+                  getFreq={this.getFreq}
                   size={this.state.size}
                   opacity={this.state.data[0].opacity * 100}
                   title={this.state.title}

@@ -25,13 +25,13 @@ export default class DataOptions extends React.Component {
             lastLabel: 'Frequency',
             freqActive: false,
             xDefaultValues: [],
-            checked: true
+            checked: true,
+            hasLoaded: false
         }
         this.checkboxData = [];
 
         this.handleChange = this.handleChange.bind(this);
         this.updateAxis = this.updateAxis.bind(this);
-        this.switchFreq = this.switchFreq.bind(this);
         this.removeDuplicates = this.removeDuplicates.bind(this);
     }
 
@@ -44,17 +44,35 @@ export default class DataOptions extends React.Component {
           },
           xDefaultValues: {$set: null}
         }), this.updateAxis);
+
       }
+
+
+/*
+      if (this.props.checkboxData.length > 0 && this.props.checkboxData !== prevProps.checkboxData) {
+        let defaultSet = {
+          target: {
+            name: this.props.checkboxData[0].type,
+            value: this.props.checkboxData[0].data,
+            checked: true
+          }
+        };
+        // Manually checks first checkbox
+        document.querySelector('input[name=' + defaultSet.target.name + ']').checked = true;
+        this.handleChange(defaultSet);
+      }
+      */
+
     }
 
     handleChange(event) {
         var target = event.target;
-
         var axis = {
             type: target.name,
             values: target.value,
             active: target.checked
         }
+        console.log(axis);
         let stateHolder = this.state.currentAxes;
         if (axis.active === true) {
           // Attempting to check third checkbox
@@ -124,21 +142,31 @@ export default class DataOptions extends React.Component {
       }
         let data = this.state.currentAxes;
         this.state.freqActive ? data.x.values = this.state.xDefaultValues.toString().split(",") : //none
-        data.x.values = data.x.values.toString().split(",")
+        data.x.values = data.x.values.toString().split(",");
+        // Only one checkbox is selected so the yaxis is either count or frequency
         if (!data.y.active) {
-            this.state.currentLabel === 'Count' ? data.y.values = this.props.getCount(data.x.values) : data.y.values = this.props.getFreq(data.x.values);
-            data.x.values = this.removeDuplicates(data.x.values)
+          if (this.state.currentLabel === 'Count') {  // Count is selected
+            data.y.values = this.props.getCount(data.x.values);
+          }
+          else {  // Frequency was selected
+            data.y.values = this.props.getFreq(data.x.values);
+          }
+          // Set type to Count or Frequency
+          data.y.type = this.state.currentLabel;
+          data.x.values = this.removeDuplicates(data.x.values)
         }
         else {
-            data.y.values = data.y.values.toString().split(",");
+          data.y.values = data.y.values.toString().split(",");
         }
-        this.props.updateGraph(data);
+      this.props.updateGraph(data);
     }
 
-    switchFreq() {
-        var temp = this.state.lastLabel;
-        this.setState({ lastLabel : this.state.currentLabel })
-        this.setState({ currentLabel : temp })
+    toggleDataType = () => {
+      let temp = this.state.lastLabel;
+      this.setState({
+        lastLabel: this.state.currentLabel,
+        currentLabel: temp
+      }, this.updateAxis);
     }
 
     removeDuplicates(arr) {
@@ -196,6 +224,7 @@ export default class DataOptions extends React.Component {
             {this.state.currentAxes.y.type === field.type ? <label id={field.type} className={css.label}><b>(Y Axis)</b></label> : <label id={field.type}></label>}
         </div>
         );
+        console.log(checkboxList);
         return (
             <div>
                 <div className={css.data_options_wrapper}>
@@ -203,7 +232,7 @@ export default class DataOptions extends React.Component {
                       {checkboxList}
                     </div>
                 </div>
-                <Button onClick={this.switchFreq}>
+                <Button onClick={this.toggleDataType}>
                   {this.state.currentLabel}
                 </Button>
                 <Button onClick={this.switchAxis}>

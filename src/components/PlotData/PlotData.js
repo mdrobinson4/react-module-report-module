@@ -7,9 +7,12 @@ export default class PlotData extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-    }
+    this.state = { };
+  }
 
+  componentDidUpdate(prevProps, prevState) {
+    console.log(this.props.data);
+  }
     // Pass through each object which has several sub-objects with data and store data with dup names together
     mergeRecords = (records, title) => {
       let dataArr = {};
@@ -40,7 +43,7 @@ export default class PlotData extends React.Component {
       }
       this.updateRecords(update(this.state, {propertyObjectArray: {$set: res}}));
     }
-  }
+
   render() {
     return (
       <Plot

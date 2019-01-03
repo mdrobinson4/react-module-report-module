@@ -39,6 +39,7 @@ export default class GraphUI extends React.Component {
               changeSet={this.props.changeSet}
             />
             <DataOptions
+              updateLabel={this.props.updateLabel}
               checkboxData={this.props.checkboxData}
               updateGraph={this.props.updateGraph}
               getCount={this.props.getCount}
