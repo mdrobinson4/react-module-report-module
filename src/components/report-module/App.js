@@ -150,10 +150,10 @@ export default class App extends React.Component {
   changeSet = (e) => {
     this.createGraph(e.target.value);
     let set = this.state.propertyObjectArray[0].data;
-    
+
     this.onAxisChange(this.getDefault(set));
   }
-  
+
   getCount = (arr) => {
     let uniqueValues = new Map();
     let count = 0;
@@ -161,7 +161,7 @@ export default class App extends React.Component {
 
     for (var x = 0; x <= arr.length; x++) {
         if (uniqueValues.has(arr[x])) { //check first to see if the map contains a given value, if not add it and initialize to count of 1
-          count = uniqueValues.get(arr[x]); 
+          count = uniqueValues.get(arr[x]);
           count++;
           uniqueValues.set(arr[x], count);
         }
@@ -173,7 +173,7 @@ export default class App extends React.Component {
     uniqueValues.forEach(function (value) { //iterate over map and push values to new array
       countArr.push(value);
     })
-    
+
     let initialMode = { //create a base pair from the map and initial array
       key: arr[0],
       value: countArr[0]
@@ -206,7 +206,7 @@ export default class App extends React.Component {
 
     for (var x = 0; x <= arr.length; x++) {
         if (uniqueValues.has(arr[x])) { //check first to see if the map contains a given value, if not add it and initialize to count of 1
-          count = uniqueValues.get(arr[x]); 
+          count = uniqueValues.get(arr[x]);
           count++;
           uniqueValues.set(arr[x], count);
         }
@@ -223,7 +223,7 @@ export default class App extends React.Component {
 
       freqArr.push(freq);
     });
-    
+
     return freqArr;
   }
 
@@ -322,7 +322,7 @@ export default class App extends React.Component {
   updateRecords = (newRecords) => {
     this.setState(newRecords);
   }
-  
+
   /*  Make an API request to the backend to get the records   */
   getRecords = async (okapiToken, i) => {
     // Base case -> graph the first key in the first datatset

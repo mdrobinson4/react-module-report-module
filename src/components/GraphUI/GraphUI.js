@@ -1,9 +1,9 @@
 import React from 'react';
-import Button from './Button';
-import DataOptions from './DataOptions'
-import Slider from './Slider'
-import Dropdown from './Dropdown';
-import SetDropdown from './SetDropdown';
+import Button from '../Button';
+import DataOptions from '../DataOptions'
+import Slider from '../Slider'
+import Dropdown from '../Dropdown';
+import SetDropdown from '../SetDropdown';
 import css from './GraphUI.css';
 
 /*
@@ -35,23 +35,20 @@ export default class GraphUI extends React.Component {
           <div className={css.axisControl}>
             <SetDropdown
               label={'Dataset'}
-              values={this.props.sets}
+              values={(Object.keys(this.props.data))}
               changeSet={this.props.changeSet}
             />
             <DataOptions
-              axisData={this.props.axisData}
-              changeAxis={this.props.changeAxis}
+              checkboxData={this.props.checkboxData}
+              updateGraph={this.props.updateGraph}
               getCount={this.props.getCount}
               getFreq={this.props.getFreq}
-            />
-            <Button
-              label={"Switch Axes"}
-              onClick={this.props.swapAxes}
+              name={this.props.name}
             />
             <Slider
               label={"Opacity"}
               properties={this.state.sliderValues.opacity}
-              updateValue={this.props.updateOpac}
+              updateValue={this.props.setOpacity}
             />
             <Slider
               label={"Graph Size"}
@@ -60,7 +57,8 @@ export default class GraphUI extends React.Component {
             />
             <Dropdown
               label={"Graph Type"}
-              changeType={this.props.changeType}
+              values={this.props.values}
+              changeType={this.props.changeGraphType}
             />
           </div>
         </div>

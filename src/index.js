@@ -5,7 +5,6 @@ import Route from 'react-router-dom/Route';
 import Application from './routes/application';
 import ExamplePage from './routes/example-page';
 import Settings from './settings';
-import App from './components/report-module/App';
 
 /*
   STRIPES-NEW-APP
@@ -24,8 +23,7 @@ class ReportModule extends React.Component {
     }
     return (
       <Switch>
-        <App />
-        <Route path={`${this.props.match.path}`} exact component={Application} />
+        <Route path={`${this.props.match.path}`} exact render={() => <Application {...this.props} />} />
         <Route path={`${this.props.match.path}/examples`} exact component={ExamplePage} />
       </Switch>
     );
