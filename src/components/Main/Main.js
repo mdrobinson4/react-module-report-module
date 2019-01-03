@@ -107,7 +107,7 @@ export default class Main extends React.Component {
       }
     }
 
-    /*  Updates the height and width of graph  */
+    /*  Size is updated by window resizing  */
     handleWindowResize = () => {
       this.setState(update(this.state, {
         layout: {width: {$set: window.innerWidth * 0.8},
@@ -115,6 +115,7 @@ export default class Main extends React.Component {
       }}));
     }
 
+    /*  Size is updated by the slider  */
     updateSize = e => {
       this.setState(update(this.state, {
         size: {$set: e.target.value},
@@ -269,7 +270,7 @@ export default class Main extends React.Component {
     render() {
         return (
           <Paneset isRoot>
-            <Pane defaultWidth="20%" paneTitle="Graph User Interface" >
+            <Pane defaultWidth="20%" paneTitle="Graph Controls" >
               <GraphUI
                   size={this.state.size}
                   opacity={this.state.data[0].opacity * 100}
@@ -287,15 +288,15 @@ export default class Main extends React.Component {
                   handleWindowResize={this.handleWindowResize}
               />
               </Pane>
-            <Pane defaultWidth="fill" paneTitle="Graph" >
+            <Pane defaultWidth="fill" paneTitle="Graph And Table" >
               <Plot
                 data={this.state.data}
                 layout={this.state.layout}
                 useResizeHandler={this.state.useResizeHandler}
                 style={this.state.style}
               />
-            </Pane>
-            <Pane defaultWidth="fill" paneTitle="Table" >
+
+
               <Grid
                 title={this.state.title}
                 resources={this.props.resources}

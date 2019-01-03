@@ -76,7 +76,7 @@ export default class GraphUI extends React.Component {
               <Slider
                 label={"Graph Size"}
                 onChange={this.props.updateSize}
-                max={2048}
+                max={1300}
                 min={300}
                 default={500}
                 value={this.props.size}

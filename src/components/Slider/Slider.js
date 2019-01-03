@@ -14,6 +14,13 @@ export default class Slider extends React.Component {
 
     render() {
       let value = this.props.value || this.props.default;
+
+      /* Limit the value when it is changed by something other than the slider  */
+      /*if (value > this.props.max)
+        value = this.props.max;
+      else if (value < this.props.min)
+        value = this.props.min;*/
+
       return (
         <div className={styles.range_wrapper}>
           <label className={styles.label}>{this.props.label}</label>

@@ -22,7 +22,8 @@ export default class Grid extends React.Component {
     this.visibleColumns = {
       inventory: ['title', 'createdByUserId', 'createdDate', 'id', 'source'],
       users: ['active', 'city', 'countryId', 'region', 'postalCode', 'primaryAddress', 'preferredContactTypeId']
-      /*locations: [],
+      /*
+      locations: [],
       statisticalCodeTypes: [],
       classificationTypes: [],
       instanceTypes: [],
@@ -30,7 +31,8 @@ export default class Grid extends React.Component {
       contributorNameTypes: [],
       contributorTypes: [],
       identifierTypes: [],
-      notifications: []*/
+      notifications: []
+      */
     };
     this.flatRecords = {};
   }
@@ -91,6 +93,7 @@ export default class Grid extends React.Component {
     }
     this.setState({columns: columns, title: title});
   }
+
   handleTableClick = () => {
     console.log('EVENT HERE');
   }
