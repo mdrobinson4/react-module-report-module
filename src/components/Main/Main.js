@@ -18,10 +18,6 @@ export default class Main extends React.Component {
         'type': 'okapi',
         'path': 'users?limit=1000&query=%28cql.allRecords%3D1%29%20sortby%20personal.lastName%20personal.firstName'
       },
-      'statisticalCodeTypes': {
-        'type': 'okapi',
-        'path': 'inventory/instances?limit=1000&query=%28title%3D%22undefined%2A%22%20or%20contributors%20adj%20%22%5C%22name%5C%22%3A%20%5C%22undefined%2A%5C%22%22%20or%20identifiers%20adj%20%22%5C%22value%5C%22%3A%20%5C%22undefined%2A%5C%22%22%29%20sortby%20title'
-      },
       'locations': {
         'type': 'okapi',
         'path': 'locations?limit=1000&query=cql.allRecords=1%20sortby%20name'
@@ -49,11 +45,7 @@ export default class Main extends React.Component {
       'identifierTypes': {
         'type': 'okapi',
         'path': 'identifier-types?limit=1000&query=cql.allRecords=1%20sortby%20name'
-      },
-      'notifications': {
-        'type': 'okapi',
-        'path': 'notify'
-      },
+      }
     }
 
     constructor(props) {
@@ -209,6 +201,7 @@ export default class Main extends React.Component {
     }
 
   getCount = (arr) => {
+    console.log('COUNT');
     let uniqueValues = new Map();
     let count = 0;
     let countArr = [];
@@ -249,6 +242,7 @@ export default class Main extends React.Component {
   }
 
   getFreq = (arr) => {
+    console.log('FREQUENCY');
     let uniqueValues = new Map();
     let count = 0;
     let freqArr = [];
@@ -360,15 +354,14 @@ export default class Main extends React.Component {
         res.push(propertyObject);
       }
       this.checkboxDataMem[title] = res;
-      this.setState({checkboxData: res, title: title});
+      this.setState({title: title, checkboxData: res, title: title});
     }
 
     changeSet = (e) => {
       let title = e.target.value;
       if (title in this.checkboxDataMem)
-        this.setState({checkboxData: this.checkboxDataMem[title]});
+        this.setState({title: title, checkboxData: this.checkboxDataMem[title]});
       else if (!(title in this.checkboxDataMem)) {
-
         this.setGraphObj(title);
         //this.setState({checkboxData: this.checkboxDataMem[title]});
       }

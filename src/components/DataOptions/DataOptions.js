@@ -36,33 +36,18 @@ export default class DataOptions extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-      if ((this.props.checkboxData === undefined) || this.props.checkboxData != prevProps.checkboxData) {
+      if ((this.props.checkboxData !== undefined) && this.props.checkboxData != prevProps.checkboxData) {
+        let data = {values: this.props.checkboxData[0].data};
+        document.querySelector('input[name=' + this.props.checkboxData[0].type + ']').checked = true;
         this.setState(update(this.state, {
           currentAxes: {
-            x: {active: {$set: false}, type: {$set: null}, values: {$set: null}},   // Set Both X and Y Axis To Null
+            x: {active: {$set: true}, type: {$set: this.props.checkboxData[0].type}, values: {$set: {values: this.props.checkboxData[0].data}}},   // Set Both X and Y Axis To Null
             y: {active: {$set: false}, type: {$set: null}, values: {$set: null}}
           },
-          xDefaultValues: {$set: null}
+          xDefaultValues: {$set: this.props.checkboxData[0].data},
+          freqActive: {$set: true}
         }), this.updateAxis);
-
       }
-
-
-/*
-      if (this.props.checkboxData.length > 0 && this.props.checkboxData !== prevProps.checkboxData) {
-        let defaultSet = {
-          target: {
-            name: this.props.checkboxData[0].type,
-            value: this.props.checkboxData[0].data,
-            checked: true
-          }
-        };
-        // Manually checks first checkbox
-        document.querySelector('input[name=' + defaultSet.target.name + ']').checked = true;
-        this.handleChange(defaultSet);
-      }
-      */
-
     }
 
     handleChange(event) {
@@ -72,7 +57,6 @@ export default class DataOptions extends React.Component {
             values: target.value,
             active: target.checked
         }
-        console.log(axis);
         let stateHolder = this.state.currentAxes;
         if (axis.active === true) {
           // Attempting to check third checkbox
@@ -101,7 +85,6 @@ export default class DataOptions extends React.Component {
           // Both X and Y Axis Are Set
           if (this.state.currentAxes.x.active === true && this.state.currentAxes.y.active === true) {
             let newXaxis = [];
-            // Deselected X Axis
             if (axis.type === this.state.currentAxes.x.type) {
               this.setState(update(this.state, {
                 xDefaultValues: {$set: this.state.currentAxes.y.values},
@@ -124,6 +107,7 @@ export default class DataOptions extends React.Component {
           }
           // Deselecting only checkbox
           else if (this.state.currentAxes.x.active === false || this.state.currentAxes.y.active === false) {
+            console.log('DESELECTING XAXIS');
             this.setState(update(this.state, {
               currentAxes: {
                 x: {active: {$set: false}, type: {$set: null}, values: {$set: null}},   // Set Both X and Y Axis To Null
@@ -136,13 +120,19 @@ export default class DataOptions extends React.Component {
     }
 
     updateAxis() {
-      if (this.state.currentAxes.x.active === false && this.state.currentAxes.y.active === false) {
-        this.props.updateGraph(this.state.currentAxes);
-        return;
+      let data = this.state.currentAxes;
+      // Create an empty dataset to graph
+      if (data.x.active === false && data.y.active === false) {
+        data = {
+          x: {values: [], type: []},
+          y: {values: [], type: []}
+        };
       }
-        let data = this.state.currentAxes;
-        this.state.freqActive ? data.x.values = this.state.xDefaultValues.toString().split(",") : //none
+      else if (this.state.freqActive)
+        data.x.values = this.state.xDefaultValues.toString().split(",");
+      else
         data.x.values = data.x.values.toString().split(",");
+
         // Only one checkbox is selected so the yaxis is either count or frequency
         if (!data.y.active) {
           if (this.state.currentLabel === 'Count') {  // Count is selected
@@ -224,7 +214,6 @@ export default class DataOptions extends React.Component {
             {this.state.currentAxes.y.type === field.type ? <label id={field.type} className={css.label}><b>(Y Axis)</b></label> : <label id={field.type}></label>}
         </div>
         );
-        console.log(checkboxList);
         return (
             <div>
                 <div className={css.data_options_wrapper}>

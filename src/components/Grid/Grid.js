@@ -38,9 +38,10 @@ export default class Grid extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
+    console.log(this.props.resources);
     let keys = Object.keys(this.props.resources); // Get the titles of each resource
     if (this.props.resources && this.props.resources[keys[0]] !== undefined) {  // Wait till the resources are loaded
-      if (this.props.resources[this.props.title] !== undefined && this.props.title != this.state.title) { // Check to see if a different set was selected
+      if (this.props.resources[this.props.title] !== undefined && this.props.title != prevProps.title) { // Check to see if a different set was selected
         this.setTable(this.props.title, this.props.resources);  // Update the table
       }
     }
@@ -58,7 +59,7 @@ export default class Grid extends React.Component {
           }
         }
         this.setState({data: this.flatRecords[this.props.title]});
-        this.updateColumns(title, this.flatRecords[this.props.title]);
+        this.updateColumns(this.props.title, this.flatRecords[this.props.title]);
     }
   }
 
