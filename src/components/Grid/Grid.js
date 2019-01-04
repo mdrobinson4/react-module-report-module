@@ -6,7 +6,7 @@ import { Pane, Paneset } from '@folio/stripes-components'
 
 // Import React Table
 import ReactTable from "react-table"
-import 'react-table/react-table.css'
+import './react-table.css'
 
 
 
@@ -38,7 +38,6 @@ export default class Grid extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    console.log(this.props.resources);
     let keys = Object.keys(this.props.resources); // Get the titles of each resource
     if (this.props.resources && this.props.resources[keys[0]] !== undefined) {  // Wait till the resources are loaded
       if (this.props.resources[this.props.title] !== undefined && this.props.title != prevProps.title) { // Check to see if a different set was selected

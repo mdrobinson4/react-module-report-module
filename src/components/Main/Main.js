@@ -52,15 +52,13 @@ export default class Main extends React.Component {
         super(props);
         this.state = {
           title: '',
-          useResizeHandler: true,
           size: window.innerWidth * 0.8,
-          style: { width: '100%', height: '100%' },
           data: [{ type: 'bar', opacity: 1 }],
           layout: {
-            height: 1000,
+            autosize: true,
             title: '',
             xaxis: { title: '' },
-            yaxis: {title: String}
+            yaxis: {title: ''}
           },
           defaultHeight: 500,
           defaultWidth: 1000,
@@ -69,9 +67,10 @@ export default class Main extends React.Component {
           propertyObjectArray: [],
           hasLoaded: false,
           checkboxData: [],
+          xValues: [],
+          x: [],
+          y: []
         };
-        this.currWidth = window.innerWidth;
-        this.currHeight = window.innerHeight;
         this.checkboxDataMem = [];
     }
 
@@ -85,14 +84,6 @@ export default class Main extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-      if (this.currWidth !== window.innerWidth || this.currHeight !== window.innerHeight) {
-        if (!(isNaN(this.props.width)) === true) {
-          this.setState(update(this.state, {size: {$set: Number(this.props.width)}})); // Update the slider with the value from the window changing
-        }
-        this.currWidth = window.innerWidth;
-        this.currHeight = window.innerHeight;
-      }
-
       let keys = Object.keys(this.props.resources);
       let initialSet = {target: {value: 'users'}};   // Set users as the default set
       if (this.state.hasLoaded === false && this.props.resources[keys[0]].hasLoaded === true) {
@@ -100,24 +91,6 @@ export default class Main extends React.Component {
         this.setState({hasLoaded: true});
       }
     }
-
-    /*  Size is updated by window resizing  */
-    /*handleWindowResize = () => {
-      this.setState(update(this.state, {
-        layout: {width: {$set: window.innerWidth * 0.8},
-        height: {$set: window.innerWidth * 0.8 * 0.642857143 }
-      }}));
-    }*/
-
-    /*  Size is updated by the slider  */
-    /*updateSize = e => {
-      this.setState(update(this.state, {
-        size: {$set: e.target.value},
-        layout: {
-          width: {$set: e.target.value},
-          height: {$set: e.target.value * 0.642857143 }
-        }}));
-    }*/
 
     updateSize = (e) => {
     let sizeMultiplier = e.target.value;
@@ -128,8 +101,8 @@ export default class Main extends React.Component {
     newWidth *= (sizeMultiplier / 100);
 
     var newLayout = {
-        height: newHeight,
-        width: newWidth,
+        //height: newHeight,
+        //width: newWidth,
         title: this.state.layout.title,
         xaxis: this.state.layout.xaxis,
         yaxis: this.state.layout.yaxis
@@ -137,60 +110,6 @@ export default class Main extends React.Component {
 
     this.setState({layout: newLayout});
 }
-
-    // called from the Dropdown component when graph type is changed. Might need to be moved into its own component to improve performance if more graph types are incorporated
-    changeGraphType = (newType) => {
-
-      let newGraph = [{}];
-      newType = newType.toLowerCase();
-
-      if (newType === 'pie') {
-
-           newGraph = [{
-              labels: this.state.data[0].x,
-              values: this.state.data[0].y,
-              type: newType,
-              opacity: this.state.data[0].opacity
-          }];
-      }
-      else if (newType === 'histogram') {
-        this.setState({yDefaultValues : this.state.data[0].y});
-
-        newGraph = [{
-          x: this.state.data[0].x,
-          type: newType,
-          opacity: this.state.data[0].opacity
-        }];
-      }
-      else if (this.state.data[0].type === 'histogram') {
-
-        newGraph = [{
-          x: this.state.data[0].x,
-          y: this.state.yDefaultValues,
-          type: newType,
-          opacity: this.state.data[0].opacity
-        }];
-      }
-      else if (this.state.data[0].type === 'pie') {
-
-        newGraph = [{
-            x: this.state.data[0].labels,
-            y: this.state.data[0].values,
-            type: newType,
-            opacity: this.state.data[0].opacity
-        }];
-      }
-      else {
-
-          newGraph = [{
-              x: this.state.data[0].x,
-              y: this.state.data[0].y,
-              type: newType,
-              opacity: this.state.data[0].opacity
-          }];
-      }
-      this.setState({data: newGraph});
-    }
 
     getDefault = (e) => {
       let defaultSet = {
@@ -201,7 +120,6 @@ export default class Main extends React.Component {
     }
 
   getCount = (arr) => {
-    console.log('COUNT');
     let uniqueValues = new Map();
     let count = 0;
     let countArr = [];
@@ -242,7 +160,6 @@ export default class Main extends React.Component {
   }
 
   getFreq = (arr) => {
-    console.log('FREQUENCY');
     let uniqueValues = new Map();
     let count = 0;
     let freqArr = [];
@@ -316,24 +233,77 @@ export default class Main extends React.Component {
     }
 
     /* Updates the x and y values and the axis labels */
-    updateGraph = (data) => {
-      let newData = [{
-        x: data.x.values,
-        y: data.y.values,
-        type: this.state.data[0].type,
-        opacity: this.state.data[0].opacity
-      }];
-
-      let newLayout = {
-        title: this.state.title.toUpperCase(),
-        xaxis: {
-          title: data.x.type
-        },
-        yaxis: {
-          title: data.y.type
+    updateGraph = (data, xValues) => {
+      this.setState(update(this.state, {
+        x: {values: {$set: data.x.values}, active: {$set: data.x.active}},
+        y: {values: {$set: data.y.values}, active: {$set: data.y.active}},
+        xValues: {$set: data.x.values},
+        layout: {
+          title: {$set: this.state.title.toUpperCase()},
+          xaxis: {title: {$set: data.x.type}},
+          yaxis: {title: {$set: data.y.type}}
         }
+      }), () => {this.changeGraphType(this.state.data[0].type)});
+    }
+
+    // called from the Dropdown component when graph type is changed. Might need to be moved into its own component to improve performance if more graph types are incorporated
+    changeGraphType = (gType) => {
+      let type = gType.toLowerCase();
+      if (type === 'pie')
+        this.pie(type);
+      else if (type === 'histogram')
+        this.histogram(type);
+      else
+        this.barLine(type);
+    }
+
+    barLine = (type) => {
+      this.setState(update(this.state, {
+        data: {
+          $set: [{
+            x: this.state.x.values,
+            y: this.state.y.values,
+            type: type,
+            opacity: this.state.data[0].opacity
+          }]
+        }
+      }));
+    }
+
+    // Creates histogram graph
+    histogram = () => {
+      let data = [];
+      data.push({
+        x: this.state.xValues,
+        type: "histogram",
+        opacity: this.state.data[0].opacity
+      });
+
+      if (this.state.y.active === true) {
+        data.push({
+          y: this.state.y.values,
+          type: "histogram",
+          opacity: 0.5
+        })
       }
-      this.setState({layout: newLayout, data: newData});
+      this.setState(update(this.state, {
+        data: {$set: data},
+        layout: {barmode: {$set: "stacked"}}
+      }));
+    }
+
+    // Creates  pie chart
+    pie = () => {
+      this.setState(update(this.state, {
+        data: {
+          $set: [{
+            labels: this.state.x.values,
+            values: this.state.y.values,
+            type: 'pie',
+            opacity: this.state.data[0].opacity
+          }]
+        }
+      }));
     }
 
     /*  Store the records in state as an array of objects and store the name of the data and the actual data in the each object */
@@ -368,6 +338,7 @@ export default class Main extends React.Component {
     }
 
     render() {
+      console.log(this.state.data[0]);
         return (
           <Paneset isRoot>
             <Pane defaultWidth="20%" paneTitle="Graph Controls" >
@@ -388,17 +359,16 @@ export default class Main extends React.Component {
                   width={this.state.layout.width}
                   defaultHeight={this.state.layout.height}
                   handleWindowResize={this.handleWindowResize}
+                  graphType={this.state.data[0].type}
               />
               </Pane>
             <Pane defaultWidth="fill" paneTitle="Graph And Table" >
               <Plot
                 data={this.state.data}
                 layout={this.state.layout}
-                useResizeHandler={this.state.useResizeHandler}
-                style={this.state.style}
+                useResizeHandler={true}
+                style={{ width: '100%', height: '100%' }}
               />
-
-
               <Grid
                 title={this.state.title}
                 resources={this.props.resources}

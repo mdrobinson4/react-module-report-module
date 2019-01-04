@@ -45,17 +45,20 @@ export default class GraphUI extends React.Component {
               getCount={this.props.getCount}
               getFreq={this.props.getFreq}
               name={this.props.name}
+              graphType={this.props.graphType}
             />
             <Slider
               label={"Opacity"}
               properties={this.state.sliderValues.opacity}
               updateValue={this.props.setOpacity}
             />
-            <Slider
+            {/*
+              <Slider
               label={"Graph Size"}
               properties={this.state.sliderValues.graphSize}
               updateValue={this.props.updateSize}
             />
+          */}
             <Dropdown
               label={"Graph Type"}
               values={this.props.values}

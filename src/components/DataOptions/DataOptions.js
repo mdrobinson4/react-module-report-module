@@ -29,10 +29,6 @@ export default class DataOptions extends React.Component {
             hasLoaded: false
         }
         this.checkboxData = [];
-
-        this.handleChange = this.handleChange.bind(this);
-        this.updateAxis = this.updateAxis.bind(this);
-        this.removeDuplicates = this.removeDuplicates.bind(this);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -41,18 +37,19 @@ export default class DataOptions extends React.Component {
         document.querySelector('input[name=' + this.props.checkboxData[0].type + ']').checked = true;
         this.setState(update(this.state, {
           currentAxes: {
-            x: {active: {$set: true}, type: {$set: this.props.checkboxData[0].type}, values: {$set: {values: this.props.checkboxData[0].data}}},   // Set Both X and Y Axis To Null
+            x: {active: {$set: true}, type: {$set: this.props.checkboxData[0].type}, values: {$set: this.props.checkboxData[0].data}},   // Set Both X and Y Axis To Null
             y: {active: {$set: false}, type: {$set: null}, values: {$set: null}}
           },
           xDefaultValues: {$set: this.props.checkboxData[0].data},
           freqActive: {$set: true}
         }), this.updateAxis);
       }
+
     }
 
-    handleChange(event) {
-        var target = event.target;
-        var axis = {
+    handleChange = (event) => {
+        let target = event.target;
+        let axis = {
             type: target.name,
             values: target.value,
             active: target.checked
@@ -66,6 +63,10 @@ export default class DataOptions extends React.Component {
           }
           // Setting y axis
           else if (this.state.currentAxes.x.active === true) {
+            if (this.props.graphType === 'pie') {  // Prevent 2nd checkbox from being checked if 2d pie chart
+              event.target.checked = false;
+              return;
+            }
             this.setState(update(this.state, {
               currentAxes: {y: {$set: axis}},
               freqActive: {$set: false}
@@ -107,11 +108,10 @@ export default class DataOptions extends React.Component {
           }
           // Deselecting only checkbox
           else if (this.state.currentAxes.x.active === false || this.state.currentAxes.y.active === false) {
-            console.log('DESELECTING XAXIS');
             this.setState(update(this.state, {
               currentAxes: {
-                x: {active: {$set: false}, type: {$set: null}, values: {$set: null}},   // Set Both X and Y Axis To Null
-                y: {active: {$set: false}, type: {$set: null}, values: {$set: null}}
+                x: {active: {$set: false}, type: {$set: []}, values: {$set: null}},   // Set Both X and Y Axis To Null
+                y: {active: {$set: false}, type: {$set: []}, values: {$set: null}}
               },
               xDefaultValues: {$set: null}
             }), this.updateAxis);
@@ -119,36 +119,34 @@ export default class DataOptions extends React.Component {
         }
     }
 
-    updateAxis() {
-      let data = this.state.currentAxes;
-      // Create an empty dataset to graph
-      if (data.x.active === false && data.y.active === false) {
-        data = {
-          x: {values: [], type: []},
-          y: {values: [], type: []}
-        };
-      }
-      else if (this.state.freqActive)
-        data.x.values = this.state.xDefaultValues.toString().split(",");
-      else
-        data.x.values = data.x.values.toString().split(",");
+    // Gets the values as strings and returns as an array
+    getValues = (data) => {
+      if (data.active === true) // Converts string to array if active
+        return data.values.toString().split(",");
+      else if (data.active === false)  // Returns empty array if not active
+        return [];
+    }
 
-        // Only one checkbox is selected so the yaxis is either count or frequency
-        if (!data.y.active) {
-          if (this.state.currentLabel === 'Count') {  // Count is selected
-            data.y.values = this.props.getCount(data.x.values);
-          }
-          else {  // Frequency was selected
-            data.y.values = this.props.getFreq(data.x.values);
-          }
-          // Set type to Count or Frequency
-          data.y.type = this.state.currentLabel;
-          data.x.values = this.removeDuplicates(data.x.values)
-        }
-        else {
-          data.y.values = data.y.values.toString().split(",");
-        }
-      this.props.updateGraph(data);
+    updateAxis = () => {
+      let data = this.state.currentAxes;
+      let xValues = this.getValues(data.x);
+      let yValues = this.getValues(data.y);
+
+      // Only the XAXIS is selected
+      if (data.x.active === true && data.y.active === false) {
+        if (this.state.currentLabel === 'Count')                  // Count is selected
+          data.y.values = this.props.getCount(xValues);
+        else if (this.state.currentLabel === 'Frequency')         // Frequency was selected
+          data.y.values = this.props.getFreq(xValues);
+        data.y.type = this.state.currentLabel;                    // Set the label [Count / Frequency]
+        data.x.values = this.removeDuplicates(xValues);           // Remove the duplicates from the XVALUES
+      }
+      // Either both or neither of the axis are selected
+      else {
+        data.x.values = xValues;
+        data.y.values = yValues;
+      }
+      this.props.updateGraph(data, xValues);
     }
 
     toggleDataType = () => {
@@ -159,7 +157,7 @@ export default class DataOptions extends React.Component {
       }, this.updateAxis);
     }
 
-    removeDuplicates(arr) {
+    removeDuplicates = (arr) => {
         var noDupes = [];
         noDupes.push(arr[0])
         var lastElement = arr[0];
@@ -185,19 +183,26 @@ export default class DataOptions extends React.Component {
     }
 
     switchAxis = () => {
+      if (this.state.currentAxes.x.active === true && this.state.currentAxes.y.active == false) // Prevents user from only having YAXIS
+        return;
       this.setState({
+        // Swaps X and Y axis
         currentAxes: {
           y: this.state.currentAxes.x,
           x: this.state.currentAxes.y,
         },
         xDefaultValues: this.state.currentAxes.y.values
       }, this.updateAxis);
-      //this.setState(update(this.state, {currentAxes: {x: {$set: this.state.currentAxes.y}, y: {$set: this.state.currentAxes.x}}, xDefaultValues: {$set: this.state.currentAxes.y}}), this.props.updateGraph(this.state.currentAxes));
-      //this.props.updateGraph(this.state.currentAxes);
     }
 
     render() {
       let x = this.props.checkboxData;
+      let checkboxText = [];
+      if (this.props.graphType === 'histogram')
+        checkboxText = ['X1', 'X2'];
+      else
+        checkboxText = ['X Axis', 'Y Axis'];
+
         const checkboxList = this.props.checkboxData.map((field) =>
         <div key={field.type}>
             <label>
@@ -210,8 +215,8 @@ export default class DataOptions extends React.Component {
                 key={field.data}
                 onChange={this.handleChange}
             />
-            {((this.state.currentAxes.x.type === field.type) ) ? <label id={field.type} className={css.label}><b>(X Axis)</b></label> : <label id={field.type}></label>}
-            {this.state.currentAxes.y.type === field.type ? <label id={field.type} className={css.label}><b>(Y Axis)</b></label> : <label id={field.type}></label>}
+            {((this.state.currentAxes.x.type === field.type) ) ? <label id={field.type} className={css.label}><b>{checkboxText[0]}</b></label> : <label id={field.type}></label>}
+            {this.state.currentAxes.y.type === field.type ? <label id={field.type} className={css.label}><b>{checkboxText[1]}</b></label> : <label id={field.type}></label>}
         </div>
         );
         return (
