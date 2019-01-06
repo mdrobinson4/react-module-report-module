@@ -143,8 +143,10 @@ export default class DataOptions extends React.Component {
       }
       // Either both or neither of the axis are selected
       else {
-        data.x.values = xValues;
-        data.y.values = yValues;
+        data.x[0].values = this.removeDuplicates(xValues);
+        data.y[0].values = this.getCount(xValues);
+        data.x[1].values = this.removeDuplicates(yValues);
+        data.y[1].values = this.getCount(yValues);
       }
       this.props.updateGraph(data, xValues);
     }
