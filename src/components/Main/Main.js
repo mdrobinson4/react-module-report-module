@@ -234,9 +234,11 @@ export default class Main extends React.Component {
 
     /* Updates the x and y values and the axis labels */
     updateGraph = (data, xValues) => {
+        let x = data
+            
       this.setState(update(this.state, {
-        x: {values: {$set: data.x.values}, active: {$set: data.x.active}},
-        y: {values: {$set: data.y.values}, active: {$set: data.y.active}},
+        x: {$set: data.x},
+        y: {$set: data.y},
         xValues: {$set: data.x.values},
         layout: {
           title: {$set: this.state.title.toUpperCase()},
@@ -289,7 +291,7 @@ export default class Main extends React.Component {
         opacity: this.state.data[0].opacity
       });
 
-      if (this.state.y.active === true) {
+      if (this.state.x[0].active === true && this.state.x[0].active === true) {
         data.push({
           y: this.state.y.values,
           type: "histogram",
