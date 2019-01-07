@@ -68,8 +68,8 @@ export default class Main extends React.Component {
           hasLoaded: false,
           checkboxData: [],
           xValues: [],
-          x: [],
-          y: []
+          x: [ {values: [], active: false} ],
+          y: [ {values: [], active: false} ]
         };
         this.checkboxDataMem = [];
     }
@@ -120,6 +120,8 @@ export default class Main extends React.Component {
     }
 
   getCount = (arr) => {
+    if (arr.length === 0)
+      return [];
     let uniqueValues = new Map();
     let count = 0;
     let countArr = [];
@@ -160,6 +162,8 @@ export default class Main extends React.Component {
   }
 
   getFreq = (arr) => {
+    if (arr.length === 0)
+      return [];
     let uniqueValues = new Map();
     let count = 0;
     let freqArr = [];
@@ -189,6 +193,8 @@ export default class Main extends React.Component {
 
 
     getCount(arr) {
+      if (arr.length === 0)
+        return [];
         var lastElement = arr[0];
         var count = 1;
 
@@ -234,9 +240,11 @@ export default class Main extends React.Component {
 
     /* Updates the x and y values and the axis labels */
     updateGraph = (data, xValues) => {
+      console.log(data.x[0]);
+      console.log(data.y[0]);
       this.setState(update(this.state, {
-        x: {values: {$set: data.x.values}, active: {$set: data.x.active}},
-        y: {values: {$set: data.y.values}, active: {$set: data.y.active}},
+        x: {$set: data.x},
+        y: {$set: data.y},
         xValues: {$set: data.x.values},
         layout: {
           title: {$set: this.state.title.toUpperCase()},
@@ -258,16 +266,26 @@ export default class Main extends React.Component {
     }
 
     barLine = (type) => {
-      this.setState(update(this.state, {
-        data: {
-          $set: [{
-            x: this.state.x.values,
-            y: this.state.y.values,
+      let data = [];
+        data.push({
+            x: this.state.x[0].values,
+            y: this.state.y[0].values,
             type: type,
             opacity: this.state.data[0].opacity
-          }]
+        });
+        // Second set of data
+        if (this.state.x[0].active === true && this.state.x[1].active === true) {
+            data.push({
+                x: this.state.x[1].values,
+                y: this.state.y[1].values,
+                type: type,
+                opacity: this.state.data[0].opacity
+            });
         }
-      }));
+        this.setState(update(this.state, {
+            data: {$set: data},
+            layout: {barmode: {$set: "stacked"}}
+        }));
     }
 
     // Creates histogram graph
@@ -279,7 +297,7 @@ export default class Main extends React.Component {
         opacity: this.state.data[0].opacity
       });
 
-      if (this.state.y.active === true) {
+      if (this.state.x[0].active === true && this.state.x[1].active === true) {
         data.push({
           y: this.state.y.values,
           type: "histogram",
@@ -338,7 +356,6 @@ export default class Main extends React.Component {
     }
 
     render() {
-      console.log(this.state.data[0]);
         return (
           <Paneset isRoot>
             <Pane defaultWidth="20%" paneTitle="Graph Controls" >
