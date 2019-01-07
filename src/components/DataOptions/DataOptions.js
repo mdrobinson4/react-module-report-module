@@ -9,149 +9,143 @@ export default class DataOptions extends React.Component {
         super(props);
 
         this.state = {
-            currentAxes: {
-                x: {
-                    type: String,
-                    values: [ ],
-                    active: false
-                },
-                y: {
-                    type: String,
-                    values: [ ],
-                    active: false
-                }
-            },
-            currentLabel: 'Count',
-            lastLabel: 'Frequency',
-            freqActive: false,
-            xDefaultValues: [],
-            checked: true,
-            hasLoaded: false
+          x: [
+            {type: '', values: [ ], active: false},
+            {type: '', values: [ ], active: false}
+          ],
+          y: [
+            {values: [ ]},
+            {values: [ ]}
+          ],
+          labels: ['Count', 'Frequency'],
+          currentLabel: 'Count',
+          lastLabel: 'Frequency',
+          freqActive: false,
+          xDefaultValues: [],
+          checked: true,
+          hasLoaded: false,
+          notActive: [
+            {type: '', values: [ ], active: false},
+            {type: '', values: [ ], active: false}
+          ]
         }
         this.checkboxData = [];
     }
 
     componentDidUpdate(prevProps, prevState) {
       if ((this.props.checkboxData !== undefined) && this.props.checkboxData != prevProps.checkboxData) {
-        let data = {values: this.props.checkboxData[0].data};
-        document.querySelector('input[name=' + this.props.checkboxData[0].type + ']').checked = true;
+        let index = 0;
+        let data = {values: this.props.checkboxData[0].data};   // Collect the data from the first checkbox
+        document.querySelector('input[name=' + this.props.checkboxData[0].type + ']').checked = true; // Check the first checkbox
         this.setState(update(this.state, {
-          currentAxes: {
-            x: {active: {$set: true}, type: {$set: this.props.checkboxData[0].type}, values: {$set: this.props.checkboxData[0].data}},   // Set Both X and Y Axis To Null
-            y: {active: {$set: false}, type: {$set: null}, values: {$set: null}}
+          x: {  // Default XAXIS data
+            [index]: {active: {$set: true},
+            type: {$set: this.props.checkboxData[0].type},
+            values: {$set: this.props.checkboxData[0].data}
+            }
           },
-          xDefaultValues: {$set: this.props.checkboxData[0].data},
-          freqActive: {$set: true}
+          y: {$set: this.state.notActive} // set YAXIS data to null
         }), this.updateAxis);
       }
-
     }
 
-    handleChange = (event) => {
-        let target = event.target;
+    handleChange = (e) => {
         let axis = {
-            type: target.name,
-            values: target.value,
-            active: target.checked
+            type: e.target.name,
+            values: this.getValues(e.target),
+            active: e.target.checked
         }
-        let stateHolder = this.state.currentAxes;
+        let index = 0;
+
         if (axis.active === true) {
           // Attempting to check third checkbox
-          if (this.state.currentAxes.x.active === true && this.state.currentAxes.y.active === true) {
+          if (this.state.x[0].active === true && this.state.x[1].active === true) {
             // alert('DESELCT ONE FIRST!!');
-            event.target.checked = false;
+            e.target.checked = false;
           }
-          // Setting y axis
-          else if (this.state.currentAxes.x.active === true) {
+          // Selected second checkbox
+          else if (this.state.x[0].active === true) {
             if (this.props.graphType === 'pie') {  // Prevent 2nd checkbox from being checked if 2d pie chart
               event.target.checked = false;
               return;
             }
             this.setState(update(this.state, {
-              currentAxes: {y: {$set: axis}},
-              freqActive: {$set: false}
+              x: {[index + 1]: {$set: axis}}
             }), this.updateAxis);
           }
-          // Setting x axis
+          // Setting First checkbox
           else {
             this.setState(update(this.state, {
-              xDefaultValues: {$set: axis.values},
-              currentAxes: {x: {$set: axis}},
-              freqActive: {$set: true}
+              x: {[index]: {$set: axis}}
             }), this.updateAxis);
           }
         }
         // Deselected a checkbox
         else if (axis.active === false) {
           // Both X and Y Axis Are Set
-          if (this.state.currentAxes.x.active === true && this.state.currentAxes.y.active === true) {
-            let newXaxis = [];
-            if (axis.type === this.state.currentAxes.x.type) {
+          if (this.state.x[0].active === true && this.state.x[1].active === true) {
+            // Deselecting first checkbox
+            if (axis.type === this.state.x[0].type) {
               this.setState(update(this.state, {
-                xDefaultValues: {$set: this.state.currentAxes.y.values},
-                freqActive: {$set: true},
-                currentAxes: {
-                  x: {type: {$set: this.state.currentAxes.y.type}, values: {$set: this.state.currentAxes.y.values}, active: {$set: this.state.currentAxes.y.active}},  // Set The X Axis as the Y axis
-                  y: {type: {$set: null}, values: {$set: null}, active: {$set: false}}  // Clear The Y Axis
-                }
+                x: {[index]: {$set: this.state.x[1]}, [index + 1] : {$set: this.state.notActive[0]}}
               }), this.updateAxis);
             }
-            // Deselected The Y Axis
+            // Deselecting the second checkbox
             else {
               this.setState(update(this.state, {
-                freqActive: {$set: true},
-                currentAxes: {
-                  y: {type: {$set: null}, values: {$set: null}, active: {$set: false}}
-                }
+                x: {[index + 1]: {$set: this.state.notActive[0]}}
               }), this.updateAxis);
             }
           }
           // Deselecting only checkbox
-          else if (this.state.currentAxes.x.active === false || this.state.currentAxes.y.active === false) {
+          else if (this.state.x[0].active === false || this.state.x[1].active === false) {
             this.setState(update(this.state, {
-              currentAxes: {
-                x: {active: {$set: false}, type: {$set: []}, values: {$set: null}},   // Set Both X and Y Axis To Null
-                y: {active: {$set: false}, type: {$set: []}, values: {$set: null}}
-              },
-              xDefaultValues: {$set: null}
+              x: {$set: this.state.notActive},
+              y: {$set: this.state.notActive},
             }), this.updateAxis);
           }
         }
     }
 
     // Gets the values as strings and returns as an array
-    getValues = (data) => {
-      if (data.active === true) // Converts string to array if active
-        return data.values.toString().split(",");
-      else if (data.active === false)  // Returns empty array if not active
+    getValues = (target) => {
+      if (target.checked === true) // Converts string to array if active
+        return target.value.toString().split(",");
+      else  // Returns empty array if not active
         return [];
     }
 
-    updateAxis = () => {
-      let data = this.state.currentAxes;
-      let xValues = this.getValues(data.x);
-      let yValues = this.getValues(data.y);
+    setYaxis = (indices) => {
+      let data = {x: this.state.x, y: [{values: []}, {values: []}]};
+      for (let index of indices) {
 
-      // Only the XAXIS is selected
-      if (data.x.active === true && data.y.active === false) {
-        if (this.state.currentLabel === 'Count')                  // Count is selected
-          data.y.values = this.props.getCount(xValues);
-        else if (this.state.currentLabel === 'Frequency')         // Frequency was selected
-          data.y.values = this.props.getFreq(xValues);
-        data.y.type = this.state.currentLabel;                    // Set the label [Count / Frequency]
-        data.x.values = this.removeDuplicates(xValues);           // Remove the duplicates from the XVALUES
+        if (this.state.currentLabel === 'Count')
+          data.y[index].values = this.props.getCount(data.x[index].values);
+        else
+          data.y[index].values = this.props.getFreq(data.x[index].values);
+        data.x[index].values = this.removeDuplicates(data.x[index].values);
       }
-      // Either both or neither of the axis are selected
-      else {
-        data.x[0].values = this.removeDuplicates(xValues);
-        data.y[0].values = this.getCount(xValues);
-        data.x[1].values = this.removeDuplicates(yValues);
-        data.y[1].values = this.getCount(yValues);
-      }
-      this.props.updateGraph(data, xValues);
+      let index = 0;
+      this.setState(update(this.state, {
+        y: {
+          [index]: {values: {$set: data.y[0].values}},
+          [index + 1]: {values: {$set: data.y[1].values}}
+        },
+        x: {$set: data.x}
+      }), this.props.updateGraph({x: data.x, y: data.y}));
     }
 
-    toggleDataType = () => {
+    updateAxis = () => {
+      let labels = [];
+      if (this.state.x[0].active === true && this.state.x[1].active === true)
+        labels = [0, 1];
+      else
+        labels = [0];
+
+      let data = this.setYaxis(labels);
+    }
+
+    toggleDataType = (e) => {
       let temp = this.state.lastLabel;
       this.setState({
         lastLabel: this.state.currentLabel,
@@ -160,17 +154,18 @@ export default class DataOptions extends React.Component {
     }
 
     removeDuplicates = (arr) => {
-        var noDupes = [];
-        noDupes.push(arr[0])
-        var lastElement = arr[0];
-
-        for (var x = 1; x < arr.length; x++) {
-            if (arr[x] !== lastElement) {
-                noDupes.push(arr[x]);
-                lastElement = arr[x];
-            }
+      let flag = false;
+      let unique = [];
+      for (let item of arr) {
+        for (let find of unique) {
+          if (find === item)
+            flag = true;
         }
-        return noDupes;
+         if (flag === false)
+           unique.push(item);
+         flag = false;
+      }
+      return unique;
     }
     cleanCheckboxLabel = (text) => {
       let newStr = '';
@@ -185,25 +180,16 @@ export default class DataOptions extends React.Component {
     }
 
     switchAxis = () => {
-      if (this.state.currentAxes.x.active === true && this.state.currentAxes.y.active == false) // Prevents user from only having YAXIS
-        return;
-      this.setState({
-        // Swaps X and Y axis
-        currentAxes: {
-          y: this.state.currentAxes.x,
-          x: this.state.currentAxes.y,
-        },
-        xDefaultValues: this.state.currentAxes.y.values
-      }, this.updateAxis);
+      let index = 0;
+      this.setState(update(this.state, {
+        x: {[index]: {values: {$set: this.state.y[0].values}}, [index + 1]: {values: {$set: this.state.y[1].values}}},
+        y: {[index]: {values: {$set: this.state.x[0].values}}, [index + 1]: {values: {$set: this.state.x[1].values}}},
+      }), () => {this.props.updateGraph({x: this.state.x, y: this.state.y})});
     }
 
     render() {
       let x = this.props.checkboxData;
-      let checkboxText = [];
-      if (this.props.graphType === 'histogram')
-        checkboxText = ['X1', 'X2'];
-      else
-        checkboxText = ['X Axis', 'Y Axis'];
+      let checkboxText = ['X0', 'X1'];
 
         const checkboxList = this.props.checkboxData.map((field) =>
         <div key={field.type}>
@@ -217,8 +203,8 @@ export default class DataOptions extends React.Component {
                 key={field.data}
                 onChange={this.handleChange}
             />
-            {((this.state.currentAxes.x.type === field.type) ) ? <label id={field.type} className={css.label}><b>{checkboxText[0]}</b></label> : <label id={field.type}></label>}
-            {this.state.currentAxes.y.type === field.type ? <label id={field.type} className={css.label}><b>{checkboxText[1]}</b></label> : <label id={field.type}></label>}
+            {((this.state.x[0].type === field.type) ) ? <label id={field.type} className={css.label}><b>{checkboxText[0]}</b></label> : <label id={field.type}></label>}
+            {this.state.x[1].type === field.type ? <label id={field.type} className={css.label}><b>{checkboxText[1]}</b></label> : <label id={field.type}></label>}
         </div>
         );
         return (

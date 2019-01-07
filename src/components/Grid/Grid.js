@@ -14,7 +14,7 @@ export default class Grid extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: undefined,
+      data: [],
       columns: [],
       title: '',
     };
@@ -57,8 +57,8 @@ export default class Grid extends React.Component {
           this.flatRecords[title].push(this.flattenRecords(records[title][i]));    // Create an array of flat records
           }
         }
-        this.setState({data: this.flatRecords[this.props.title]});
-        this.updateColumns(this.props.title, this.flatRecords[this.props.title]);
+        this.setState({data: this.flatRecords[this.props.title]}, () => {this.updateColumns(this.props.title, this.flatRecords[this.props.title])});
+        //this.updateColumns(this.props.title, this.flatRecords[this.props.title]);
     }
   }
 
@@ -86,16 +86,33 @@ export default class Grid extends React.Component {
     for (let key in records[0]) {   // Iterate through the keys
     if (title in this.visibleColumns) {   // Check if we have specified which columns to display
       if (this.visibleColumns[title].includes(key)) // Only display specified columns
-        columns.push({Header: key.toUpperCase(), accessor: key});
+        columns.push({Header: key.toUpperCase(), accessor: key, width: this.getColumnWidth(key, key)});
     }
     else  // Otherwise display all columns
-      columns.push({Header: key.toUpperCase(), accessor: key});
+      columns.push({Header: key.toUpperCase(), accessor: key, width: this.getColumnWidth(key, key)});
     }
     this.setState({columns: columns, title: title});
   }
 
   handleTableClick = () => {
     console.log('EVENT HERE');
+  }
+
+  getColumnWidth = (accessor, headerText) => {
+    let {data} = this.state;
+    let max = 0;
+    const maxWidth = 400;
+    const magicSpacing = 18;
+
+    for (let i = 0; i < data.length; i++) {
+      if (data[i] !== undefined && data[i][accessor] !== null) {
+        if (JSON.stringify(data[i][accessor] || 'null').length > max) {
+          max = JSON.stringify(data[i][accessor] || 'null').length;
+        }
+      }
+    }
+    console.log(Math.min(maxWidth, Math.max(max, headerText.length) * magicSpacing));
+    return Math.min(maxWidth, Math.max(max, headerText.length) * magicSpacing);
   }
 
 
