@@ -240,8 +240,6 @@ export default class Main extends React.Component {
 
     /* Updates the x and y values and the axis labels */
     updateGraph = (data, xValues) => {
-      console.log(data.x[0]);
-      console.log(data.y[0]);
       this.setState(update(this.state, {
         x: {$set: data.x},
         y: {$set: data.y},
@@ -324,22 +322,56 @@ export default class Main extends React.Component {
       }));
     }
 
+    /*  Make the records one-dimensional  */
+    flattenRecords = (ob) => {
+      let toReturn = {};  // final result
+      for (let i in ob) { // Iterate each key / value pair in the set
+        if (!ob.hasOwnProperty(i)) continue;  // Skip if the initial object has key
+        if ((typeof ob[i]) === 'object') {    // Go a level lower if value is an array or object
+          let flatObject = this.flattenRecords(ob[i]);   // Go a level lower
+          for (let x in flatObject) {
+            if (!flatObject.hasOwnProperty(x)) continue;
+               toReturn[x] = flatObject[x];
+          }
+        }
+        else
+          toReturn[i] = ob[i];
+      }
+      return toReturn;
+    };
+
     /*  Store the records in state as an array of objects and store the name of the data and the actual data in the each object */
     setGraphObj = (title) => {
       let data = this.props.resources;
-      let propertyArray = Object.keys(data[title].records[0][title][0]); // array of properties from the first key's value
+      let records = [];
+      let keysSeen = [];
+
+      // Make all of the records at the same level
+      data[title].records[0][title].forEach( (obj) => {
+        records.push(this.flattenRecords(obj));
+      });
+      //console.log(records);
       let res = [];
+      let props = new Set([]);
+
+      records.forEach((obj) => {
+        for (let prop in obj) {
+          props.add(prop);
+        }
+      });
+      console.log([...props]);
       // Iterate the properties
-      for (let prop in data[title].records[0][title][0]) {
+      for (let prop of [...props]) {
         let propertyObject = {
           type: prop,
           data: []
         }
         // Pass through the corresponding array of data and push values into propertyObject
-        for (let obj of data[title].records[0][title]) {
+        records.forEach( (obj) => {
           propertyObject.data.push(obj[prop]);
-        }
+        });
         res.push(propertyObject);
+        console.log(res);
       }
       this.checkboxDataMem[title] = res;
       this.setState({title: title, checkboxData: res, title: title});
@@ -389,6 +421,7 @@ export default class Main extends React.Component {
               <Grid
                 title={this.state.title}
                 resources={this.props.resources}
+                flattenRecords={this.flattenRecords}
               />
             </Pane>
           </Paneset>
