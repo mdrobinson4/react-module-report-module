@@ -344,13 +344,11 @@ export default class Main extends React.Component {
     setGraphObj = (title) => {
       let data = this.props.resources;
       let records = [];
-      let keysSeen = [];
 
       // Make all of the records at the same level
       data[title].records[0][title].forEach( (obj) => {
         records.push(this.flattenRecords(obj));
       });
-      //console.log(records);
       let res = [];
       let props = new Set([]);
 
@@ -359,7 +357,6 @@ export default class Main extends React.Component {
           props.add(prop);
         }
       });
-      console.log([...props]);
       // Iterate the properties
       for (let prop of [...props]) {
         let propertyObject = {
@@ -371,7 +368,6 @@ export default class Main extends React.Component {
           propertyObject.data.push(obj[prop]);
         });
         res.push(propertyObject);
-        console.log(res);
       }
       this.checkboxDataMem[title] = res;
       this.setState({title: title, checkboxData: res, title: title});
