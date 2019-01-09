@@ -34,15 +34,15 @@ export default class DataOptions extends React.Component {
 
     componentDidUpdate(prevProps, prevState) {
       if ((this.props.checkboxData !== undefined) && this.props.checkboxData != prevProps.checkboxData) {
-        let index = 0;
         let data = {values: this.props.checkboxData[0].data};   // Collect the data from the first checkbox
         document.querySelector('input[name=' + this.props.checkboxData[0].type + ']').checked = true; // Check the first checkbox
         this.setState(update(this.state, {
           x: {  // Default XAXIS data
-            [index]: {active: {$set: true},
+            [0]: {active: {$set: true},
             type: {$set: this.props.checkboxData[0].type},
             values: {$set: this.props.checkboxData[0].data}
-            }
+            },
+            [1]: {$set: this.state.notActive[0]}
           },
           y: {$set: this.state.notActive} // set YAXIS data to null
         }), this.updateAxis);

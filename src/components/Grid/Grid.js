@@ -20,8 +20,8 @@ export default class Grid extends React.Component {
     };
     // Includes the columns that we want to display
     this.visibleColumns = {
-      inventory: ['title', 'createdByUserId', 'createdDate', 'id', 'source'],
-      users: ['active', 'city', 'countryId', 'region', 'postalCode', 'primaryAddress', 'preferredContactTypeId']
+      //inventory: ['title', 'createdByUserId', 'createdDate', 'id', 'source'],
+      //users: ['active', 'city', 'countryId', 'region', 'postalCode', 'primaryAddress', 'preferredContactTypeId']
       /*
       locations: [],
       statisticalCodeTypes: [],
@@ -54,31 +54,13 @@ export default class Grid extends React.Component {
         for (let i = 0; i < records[title].length; i++) {   // Iterate each set of data in records
           if (!this.flatRecords.hasOwnProperty(title))
             this.flatRecords[title] = [];
-          this.flatRecords[title].push(this.flattenRecords(records[title][i]));    // Create an array of flat records
+          this.flatRecords[title].push(this.props.flattenRecords(records[title][i]));    // Create an array of flat records
           }
         }
         this.setState({data: this.flatRecords[this.props.title]}, () => {this.updateColumns(this.props.title, this.flatRecords[this.props.title])});
         //this.updateColumns(this.props.title, this.flatRecords[this.props.title]);
     }
   }
-
-  /*  Make the records one-dimensional  */
-  flattenRecords = (ob) => {
-    let toReturn = {};  // final result
-    for (let i in ob) { // Iterate each key / value pair in the set
-      if (!ob.hasOwnProperty(i)) continue;  // Skip if the initial object has key
-      if ((typeof ob[i]) === 'object') {    // Go a level lower if value is an array or object
-        let flatObject = this.flattenRecords(ob[i]);   // Go a level lower
-        for (let x in flatObject) {
-          if (!flatObject.hasOwnProperty(x)) continue;
-             toReturn[x] = flatObject[x];
-        }
-      }
-      else
-        toReturn[i] = ob[i];
-    }
-    return toReturn;
-  };
 
   // Set the columns for table
   updateColumns = (title, records) => {
@@ -111,7 +93,7 @@ export default class Grid extends React.Component {
         }
       }
     }
-    console.log(Math.min(maxWidth, Math.max(max, headerText.length) * magicSpacing));
+    //console.log(Math.min(maxWidth, Math.max(max, headerText.length) * magicSpacing));
     return Math.min(maxWidth, Math.max(max, headerText.length) * magicSpacing);
   }
 
