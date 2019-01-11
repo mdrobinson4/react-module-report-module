@@ -47,6 +47,8 @@ export default class DataOptions extends React.Component {
           y: {$set: this.state.notActive} // set YAXIS data to null
         }), this.updateAxis);
       }
+      else if (this.props.graphType !== prevProps.graphType)
+        this.updateAxis();
     }
 
     handleChange = (e) => {
@@ -65,18 +67,18 @@ export default class DataOptions extends React.Component {
           }
           // Selected second checkbox
           else if (this.state.x[0].active === true) {
-            if (this.props.graphType === 'pie') {  // Prevent 2nd checkbox from being checked if 2d pie chart
+            /*if (this.props.graphType === 'pie') {  // Prevent 2nd checkbox from being checked if 2d pie chart
               event.target.checked = false;
               return;
-            }
+            }*/
             this.setState(update(this.state, {
-              x: {[index + 1]: {$set: axis}}
+              x: {[1]: {$set: axis}}
             }), this.updateAxis);
           }
           // Setting First checkbox
           else {
             this.setState(update(this.state, {
-              x: {[index]: {$set: axis}}
+              x: {[0]: {$set: axis}}
             }), this.updateAxis);
           }
         }
@@ -119,11 +121,20 @@ export default class DataOptions extends React.Component {
       let data = {x: this.state.x, y: [{values: []}, {values: []}]};
       for (let index of indices) {
 
-        if (this.state.currentLabel === 'Count')
-          data.y[index].values = this.props.getCount(data.x[index].values);
+        if (this.state.currentLabel === 'Count') {
+          let count = this.props.getCount(data.x[index].values);
+          if (this.props.graphType === 'Pie')
+            data.y[index].values = count.all;
+          else
+            data.y[index].values = count.unique;
+        }
         else
           data.y[index].values = this.props.getFreq(data.x[index].values);
-        data.x[index].values = this.removeDuplicates(data.x[index].values);
+        if (this.props.graphType !== 'Pie') {
+          data.x[index].values = this.removeDuplicates(data.x[index].values);
+          console.log('REMOVED DUPLICATES');
+        }
+
       }
       let index = 0;
       this.setState(update(this.state, {

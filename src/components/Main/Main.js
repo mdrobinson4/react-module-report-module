@@ -125,25 +125,37 @@ export default class Main extends React.Component {
     let uniqueValues = new Map();
     let count = 0;
     let countArr = [];
-    for (var x = 0; x <= arr.length; x++) {
+    let indices = {};
+    let fullCount = [];
+    for (var x = 0; x < arr.length; x++) {
         if (uniqueValues.has(arr[x])) { //check first to see if the map contains a given value, if not add it and initialize to count of 1
           count = uniqueValues.get(arr[x]);
           count++;
           uniqueValues.set(arr[x], count);
+          indices[arr[x]].push(x);
         }
         else {
-          if (arr[x] !== undefined) uniqueValues.set(arr[x], 1)
+          if (arr[x] !== undefined) {
+            uniqueValues.set(arr[x], 1);
+            indices[arr[x]] = [];
+            indices[arr[x]].push(x);
+          }
         }
     }
-    uniqueValues.forEach(function (value) { //iterate over map and push values to new array
-      countArr.push(value);
-    })
+
+    uniqueValues.forEach((key, value) => { //iterate over map and push values to new array
+      for (let index of indices[value])
+        fullCount[index] = key;
+      countArr.push(key);
+    });
+
     let initialMode = { //create a base pair from the map and initial array
       key: arr[0],
       value: countArr[0]
     }
     this.findMode(uniqueValues, initialMode);
-    return countArr;
+    console.log(indices);
+    return {unique: countArr, all: fullCount, indices: indices};
   }
 
   findMode = (map, initialMode) => {
@@ -178,40 +190,14 @@ export default class Main extends React.Component {
           uniqueValues.set(arr[x], 1);
         }
     }
-
     uniqueValues.forEach(function (value) { //iterate over map and push values to new array
       let freq = value / arr.length;
-
       freq *=  100;
       freq = freq.toFixed(2);
-
       freqArr.push(freq);
     });
-
     return freqArr;
   }
-
-
-    getCount(arr) {
-      if (arr.length === 0)
-        return [];
-        var lastElement = arr[0];
-        var count = 1;
-
-        var countArr = [];
-
-        for (var x = 1; x <= arr.length; x++) {
-            if (arr[x] === lastElement) {
-                count++;
-            }
-            else {
-                countArr.push(count);
-                count = 1;
-                lastElement = arr[x];
-            }
-        }
-        return countArr;
-      }
 
       removeDuplicates = (arr) => {
         var noDupes = [];
@@ -310,16 +296,24 @@ export default class Main extends React.Component {
 
     // Creates  pie chart
     pie = () => {
+      if (this.state.x[0].active === true && this.state.x[1].active === true) {
+        //alert('ALERT');
+        for (let values of this.state.x[0].values) {
+
+        }
+      }
+      console.log('PIE');
       this.setState(update(this.state, {
         data: {
           $set: [{
-            labels: this.state.x.values,
-            values: this.state.y.values,
+            labels: this.state.x[0].values,
+            values: this.state.y[0].values,
             type: 'pie',
             opacity: this.state.data[0].opacity
           }]
         }
       }));
+
     }
 
     /*  Make the records one-dimensional  */
