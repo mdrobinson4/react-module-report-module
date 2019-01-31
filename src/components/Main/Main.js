@@ -13,6 +13,7 @@ import PropTypes from 'prop-types';
 
 export default class Main extends React.Component {
 
+    // List of resources to get from Folio backend
     static manifest = {
       'users': {
         'type': 'okapi',
@@ -92,6 +93,10 @@ export default class Main extends React.Component {
       }
     }
 
+    /*
+      This function is responsible for updating the size of the plotly chart.
+      It directly updates the width and height attributes in the layout object
+    */
     updateSize = (e) => {
     let sizeMultiplier = e.target.value;
     let newHeight = this.state.defaultHeight;
@@ -110,7 +115,7 @@ export default class Main extends React.Component {
 
     this.setState({layout: newLayout});
 }
-
+    // Gets the values in the first checkbox and graphs it
     getDefault = (e) => {
       let defaultSet = {
         x: {values: e},
@@ -119,6 +124,7 @@ export default class Main extends React.Component {
       return defaultSet;
     }
 
+    // Returns an object which has the number of times each value appeared
   getCount = (arr) => {
     if (arr.length === 0)
       return [];
@@ -154,7 +160,6 @@ export default class Main extends React.Component {
       value: countArr[0]
     }
     this.findMode(uniqueValues, initialMode);
-    console.log(indices);
     return {unique: countArr, all: fullCount, indices: indices};
   }
 
@@ -226,6 +231,7 @@ export default class Main extends React.Component {
 
     /* Updates the x and y values and the axis labels */
     updateGraph = (data, xValues) => {
+      console.log(data);
       this.setState(update(this.state, {
         x: {$set: data.x},
         y: {$set: data.y},
@@ -302,7 +308,6 @@ export default class Main extends React.Component {
 
         }
       }
-      console.log('PIE');
       this.setState(update(this.state, {
         data: {
           $set: [{
